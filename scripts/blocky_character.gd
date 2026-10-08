@@ -3,6 +3,8 @@ extends Node3D
 ## Человечек из скошенных блоков: таз, торс, голова с лицом, руки и ноги
 ## с локтями и коленями, одежда, причёски, шапки и оружие в руке.
 ## Модель строится кодом, поэтому внешность меняется прямо в Инспекторе.
+## Всё тело — один меш на скелете (один вызов отрисовки на человечка); отдельные
+## меши частей тела появляются, только когда их отрывает или тело разваливается.
 ## Умеет ходить, целиться двумя руками, замахиваться битой и разваливаться:
 ## падать целиком, терять голову (хедшот), руку или ногу (дробовик)
 ## и разлетаться на куски (дробовик в упор, взрыв).
@@ -69,6 +71,11 @@ var _neck: Node3D
 var _hand: Node3D
 var _gun: Node3D
 var _limbs := {}  # "arm_l" -> [плечо, локоть], "leg_l" -> [бедро, колено]
+var _parts: Array[Node3D] = []  # опоры частей тела в порядке построения (кость скелета = индекс)
+var _part_boxes := {}  # опора -> коробки её меша
+var _part_shadow := {}  # опора -> отбрасывает ли тень, когда станет отдельным мешем
+var _detached := {}  # опоры, у которых уже свой меш (оторваны или тело развалилось)
+var _skeleton: Skeleton3D
 var _stumps := {}
 var _phase := 0.0
 var _time := 0.0
@@ -102,6 +109,11 @@ func _ready() -> void:
 func animate(delta: float, speed: float, aiming: bool, aim_pitch := 0.0) -> void:
 	if _broken or _hips == null:
 		return
+	_pose(delta, speed, aiming, aim_pitch)
+	_sync_skeleton()
+
+
+func _pose(delta: float, speed: float, aiming: bool, aim_pitch: float) -> void:
 	_time += delta
 	speed = clampf(speed, 0.0, 1.2)
 	_phase += delta * (4.0 + 7.0 * speed)
@@ -250,6 +262,8 @@ func sever_limb(limb: String, direction: Vector3, force: float) -> bool:
 		# Уцелевшая рука зажимает рану — оружие падает.
 		drop_weapon()
 	joint.basis = Basis()
+	_detach_part(root)
+	_detach_part(joint)
 	var length := (_upper + _fore + 0.1) if is_arm else (_thigh + _shin + 0.08)
 	var size := Vector3(0.14, length, 0.15) * _l if is_arm else Vector3(0.2 * _l, length, 0.24 * _l)
 	direction.y = maxf(direction.y, 0.0)
@@ -302,6 +316,11 @@ func break_apart(mode: Death, direction: Vector3, force: float) -> void:
 	if _broken or _hips == null:
 		return
 	_broken = true
+	# Дальше части тела летят отдельно: у каждой свой меш, скелет больше не нужен.
+	for part in _parts:
+		_detach_part(part)
+	_skeleton.visible = false
+	_skeleton.queue_free()
 	direction.y = maxf(direction.y, 0.0)
 	direction = direction.normalized() if direction.length_squared() > 0.001 else -global_basis.z
 	var container := _debris_container()
@@ -519,35 +538,101 @@ func _build() -> void:
 	_shoulder_x = 0.21 * _w + 0.075 * _l
 
 	_hips = _pivot(self, "Hips", Vector3(0, _hip_y, 0))
-	add_part_mesh(_hips, _pelvis_boxes())
+	_add_part(_hips, _pelvis_boxes())
 	for side in [-1.0, 1.0]:
 		var hip := _pivot(_hips, "HipL" if side < 0.0 else "HipR", Vector3(side * _hip_x, 0, 0))
-		add_part_mesh(hip, _thigh_boxes())
+		_add_part(hip, _thigh_boxes())
 		var knee := _pivot(hip, "Knee", Vector3(0, -_thigh, 0))
-		add_part_mesh(knee, _shin_boxes())
+		_add_part(knee, _shin_boxes())
 		_limbs["leg_l" if side < 0.0 else "leg_r"] = [hip, knee]
 
 	_chest = _pivot(_hips, "Chest", Vector3(0, _waist, 0))
 	_torso = _pivot(_chest, "Torso", Vector3(0, 0.28, 0))
-	add_part_mesh(_torso, _torso_boxes())
+	_add_part(_torso, _torso_boxes())
 	_neck = _pivot(_chest, "Neck", Vector3(0, _neck_y, 0))
-	add_part_mesh(_neck, _head_boxes())
-	_no_shadow(_neck)
+	_add_part(_neck, _head_boxes(), false)
 
 	for side in [-1.0, 1.0]:
 		var shoulder := _pivot(_chest, "ShoulderL" if side < 0.0 else "ShoulderR", Vector3(side * _shoulder_x, _shoulder_y, 0))
-		add_part_mesh(shoulder, _upper_arm_boxes())
+		_add_part(shoulder, _upper_arm_boxes(), false)
 		var elbow := _pivot(shoulder, "Elbow", Vector3(0, -_upper, 0))
-		add_part_mesh(elbow, _forearm_boxes(side))
-		_no_shadow(shoulder)
-		_no_shadow(elbow)
+		_add_part(elbow, _forearm_boxes(side), false)
 		_limbs["arm_l" if side < 0.0 else "arm_r"] = [shoulder, elbow]
 		if side > 0.0:
 			# Кисть правой руки повёрнута так, чтобы ствол смотрел вдоль руки.
 			_hand = _pivot(elbow, "Grip", Vector3(0, -_fore - 0.06, 0))
 			_hand.rotation.x = -PI / 2.0
 	set_weapon(weapon)
+	_build_skin()
 	animate(0.0, 0.0, false)
+
+
+func _add_part(pivot: Node3D, boxes: Array, shadow := true) -> void:
+	_parts.append(pivot)
+	_part_boxes[pivot] = boxes
+	_part_shadow[pivot] = shadow
+
+
+## Всё тело одним мешем: каждая часть привязана к своей кости, кости повторяют опоры.
+func _build_skin() -> void:
+	_skeleton = Skeleton3D.new()
+	_skeleton.name = "Skeleton"
+	add_child(_skeleton)
+	var skin := Skin.new()
+	var all_boxes := []
+	for i in _parts.size():
+		_skeleton.add_bone("%s%d" % [_parts[i].name, i])
+		skin.add_bind(i, Transform3D.IDENTITY)
+		all_boxes.append(_part_boxes[_parts[i]])
+	var key := "skinned" + str(all_boxes)
+	if not _mesh_cache.has(key):
+		var tool := SurfaceTool.new()
+		tool.set_skin_weight_count(SurfaceTool.SKIN_4_WEIGHTS)
+		tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for i in all_boxes.size():
+			for box: Array in all_boxes[i]:
+				_add_shape(tool, box[0], box[1], box[2], box[3] if box.size() > 3 else 0.0,
+						box[4] if box.size() > 4 else Vector2.ONE, i)
+		tool.index()
+		tool.set_material(_vertex_color_material())
+		_mesh_cache[key] = tool.commit()
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = _mesh_cache[key]
+	body.skin = skin
+	# Вершины лежат в осях своих костей, поэтому границы задаём сами.
+	body.custom_aabb = AABB(Vector3(-1.0, -0.2, -1.0), Vector3(2.0, 2.6, 2.0))
+	_skeleton.add_child(body)
+
+
+## Кости скелета повторяют опоры (Node3D), которые двигает анимация.
+func _sync_skeleton() -> void:
+	if _skeleton == null or _broken:
+		return
+	for i in _parts.size():
+		var part := _parts[i]
+		if _detached.has(part):
+			_skeleton.set_bone_pose_scale(i, Vector3.ONE * 0.0001)
+			continue
+		var pose := part.transform
+		var node := part.get_parent() as Node3D
+		while node != self:
+			pose = node.transform * pose
+			node = node.get_parent() as Node3D
+		_skeleton.set_bone_pose_position(i, pose.origin)
+		_skeleton.set_bone_pose_rotation(i, pose.basis.get_rotation_quaternion())
+		_skeleton.set_bone_pose_scale(i, pose.basis.get_scale())
+
+
+## Часть тела получает собственный меш, а на общем скелете её больше не видно.
+func _detach_part(part: Node3D) -> void:
+	if _detached.has(part) or not is_instance_valid(part):
+		return
+	_detached[part] = true
+	var mesh := add_part_mesh(part, _part_boxes[part])
+	if not _part_shadow[part]:
+		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_sync_skeleton()
 
 
 func _randomize_look() -> void:
@@ -807,7 +892,7 @@ static func add_part_mesh(parent: Node3D, boxes: Array) -> MeshInstance3D:
 	return instance
 
 
-## Тени отбрасывают только торс и ноги: на телефоне это заметно экономит отрисовку.
+## Мелочь (оружие, культи, оторванные руки и голова) теней не отбрасывает — экономия на телефоне.
 static func _no_shadow(part: Node3D) -> void:
 	for child in part.get_children():
 		if child is MeshInstance3D:
@@ -815,7 +900,7 @@ static func _no_shadow(part: Node3D) -> void:
 
 
 ## Коробка со скошенными рёбрами (bevel) и сужением книзу/кверху (taper: множители низа и верха).
-static func _add_shape(tool: SurfaceTool, size: Vector3, offset: Vector3, color: Color, bevel: float, taper: Vector2) -> void:
+static func _add_shape(tool: SurfaceTool, size: Vector3, offset: Vector3, color: Color, bevel: float, taper: Vector2, bone := -1) -> void:
 	var h := size * 0.5
 	var c := minf(bevel, minf(h.x, minf(h.y, h.z)) * 0.8)
 	var i := h - Vector3.ONE * c
@@ -880,6 +965,9 @@ static func _add_shape(tool: SurfaceTool, size: Vector3, offset: Vector3, color:
 			for index in [0, t + 1, t]:
 				tool.set_normal(normal)
 				tool.set_color(color)
+				if bone >= 0:
+					tool.set_bones(PackedInt32Array([bone, 0, 0, 0]))
+					tool.set_weights(PackedFloat32Array([1.0, 0.0, 0.0, 0.0]))
 				tool.add_vertex(points[index] + offset)
 
 

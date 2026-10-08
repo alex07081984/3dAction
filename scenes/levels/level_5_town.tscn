@@ -48,30 +48,32 @@
 [ext_resource type="Material" path="res://materials/hazard.tres" id="46_hazard"]
 [ext_resource type="Material" path="res://materials/pipe.tres" id="47_pipe"]
 [ext_resource type="Material" path="res://materials/car_black.tres" id="48_car_black"]
-[ext_resource type="Material" path="res://materials/lamp.tres" id="49_lamp"]
+[ext_resource type="Script" path="res://scripts/street_lamps.gd" id="49_street_lamps"]
 [ext_resource type="Script" path="res://scripts/property.gd" id="50_property"]
 [ext_resource type="Script" path="res://scripts/property_door.gd" id="51_property_door"]
 [ext_resource type="Material" path="res://materials/bed_sheet.tres" id="52_bed_sheet"]
 [ext_resource type="Material" path="res://materials/crate.tres" id="53_crate"]
 [ext_resource type="Material" path="res://materials/blanket.tres" id="54_blanket"]
-[ext_resource type="Material" path="res://materials/red_carpet.tres" id="55_red_carpet"]
-[ext_resource type="Material" path="res://materials/monitor.tres" id="56_monitor"]
-[ext_resource type="Material" path="res://materials/sofa.tres" id="57_sofa"]
-[ext_resource type="Material" path="res://materials/pool_water.tres" id="58_pool_water"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/gunner.tscn" id="59_gunner"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/rusher.tscn" id="60_rusher"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="61_heavy"]
-[ext_resource type="Script" path="res://scripts/pickup.gd" id="62_pickup"]
-[ext_resource type="Script" path="res://scripts/wave_zone.gd" id="63_wave_zone"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="64_player"]
-[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="65_explosive_barrel"]
-[ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="66_gas_cylinder"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="67_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="68_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="69_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="70_shotgun"]
-[ext_resource type="Resource" path="res://weapons/deagle.tres" id="71_deagle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="72_hud"]
+[ext_resource type="Material" path="res://materials/lamp.tres" id="55_lamp"]
+[ext_resource type="Material" path="res://materials/red_carpet.tres" id="56_red_carpet"]
+[ext_resource type="Material" path="res://materials/monitor.tres" id="57_monitor"]
+[ext_resource type="Material" path="res://materials/sofa.tres" id="58_sofa"]
+[ext_resource type="Material" path="res://materials/pool_water.tres" id="59_pool_water"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/gunner.tscn" id="60_gunner"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/rusher.tscn" id="61_rusher"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="62_heavy"]
+[ext_resource type="Script" path="res://scripts/pickup.gd" id="63_pickup"]
+[ext_resource type="Script" path="res://scripts/wave_zone.gd" id="64_wave_zone"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="65_player"]
+[ext_resource type="Shader" path="res://materials/night_sky.gdshader" id="66_night_sky"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="67_explosive_barrel"]
+[ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="68_gas_cylinder"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="69_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="70_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="71_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="72_shotgun"]
+[ext_resource type="Resource" path="res://weapons/deagle.tres" id="73_deagle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="74_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(126, 6, 1)
@@ -115,11 +117,9 @@ size = Vector3(18, 4, 18)
 [sub_resource type="BoxShape3D" id="Box_14"]
 size = Vector3(18, 4, 18)
 
-[sub_resource type="ProceduralSkyMaterial" id="SkyMat_5"]
-sky_top_color = Color(0.25, 0.45, 0.8, 1)
-sky_horizon_color = Color(0.7, 0.8, 0.9, 1)
-ground_bottom_color = Color(0.2, 0.25, 0.2, 1)
-ground_horizon_color = Color(0.7, 0.8, 0.9, 1)
+[sub_resource type="ShaderMaterial" id="SkyMat_5"]
+shader = ExtResource("66_night_sky")
+shader_parameter/moon_direction = Vector3(0.394, 0.6157, -0.6824)
 
 [sub_resource type="Sky" id="Sky_5"]
 sky_material = SubResource("SkyMat_5")
@@ -127,20 +127,21 @@ sky_material = SubResource("SkyMat_5")
 [sub_resource type="Environment" id="Env_5"]
 background_mode = 2
 sky = SubResource("Sky_5")
-ambient_light_source = 3
-ambient_light_energy = 0.35
+ambient_light_source = 2
+ambient_light_color = Color(0.3, 0.36, 0.52, 1)
+ambient_light_energy = 0.5
 tonemap_mode = 2
 fog_enabled = true
-fog_light_color = Color(0.55, 0.65, 0.8, 1)
-fog_density = 0.0025
-fog_sky_affect = 0.1
+fog_light_color = Color(0.05, 0.06, 0.1, 1)
+fog_density = 0.011
+fog_sky_affect = 0.25
 
 [node name="Level5Town" type="Node3D"]
-script = ExtResource("67_town")
+script = ExtResource("69_town")
 level_index = 4
 title = "Город"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("68_weapon_data")]([ExtResource("69_pistol"), ExtResource("70_shotgun"), ExtResource("71_deagle")])
+start_weapons = Array[ExtResource("70_weapon_data")]([ExtResource("71_pistol"), ExtResource("72_shotgun"), ExtResource("73_deagle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -156,780 +157,863 @@ start_weapons = Array[ExtResource("68_weapon_data")]([ExtResource("69_pistol"), 
 
 [node name="Entrances" type="Node3D" parent="."]
 
-[node name="Ground" type="CSGCombiner3D" parent="Geometry"]
+[node name="Ground00" type="CSGCombiner3D" parent="Geometry"]
 use_collision = true
 
-[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.27, 0)
-size = Vector3(126, 0.5, 126)
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground00"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -0.27, -42)
+size = Vector3(42, 0.5, 42)
 material = ExtResource("1_asphalt")
 
-[node name="GroundDecor" type="CSGCombiner3D" parent="Props"]
+[node name="Ground00Decor" type="CSGCombiner3D" parent="Props"]
 
-[node name="Dash" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -58.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash2" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash3" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -52.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash4" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash5" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -46.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash6" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash7" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -40.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash8" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash9" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -34.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash10" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash11" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -28.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash12" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash13" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash13" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -22.5)
 size = Vector3(0.2, 0.03, 3)
 material = ExtResource("2_road_line")
 
-[node name="Dash14" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Dash14" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, -0.005, -36)
 size = Vector3(3, 0.03, 0.2)
 material = ExtResource("2_road_line")
 
-[node name="Dash15" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -16.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash16" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash17" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -10.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash18" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash19" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 7.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash20" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash21" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 13.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash22" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash23" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 19.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash24" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash25" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 25.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash26" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash27" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 31.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash28" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash29" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 37.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash30" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash31" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 43.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash32" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash33" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 49.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash34" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash35" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 55.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash36" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, -36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash37" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -58.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash38" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash39" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -52.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash40" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash41" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -46.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash42" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash43" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -40.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash44" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash45" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -34.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash46" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash47" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -28.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash48" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash49" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -22.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash50" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash51" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -16.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash52" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash53" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -10.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash54" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash55" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 7.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash56" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash57" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 13.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash58" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash59" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 19.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash60" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash61" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 25.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash62" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash63" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 31.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash64" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash65" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 37.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash66" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash67" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 43.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash68" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash69" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 49.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash70" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash71" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 55.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash72" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, 0)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash73" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -58.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash74" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash75" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -52.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash76" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash77" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -46.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash78" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash79" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -40.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash80" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash81" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -34.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash82" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash83" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -28.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash84" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash85" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -22.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash86" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash87" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -16.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash88" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash89" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -10.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash90" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash91" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 7.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash92" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash93" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 13.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash94" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash95" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 19.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash96" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash97" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 25.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash98" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash99" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 31.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash100" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash101" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 37.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash102" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash103" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 43.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash104" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash105" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 49.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash106" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Dash107" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 55.5)
-size = Vector3(0.2, 0.03, 3)
-material = ExtResource("2_road_line")
-
-[node name="Dash108" type="CSGBox3D" parent="Props/GroundDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, 36)
-size = Vector3(3, 0.03, 0.2)
-material = ExtResource("2_road_line")
-
-[node name="Zebra" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra2" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra3" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra4" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra5" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground00Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra6" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground01" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -0.27, 0)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground01Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -16.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, -10.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 7.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 13.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 19.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground01Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground01Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra7" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground01Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra8" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground01Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra9" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground01Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra10" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground01Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra11" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground02" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -0.27, 42)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground02Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 25.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 31.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 37.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 43.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 49.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 55.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash13" type="CSGBox3D" parent="Props/Ground02Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground02Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra12" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground02Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra13" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground02Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra14" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground02Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra15" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground02Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra16" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground10" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.27, -42)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground10Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -58.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -52.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -46.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -40.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -34.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -28.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground10Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -22.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground10Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra17" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground10Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra18" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground10Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra19" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground10Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra20" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground10Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra21" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground11" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.27, 0)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground11Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -16.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -10.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 7.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 13.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 19.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground11Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground11Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra22" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground11Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra23" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground11Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra24" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground11Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra25" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground11Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra26" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground12" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.27, 42)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground12Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 25.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 31.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 37.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 43.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 49.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 55.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground12Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground12Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra27" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground12Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra28" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground12Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra29" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground12Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra30" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground12Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra31" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground20" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground20"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.27, -42)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground20Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, -36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -58.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -52.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -46.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -40.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -34.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -28.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash13" type="CSGBox3D" parent="Props/Ground20Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -22.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground20Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra32" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground20Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra33" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground20Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra34" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground20Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra35" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground20Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -0.005, -30.1)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra36" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground21" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground21"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.27, 0)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground21Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, 0)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -16.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, -10.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 7.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 13.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground21Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 19.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground21Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra37" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground21Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra38" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground21Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra39" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground21Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra40" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground21Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -0.005, 5.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra41" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Ground22" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Asphalt" type="CSGBox3D" parent="Geometry/Ground22"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.27, 42)
+size = Vector3(42, 0.5, 42)
+material = ExtResource("1_asphalt")
+
+[node name="Ground22Decor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dash" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 25.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash2" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash3" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 31.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash4" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash5" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 37.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash6" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash7" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 43.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash8" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash9" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 49.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash10" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Dash11" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 55.5)
+size = Vector3(0.2, 0.03, 3)
+material = ExtResource("2_road_line")
+
+[node name="Dash12" type="CSGBox3D" parent="Props/Ground22Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -0.005, 36)
+size = Vector3(3, 0.03, 0.2)
+material = ExtResource("2_road_line")
+
+[node name="Zebra" type="CSGBox3D" parent="Props/Ground22Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra42" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra2" type="CSGBox3D" parent="Props/Ground22Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra43" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra3" type="CSGBox3D" parent="Props/Ground22Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra44" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra4" type="CSGBox3D" parent="Props/Ground22Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
 
-[node name="Zebra45" type="CSGBox3D" parent="Props/GroundDecor"]
+[node name="Zebra5" type="CSGBox3D" parent="Props/Ground22Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -0.005, 41.9)
 size = Vector3(0.8, 0.03, 1.4)
 material = ExtResource("2_road_line")
+
+[node name="Ground" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
 
 [node name="TownWall" type="CSGBox3D" parent="Geometry/Ground"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.59, -62.5)
@@ -3126,125 +3210,140 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 4.399, -39)
 size = Vector3(2.8, 2.6, 2.8)
 material = ExtResource("6_tree_leaves")
 
-[node name="Post" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, 20)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="StreetLamps" type="Node3D" parent="."]
+script = ExtResource("49_street_lamps")
 
-[node name="PostLamp" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.1, 20)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp00" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30.4, -0.02, -56)
 
-[node name="Post2" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 40)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp01" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -56, -0.02, -41.6)
 
-[node name="PostLamp2" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.1, 40)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp02" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -41.6, -0.02, -42)
 
-[node name="Post3" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, -24)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp03" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -0.02, -30.4)
 
-[node name="PostLamp3" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.1, -24)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp04" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30.4, -0.02, -28)
 
-[node name="Post4" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, -54)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp05" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -28, -0.02, -41.6)
 
-[node name="PostLamp4" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.1, -54)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp06" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -41.6, -0.02, -14)
 
-[node name="Post5" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, 6)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp07" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.02, -30.4)
 
-[node name="PostLamp5" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.1, 6)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp08" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -41.6, -0.02, 14)
 
-[node name="Post6" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2, -6)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp09" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.02, -30.4)
 
-[node name="PostLamp6" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.1, -6)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp10" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30.4, -0.02, 28)
 
-[node name="Post7" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 2, 6)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp11" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 28, -0.02, -41.6)
 
-[node name="PostLamp7" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 4.1, 6)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp12" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -41.6, -0.02, 42)
 
-[node name="Post8" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 2, -6)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp13" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.02, -30.4)
 
-[node name="PostLamp8" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 4.1, -6)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp14" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30.4, -0.02, 56)
 
-[node name="Post9" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, -42)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp15" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.6, -0.02, -56)
 
-[node name="PostLamp9" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 4.1, -42)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp16" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -56, -0.02, -5.6)
 
-[node name="Post10" type="CSGCylinder3D" parent="Props/StreetPropsSolid"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 2, 42)
-radius = 0.08
-height = 4
-sides = 12
-material = ExtResource("8_black_metal")
+[node name="Lamp17" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -5.6, -0.02, -42)
 
-[node name="PostLamp10" type="CSGBox3D" parent="Props/StreetPropsDecor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 4.1, 42)
-size = Vector3(0.4, 0.3, 0.4)
-material = ExtResource("49_lamp")
+[node name="Lamp18" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.6, -0.02, -28)
+
+[node name="Lamp19" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -28, -0.02, -5.6)
+
+[node name="Lamp20" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -5.6, -0.02, -14)
+
+[node name="Lamp21" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.02, 5.6)
+
+[node name="Lamp22" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -5.6, -0.02, 14)
+
+[node name="Lamp23" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.02, 5.6)
+
+[node name="Lamp24" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.6, -0.02, 28)
+
+[node name="Lamp25" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 28, -0.02, -5.6)
+
+[node name="Lamp26" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -5.6, -0.02, 42)
+
+[node name="Lamp27" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.02, 5.6)
+
+[node name="Lamp28" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.6, -0.02, 56)
+
+[node name="Lamp29" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 56, -0.02, -5.6)
+
+[node name="Lamp30" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 30.4, -0.02, -42)
+
+[node name="Lamp31" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -0.02, 41.6)
+
+[node name="Lamp32" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 41.6, -0.02, -28)
+
+[node name="Lamp33" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -28, -0.02, 30.4)
+
+[node name="Lamp34" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 30.4, -0.02, -14)
+
+[node name="Lamp35" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.02, 41.6)
+
+[node name="Lamp36" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 30.4, -0.02, 14)
+
+[node name="Lamp37" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.02, 41.6)
+
+[node name="Lamp38" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 41.6, -0.02, 28)
+
+[node name="Lamp39" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 28, -0.02, 30.4)
+
+[node name="Lamp40" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 30.4, -0.02, 42)
+
+[node name="Lamp41" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -0.02, 41.6)
+
+[node name="Lamp42" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 41.6, -0.02, 56)
+
+[node name="Lamp43" type="Marker3D" parent="StreetLamps"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 56, -0.02, 30.4)
 
 [node name="shack" type="Node3D" parent="Properties"]
 script = ExtResource("50_property")
@@ -3328,7 +3427,7 @@ material = ExtResource("18_car_red")
 [node name="Bulb" type="CSGBox3D" parent="Properties/shack/Furniture/lamp"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 2.6, 15)
 size = Vector3(0.3, 0.3, 0.3)
-material = ExtResource("49_lamp")
+material = ExtResource("55_lamp")
 
 [node name="Light" type="OmniLight3D" parent="Properties/shack/Furniture/lamp"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 2.4, 15)
@@ -3377,7 +3476,7 @@ material = ExtResource("52_bed_sheet")
 [node name="Rug" type="CSGBox3D" parent="Properties/apartment/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.02, -18)
 size = Vector3(5, 0.02, 4)
-material = ExtResource("55_red_carpet")
+material = ExtResource("56_red_carpet")
 
 [node name="Table" type="CSGBox3D" parent="Properties/apartment/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.4, -12)
@@ -3428,12 +3527,12 @@ material = ExtResource("8_black_metal")
 [node name="TV" type="CSGBox3D" parent="Properties/apartment/Furniture/tv"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 1.5, -10)
 size = Vector3(0.1, 1, 1.8)
-material = ExtResource("56_monitor")
+material = ExtResource("57_monitor")
 
 [node name="Sofa" type="CSGBox3D" parent="Properties/apartment/Furniture/tv"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.4, -10)
 size = Vector3(1, 0.8, 3)
-material = ExtResource("57_sofa")
+material = ExtResource("58_sofa")
 
 [node name="mansion" type="Node3D" parent="Properties"]
 script = ExtResource("50_property")
@@ -3471,12 +3570,12 @@ shape = SubResource("Box_11")
 [node name="Rug" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 0.02, -54)
 size = Vector3(7, 0.02, 5)
-material = ExtResource("55_red_carpet")
+material = ExtResource("56_red_carpet")
 
 [node name="Sofa" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0.45, -54)
 size = Vector3(1, 0.9, 4)
-material = ExtResource("57_sofa")
+material = ExtResource("58_sofa")
 
 [node name="Chandelier" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 3.6, -53.5)
@@ -3537,7 +3636,7 @@ material = ExtResource("3_stone")
 [node name="PoolWater" type="CSGBox3D" parent="Properties/mansion/Furniture/pool"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.5, 0.2, -53.5)
 size = Vector3(3, 0.1, 6.4)
-material = ExtResource("58_pool_water")
+material = ExtResource("59_pool_water")
 
 [node name="Lounger" type="CSGBox3D" parent="Properties/mansion/Furniture/pool"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0.25, -45.5)
@@ -3547,148 +3646,148 @@ material = ExtResource("32_white_paint")
 [node name="HubStart" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 54)
 
-[node name="Gunner" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9924, 0, 0.1232, 0, 1, 0, -0.1232, 0, -0.9924, 3.6, 0, 27)
 
-[node name="Gunner2" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner2" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9962, 0, -0.0875, 0, 1, 0, 0.0875, 0, -0.9962, -3.6, 0, 15)
 
-[node name="Rusher" parent="Enemies" instance=ExtResource("60_rusher")]
+[node name="Rusher" parent="Enemies" instance=ExtResource("61_rusher")]
 transform = Transform3D(-0.995, 0, 0.0995, 0, 1, 0, -0.0995, 0, -0.995, 2, 0, 36)
 
-[node name="Gunner3" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner3" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9908, 0, -0.1351, 0, 1, 0, 0.1351, 0, -0.9908, -3, 0, -12)
 
-[node name="Gunner4" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner4" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9961, 0, 0.0879, 0, 1, 0, -0.0879, 0, -0.9961, 3, 0, -24)
 
-[node name="Gunner5" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner5" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.3511, 0, 0.9363, 0, 1, 0, -0.9363, 0, -0.3511, 16, 0, -6)
 
-[node name="Gunner6" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner6" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0.2425, 0, 0.9701, 0, 1, 0, -0.9701, 0, 0.2425, 24, 0, 6)
 
-[node name="Gunner7" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner7" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0.3511, 0, -0.9363, 0, 1, 0, 0.9363, 0, 0.3511, -16, 0, 6)
 
-[node name="Gunner8" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner8" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.2249, 0, -0.9744, 0, 1, 0, 0.9744, 0, -0.2249, -26, 0, -6)
 
-[node name="Rusher2" parent="Enemies" instance=ExtResource("60_rusher")]
+[node name="Rusher2" parent="Enemies" instance=ExtResource("61_rusher")]
 transform = Transform3D(0.0995, 0, 0.995, 0, 1, 0, -0.995, 0, 0.0995, 46, 0, 1)
 
-[node name="Gunner9" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner9" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.1104, 0, 0.9939, 0, 1, 0, -0.9939, 0, -0.1104, 54, 0, -2)
 
-[node name="Rusher3" parent="Enemies" instance=ExtResource("60_rusher")]
+[node name="Rusher3" parent="Enemies" instance=ExtResource("61_rusher")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 18)
 
-[node name="Gunner10" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner10" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9864, 0, -0.1644, 0, 1, 0, 0.1644, 0, -0.9864, 33, 0, -18)
 
-[node name="Gunner11" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner11" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9943, 0, 0.1065, 0, 1, 0, -0.1065, 0, -0.9943, 39, 0, -28)
 
-[node name="Gunner12" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner12" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 22)
 
-[node name="Gunner13" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner13" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9908, 0, 0.1351, 0, 1, 0, -0.1351, 0, -0.9908, -33, 0, -22)
 
-[node name="Gunner14" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner14" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0.0712, 0, -0.9975, 0, 1, 0, 0.9975, 0, 0.0712, -14, 0, -35)
 
-[node name="Gunner15" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner15" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.0712, 0, 0.9975, 0, 1, 0, -0.9975, 0, -0.0712, 14, 0, -37)
 
-[node name="Heavy" parent="Enemies" instance=ExtResource("61_heavy")]
+[node name="Heavy" parent="Enemies" instance=ExtResource("62_heavy")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 0, -36)
 
-[node name="Gunner16" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner16" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0.0995, 0, -0.995, 0, 1, 0, 0.995, 0, 0.0995, -20, 0, 38)
 
-[node name="Gunner17" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner17" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 20, 0, 36)
 
-[node name="Gunner18" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner18" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.8944, 0, 0.4472, 0, 1, 0, -0.4472, 0, -0.8944, -14, 0, -50)
 
-[node name="Gunner19" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner19" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.9487, 0, -0.3162, 0, 1, 0, 0.3162, 0, -0.9487, -22, 0, -54)
 
-[node name="Gunner20" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner20" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.4961, 0, 0.8682, 0, 1, 0, -0.8682, 0, -0.4961, 12, 0, -22)
 
-[node name="Rusher4" parent="Enemies" instance=ExtResource("60_rusher")]
+[node name="Rusher4" parent="Enemies" instance=ExtResource("61_rusher")]
 transform = Transform3D(0.206, 0, 0.9785, 0, 1, 0, -0.9785, 0, 0.206, 24, 0, -14)
 
-[node name="Gunner21" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner21" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(0.5547, 0, 0.8321, 0, 1, 0, -0.8321, 0, 0.5547, 50, 0, -12)
 
-[node name="Heavy2" parent="Enemies" instance=ExtResource("61_heavy")]
+[node name="Heavy2" parent="Enemies" instance=ExtResource("62_heavy")]
 transform = Transform3D(-0.1789, 0, 0.9839, 0, 1, 0, -0.9839, 0, -0.1789, 52, 0, -20)
 
-[node name="Gunner22" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner22" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.229, 0, -0.9734, 0, 1, 0, 0.9734, 0, -0.229, -22, 0, 12)
 
-[node name="Rusher5" parent="Enemies" instance=ExtResource("60_rusher")]
+[node name="Rusher5" parent="Enemies" instance=ExtResource("61_rusher")]
 transform = Transform3D(0.4061, 0, -0.9138, 0, 1, 0, 0.9138, 0, 0.4061, -14, 0, 20)
 
-[node name="Gunner23" parent="Enemies" instance=ExtResource("59_gunner")]
+[node name="Gunner23" parent="Enemies" instance=ExtResource("60_gunner")]
 transform = Transform3D(-0.1644, 0, -0.9864, 0, 1, 0, 0.9864, 0, -0.1644, -23, 0, 46)
 
 [node name="Health" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 40)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 0
 
 [node name="Ammo" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 8)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 1
 
 [node name="Health2" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 6)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 0
 
 [node name="Ammo2" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, -30)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 1
 
 [node name="Health3" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -40)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 0
 
 [node name="Ammo3" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, 2)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 1
 
 [node name="Health4" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 0
 
 [node name="Ammo4" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 20)
-script = ExtResource("62_pickup")
+script = ExtResource("63_pickup")
 kind = 1
 
 [node name="ZoneSquare" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-script = ExtResource("63_wave_zone")
+script = ExtResource("64_wave_zone")
 title = "Центральная площадь!"
 waves = 2
 enemies_in_first_wave = 5
 extra_per_wave = 2
 rusher_share = 0.35
 heavy_in_last_wave = 0
-gunner_scene = ExtResource("59_gunner")
-rusher_scene = ExtResource("60_rusher")
-heavy_scene = ExtResource("61_heavy")
+gunner_scene = ExtResource("60_gunner")
+rusher_scene = ExtResource("61_rusher")
+heavy_scene = ExtResource("62_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneSquare"]
 shape = SubResource("Box_12")
@@ -3711,16 +3810,16 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 22, -1.9, 0)
 
 [node name="ZoneEast" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 2, 0)
-script = ExtResource("63_wave_zone")
+script = ExtResource("64_wave_zone")
 title = "Восточный перекрёсток!"
 waves = 2
 enemies_in_first_wave = 5
 extra_per_wave = 2
 rusher_share = 0.3
 heavy_in_last_wave = 1
-gunner_scene = ExtResource("59_gunner")
-rusher_scene = ExtResource("60_rusher")
-heavy_scene = ExtResource("61_heavy")
+gunner_scene = ExtResource("60_gunner")
+rusher_scene = ExtResource("61_rusher")
+heavy_scene = ExtResource("62_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneEast"]
 shape = SubResource("Box_13")
@@ -3743,16 +3842,16 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -16, -1.9, 0)
 
 [node name="ZoneTownHall" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -36)
-script = ExtResource("63_wave_zone")
+script = ExtResource("64_wave_zone")
 title = "Площадь у мэрии!"
 waves = 2
 enemies_in_first_wave = 6
 extra_per_wave = 2
 rusher_share = 0.3
 heavy_in_last_wave = 1
-gunner_scene = ExtResource("59_gunner")
-rusher_scene = ExtResource("60_rusher")
-heavy_scene = ExtResource("61_heavy")
+gunner_scene = ExtResource("60_gunner")
+rusher_scene = ExtResource("61_rusher")
+heavy_scene = ExtResource("62_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneTownHall"]
 shape = SubResource("Box_14")
@@ -3773,7 +3872,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, 16)
 
 [node name="Barriers" type="Node3D" parent="ZoneTownHall"]
 
-[node name="Player" parent="." instance=ExtResource("64_player")]
+[node name="Player" parent="." instance=ExtResource("65_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 56)
 
 [node name="OutskirtsDecor" type="CSGCombiner3D" parent="Props"]
@@ -4428,50 +4527,50 @@ material = ExtResource("19_skyline")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env_5")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.8192, -0.4394, 0.3687, 0, 0.6428, 0.766, -0.5736, -0.6275, 0.5265, 0, 40, 0)
-light_color = Color(1, 0.95, 0.85, 1)
-light_energy = 0.85
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866, -0.3078, 0.394, 0, 0.788, 0.6157, -0.5, 0.5332, -0.6824, 0, 40, 0)
+light_color = Color(0.6, 0.7, 1, 1)
+light_energy = 0.32
 shadow_enabled = true
 directional_shadow_max_distance = 50.0
 directional_shadow_mode = 1
 
 [node name="Explosives" type="Node3D" parent="."]
 
-[node name="Barrel" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.99, -0.02, 27.57)
 
-[node name="Barrel2" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel2" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, -5.03, -0.02, -11.94)
 
-[node name="Cylinder" parent="Explosives" instance=ExtResource("66_gas_cylinder")]
+[node name="Cylinder" parent="Explosives" instance=ExtResource("68_gas_cylinder")]
 transform = Transform3D(0.2756, 0, 0.9613, 0, 1, 0, -0.9613, 0, 0.2756, 17.06, -0.02, -7.06)
 
-[node name="Barrel3" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel3" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(-0.3584, 0, 0.9336, 0, 1, 0, -0.9336, 0, -0.3584, -17.06, -0.02, 7.06)
 
-[node name="Barrel4" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel4" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(-0.848, 0, 0.5299, 0, 1, 0, -0.5299, 0, -0.848, 47.06, -0.02, 2.06)
 
-[node name="Cylinder2" parent="Explosives" instance=ExtResource("66_gas_cylinder")]
+[node name="Cylinder2" parent="Explosives" instance=ExtResource("68_gas_cylinder")]
 transform = Transform3D(-0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, -0.9962, 40.42, -0.02, -27.17)
 
-[node name="Barrel5" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel5" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(-0.7431, 0, -0.6691, 0, 1, 0, 0.6691, 0, -0.7431, -15.06, -0.02, -33.94)
 
-[node name="Barrel6" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel6" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(-0.1908, 0, -0.9816, 0, 1, 0, 0.9816, 0, -0.1908, 20, -0.02, 38)
 
-[node name="Cylinder3" parent="Explosives" instance=ExtResource("66_gas_cylinder")]
+[node name="Cylinder3" parent="Explosives" instance=ExtResource("68_gas_cylinder")]
 transform = Transform3D(0.4384, 0, -0.8988, 0, 1, 0, 0.8988, 0, 0.4384, -20.94, 0, -52.94)
 
-[node name="Barrel7" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel7" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(0.891, 0, -0.454, 0, 1, 0, 0.454, 0, 0.891, 22.94, 0, -12.94)
 
-[node name="Barrel8" parent="Explosives" instance=ExtResource("65_explosive_barrel")]
+[node name="Barrel8" parent="Explosives" instance=ExtResource("67_explosive_barrel")]
 transform = Transform3D(0.9848, 0, 0.1736, 0, 1, 0, -0.1736, 0, 0.9848, 50.16, 0, -21.84)
 
-[node name="Cylinder4" parent="Explosives" instance=ExtResource("66_gas_cylinder")]
+[node name="Cylinder4" parent="Explosives" instance=ExtResource("68_gas_cylinder")]
 transform = Transform3D(0.682, 0, 0.7314, 0, 1, 0, -0.7314, 0, 0.682, -14.77, 0, 21.85)
 
 [node name="Route" type="Node3D" parent="."]
@@ -4524,4 +4623,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46, 0, 15)
 [node name="P15" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.5, 0, 15)
 
-[node name="HUD" parent="." instance=ExtResource("72_hud")]
+[node name="HUD" parent="." instance=ExtResource("74_hud")]

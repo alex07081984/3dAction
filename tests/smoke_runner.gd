@@ -42,6 +42,7 @@ func _run() -> void:
 	await _test_town_liberation()
 	await _test_hub_and_entrances()
 	await _test_property_and_perks()
+	await _test_noir_and_night()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -293,9 +294,10 @@ func _test_models() -> void:
 	fat.global_position = player.global_position + Vector3(-30, 0, 0)
 	thin.global_position = player.global_position + Vector3(-34, 0, 0)
 	await _frames(2)
-	var fat_torso := fat.model.find_child("Torso", true, false).get_child(0) as MeshInstance3D
-	var thin_torso := thin.model.find_child("Torso", true, false).get_child(0) as MeshInstance3D
-	_check(fat_torso.get_aabb().size.x > thin_torso.get_aabb().size.x * 1.5, "Толстяк толстый, Худой худой")
+	_check(fat.model.get("_w") > thin.model.get("_w") * 1.5 and fat.model.build == "fat" and thin.model.build == "thin",
+			"Толстяк толстый, Худой худой")
+	_check(gunner.model.find_children("*", "MeshInstance3D", true, false).size() <= 2,
+			"человечек рисуется одним мешем на скелете (+ оружие)")
 	fat.queue_free()
 	thin.queue_free()
 
@@ -448,6 +450,23 @@ func _test_fat_boss() -> void:
 	_teleport(player, exit.global_position)
 	await _frames(5)
 	_check(hud.get_node("%LevelComplete").visible, "после Толстяка вертолёт забирает игрока")
+
+
+func _test_noir_and_night() -> void:
+	var level := await _fresh_level(_game.TOWN_INDEX)
+	var lamps := level.get_node_or_null("StreetLamps") as StreetLamps
+	_check(lamps != null and lamps.get_lamp_count() >= 30, "ночью на улицах горят фонари (%d)" % (lamps.get_lamp_count() if lamps else 0))
+	var lights := lamps.find_children("*", "OmniLight3D", false, false).size() if lamps else 0
+	_check(lights >= 10, "часть фонарей светит по-настоящему (%d источников)" % lights)
+	var moon := level.get_node_or_null("Moonlight") as DirectionalLight3D
+	_check(moon != null and moon.light_energy < 0.5, "вместо солнца — луна")
+	var facade := load("res://materials/facade_white.tres") as ShaderMaterial
+	_check(facade != null and facade.get_shader_parameter("lit_texture") != null, "в домах светятся окна")
+	var noir := level.hud.get_node("%NoirFilter") as CanvasItem
+	_check(noir.visible, "нуар-фильтр включён по умолчанию")
+	_game.set_setting("noir", false)
+	_check(not noir.visible, "нуар-фильтр выключается в настройках")
+	_game.set_setting("noir", true)
 
 
 ## Подходим к спрятавшемуся боссу так, чтобы он был на виду.

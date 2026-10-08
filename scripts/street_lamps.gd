@@ -7,7 +7,7 @@ extends Node3D
 
 @export var real_light_every := 2  ## Настоящий свет у каждого N-го фонаря (0 — ни у одного).
 @export var light_color := Color(1.0, 0.8, 0.52)
-@export var light_energy := 2.2
+@export var light_energy := 1.5
 @export var light_range := 11.0
 @export var height := 4.6  ## Высота плафона.
 @export var arm_length := 1.3  ## Вынос кронштейна над дорогой.
@@ -38,7 +38,7 @@ func _ready() -> void:
 			light.light_color = light_color
 			light.light_energy = light_energy
 			light.omni_range = light_range
-			light.omni_attenuation = 1.4
+			light.omni_attenuation = 2.0
 			light.shadow_enabled = false
 			light.distance_fade_enabled = true
 			light.distance_fade_begin = 45.0
@@ -97,9 +97,9 @@ func _pool_mesh() -> Mesh:
 	var plane := PlaneMesh.new()
 	plane.size = Vector2.ONE * pool_radius * 2.0
 	var gradient := Gradient.new()
-	gradient.set_color(0, Color(light_color, 0.55))
+	gradient.set_color(0, Color(light_color, 0.4))
 	gradient.set_color(1, Color(light_color, 0.0))
-	gradient.add_point(0.45, Color(light_color, 0.22))
+	gradient.add_point(0.45, Color(light_color, 0.16))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill = GradientTexture2D.FILL_RADIAL
@@ -122,8 +122,9 @@ func _cone_mesh() -> Mesh:
 	cone.cap_top = false
 	cone.cap_bottom = false
 	var gradient := Gradient.new()
-	gradient.set_color(0, Color(light_color, 0.16))
-	gradient.set_color(1, Color(light_color, 0.0))
+	# У CylinderMesh низ развёртки — v = 1: конус ярче у плафона и тает к земле.
+	gradient.set_color(0, Color(light_color, 0.0))
+	gradient.set_color(1, Color(light_color, 0.07))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill_from = Vector2(0.5, 0.0)
