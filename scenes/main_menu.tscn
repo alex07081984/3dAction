@@ -1,0 +1,150 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_main_menu"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="2_blocky_character"]
+[ext_resource type="PackedScene" path="res://ui/settings_panel.tscn" id="3_settings_panel"]
+[ext_resource type="Material" path="res://materials/metal.tres" id="4_metal"]
+
+[sub_resource type="Environment" id="Env_menu"]
+background_mode = 1
+background_color = Color(0.04, 0.05, 0.08, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.38, 0.45, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+
+[node name="MainMenu" type="Node3D"]
+script = ExtResource("1_main_menu")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_menu")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+fov = 50.0
+transform = Transform3D(0.95937, -0.03554, 0.27992, 0.00000, 0.99203, 0.12596, -0.28217, -0.12085, 0.95172, 1.6, 1.5, 3.4)
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+light_energy = 0.9
+shadow_enabled = true
+transform = Transform3D(0.819152, -0.469846, 0.32899, 0, 0.573576, 0.819152, -0.573576, -0.67101, 0.469846, 0, 4, 0)
+
+[node name="RimRed" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 2.2, -2.0)
+light_color = Color(1, 0.25, 0.2, 1)
+light_energy = 3.0
+omni_range = 6.0
+
+[node name="RimBlue" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 1.6, -1.6)
+light_color = Color(0.3, 0.6, 1, 1)
+light_energy = 2.5
+omni_range = 6.0
+
+[node name="Pedestal" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, -0.15, -0.6)
+radius = 1.1
+height = 0.3
+sides = 24
+material = ExtResource("4_metal")
+
+[node name="Hero" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0, -0.6)
+
+[node name="Model" type="Node3D" parent="Hero"]
+script = ExtResource("2_blocky_character")
+skin_color = Color(0.9, 0.72, 0.58, 1)
+shirt_color = Color(0.16, 0.3, 0.55, 1)
+pants_color = Color(0.18, 0.18, 0.22, 1)
+hair_color = Color(0.1, 0.07, 0.05, 1)
+vest_color = Color(0.13, 0.15, 0.13, 1)
+weapon = "shotgun"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="UI"]
+layout_mode = 1
+offset_left = 60.0
+offset_top = 50.0
+offset_right = 760.0
+offset_bottom = 150.0
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 84
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+text = "3D ACTION"
+
+[node name="Subtitle" type="Label" parent="UI"]
+layout_mode = 1
+offset_left = 64.0
+offset_top = 150.0
+offset_right = 760.0
+offset_bottom = 190.0
+theme_override_font_sizes/font_size = 26
+text = "Подземка  ·  Метро  ·  Небоскрёб"
+
+[node name="MainButtons" type="VBoxContainer" parent="UI"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 60.0
+offset_top = 240.0
+offset_right = 520.0
+offset_bottom = 640.0
+theme_override_constants/separation = 14
+
+[node name="PlayButton" type="Button" parent="UI/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Играть"
+
+[node name="LevelsButton" type="Button" parent="UI/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Уровни"
+
+[node name="SettingsButton" type="Button" parent="UI/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Настройки"
+
+[node name="QuitButton" type="Button" parent="UI/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Выход"
+
+[node name="LevelsPanel" type="VBoxContainer" parent="UI"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = 60.0
+offset_top = 220.0
+offset_right = 760.0
+offset_bottom = 680.0
+theme_override_constants/separation = 14
+
+[node name="Header" type="Label" parent="UI/LevelsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Уровни"
+
+[node name="LevelList" type="VBoxContainer" parent="UI/LevelsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="UI/LevelsPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 72)
+layout_mode = 2
+text = "Назад"
+
+[node name="SettingsPanel" parent="UI" instance=ExtResource("3_settings_panel")]
+unique_name_in_owner = true
+visible = false

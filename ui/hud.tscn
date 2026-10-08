@@ -1,8 +1,10 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
-[ext_resource type="Script" path="res://scripts/touch/touch_joystick.gd" id="2_joystick"]
-[ext_resource type="Script" path="res://scripts/touch/touch_button.gd" id="3_button"]
+[ext_resource type="Script" path="res://scripts/touch/touch_joystick.gd" id="2_touch_joystick"]
+[ext_resource type="Script" path="res://scripts/touch/touch_button.gd" id="3_touch_button"]
+[ext_resource type="Script" path="res://scripts/ui/crosshair.gd" id="4_crosshair"]
+[ext_resource type="PackedScene" path="res://ui/settings_panel.tscn" id="5_settings_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hp_bg"]
 bg_color = Color(0, 0, 0, 0.5)
@@ -12,11 +14,18 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hp_fill"]
-bg_color = Color(0.86, 0.22, 0.27, 1)
+bg_color = Color(0.86, 0.2, 0.24, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_reload"]
+bg_color = Color(1, 0.85, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
 content_margin_left = 40.0
@@ -35,13 +44,25 @@ script = ExtResource("1_hud")
 
 [node name="DamageFlash" type="ColorRect" parent="."]
 unique_name_in_owner = true
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.9, 0.1, 0.1, 0)
+color = Color(0.8, 0, 0, 0)
+
+[node name="Crosshair" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_crosshair")
 
 [node name="TouchControls" type="Control" parent="."]
 unique_name_in_owner = true
@@ -56,32 +77,34 @@ mouse_filter = 2
 
 [node name="Joystick" type="Control" parent="TouchControls"]
 layout_mode = 1
+mouse_filter = 2
+script = ExtResource("2_touch_joystick")
 anchor_top = 0.3
-anchor_right = 0.45
+anchor_right = 0.42
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("2_joystick")
 
-[node name="AttackButton" type="Control" parent="TouchControls"]
+[node name="FireButton" type="Control" parent="TouchControls"]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -230.0
-offset_top = -230.0
-offset_right = -70.0
-offset_bottom = -70.0
 grow_horizontal = 0
 grow_vertical = 0
+offset_left = -255.0
+offset_top = -255.0
+offset_right = -85.0
+offset_bottom = -85.0
 mouse_filter = 2
-script = ExtResource("3_button")
-action = &"attack"
-text = "Удар"
+script = ExtResource("3_touch_button")
+action = &"fire"
+text = "Огонь"
 font_size = 30
+pass_drag = true
+color = Color(1, 0.35, 0.3, 0.28)
 
 [node name="JumpButton" type="Control" parent="TouchControls"]
 layout_mode = 1
@@ -90,36 +113,76 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -390.0
-offset_top = -170.0
-offset_right = -280.0
-offset_bottom = -60.0
 grow_horizontal = 0
 grow_vertical = 0
+offset_left = -400.0
+offset_top = -145.0
+offset_right = -300.0
+offset_bottom = -45.0
 mouse_filter = 2
-script = ExtResource("3_button")
+script = ExtResource("3_touch_button")
 action = &"jump"
 text = "Прыжок"
-font_size = 20
+font_size = 18
 
-[node name="DashButton" type="Control" parent="TouchControls"]
+[node name="DodgeButton" type="Control" parent="TouchControls"]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -205.0
-offset_top = -385.0
-offset_right = -95.0
-offset_bottom = -275.0
 grow_horizontal = 0
 grow_vertical = 0
+offset_left = -415.0
+offset_top = -285.0
+offset_right = -315.0
+offset_bottom = -185.0
 mouse_filter = 2
-script = ExtResource("3_button")
-action = &"dash"
+script = ExtResource("3_touch_button")
+action = &"dodge"
 text = "Рывок"
-font_size = 20
+font_size = 18
+
+[node name="ReloadButton" type="Control" parent="TouchControls"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -335.0
+offset_top = -385.0
+offset_right = -245.0
+offset_bottom = -295.0
+mouse_filter = 2
+script = ExtResource("3_touch_button")
+action = &"reload"
+text = "Заряд"
+font_size = 18
+
+[node name="SwitchButton" type="Control" parent="TouchControls"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -195.0
+offset_top = -405.0
+offset_right = -85.0
+offset_bottom = -295.0
+mouse_filter = 2
+script = ExtResource("3_touch_button")
+action = &"switch_weapon"
+text = "Пист"
+font_size = 22
+color = Color(0.4, 0.8, 1, 0.25)
 
 [node name="TopBar" type="Control" parent="."]
 layout_mode = 3
@@ -135,57 +198,55 @@ unique_name_in_owner = true
 layout_mode = 1
 offset_left = 24.0
 offset_top = 20.0
-offset_right = 364.0
-offset_bottom = 60.0
+offset_right = 324.0
+offset_bottom = 56.0
 mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBox_hp_bg")
 theme_override_styles/fill = SubResource("StyleBox_hp_fill")
-max_value = 10.0
 step = 1.0
-value = 10.0
+value = 100.0
 show_percentage = false
 
 [node name="HealthLabel" type="Label" parent="TopBar/HealthBar"]
 unique_name_in_owner = true
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 22
-text = "10 / 10"
+text = "100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="WaveLabel" type="Label" parent="TopBar"]
+[node name="ObjectiveLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -220.0
-offset_top = 14.0
-offset_right = 220.0
-offset_bottom = 56.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 32
-text = "Готовьтесь!"
+offset_left = -320.0
+offset_top = 14.0
+offset_right = 320.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 
-[node name="EnemiesLabel" type="Label" parent="TopBar"]
+[node name="KillsLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -220.0
-offset_top = 56.0
-offset_right = 220.0
-offset_bottom = 90.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 22
-text = "Врагов: 0"
+offset_left = -320.0
+offset_top = 50.0
+offset_right = 320.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 20
+text = "Убито: 0"
 horizontal_alignment = 1
 
 [node name="PauseButton" type="Button" parent="TopBar"]
@@ -194,32 +255,124 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
+grow_horizontal = 0
 offset_left = -104.0
 offset_top = 16.0
 offset_right = -24.0
 offset_bottom = 96.0
-grow_horizontal = 0
 focus_mode = 0
 theme_override_font_sizes/font_size = 32
 text = "II"
 
-[node name="Message" type="Label" parent="."]
+[node name="WeaponLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -440.0
+offset_top = -522.0
+offset_right = -60.0
+offset_bottom = -490.0
+theme_override_font_sizes/font_size = 20
+text = "Пистолет"
+horizontal_alignment = 2
+
+[node name="AmmoLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -440.0
+offset_top = -492.0
+offset_right = -60.0
+offset_bottom = -430.0
+theme_override_font_sizes/font_size = 42
+text = "12 / ∞"
+horizontal_alignment = 2
+
+[node name="ReloadBar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -210.0
-offset_right = 400.0
-offset_bottom = -120.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 56
+offset_left = -70.0
+offset_top = 36.0
+offset_right = 70.0
+offset_bottom = 46.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_hp_bg")
+theme_override_styles/fill = SubResource("StyleBox_reload")
+show_percentage = false
+
+[node name="Message" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -500.0
+offset_top = -240.0
+offset_right = 500.0
+offset_bottom = -160.0
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 60
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -500.0
+offset_top = -160.0
+offset_right = 500.0
+offset_bottom = -116.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Toast" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+offset_left = -300.0
+offset_top = -76.0
+offset_right = 300.0
+offset_bottom = -36.0
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 
 [node name="PauseMenu" type="Control" parent="."]
 unique_name_in_owner = true
@@ -232,16 +385,16 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Dim" type="ColorRect" parent="PauseMenu"]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.55)
+color = Color(0, 0, 0, 0.6)
 
 [node name="Center" type="CenterContainer" parent="PauseMenu"]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -254,7 +407,7 @@ theme_override_styles/panel = SubResource("StyleBox_panel")
 
 [node name="VBox" type="VBoxContainer" parent="PauseMenu/Center/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="PauseMenu/Center/Panel/VBox"]
 layout_mode = 2
@@ -264,15 +417,31 @@ horizontal_alignment = 1
 
 [node name="ResumeButton" type="Button" parent="PauseMenu/Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 76)
+custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
 text = "Продолжить"
 
+[node name="SettingsButton" type="Button" parent="PauseMenu/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "Настройки"
+
 [node name="RestartButton" type="Button" parent="PauseMenu/Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 76)
+custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
-text = "Начать заново"
+text = "Начать уровень заново"
+
+[node name="MenuButton" type="Button" parent="PauseMenu/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "В главное меню"
+
+[node name="SettingsPanel" parent="." instance=ExtResource("5_settings_panel")]
+unique_name_in_owner = true
+visible = false
 
 [node name="GameOver" type="Control" parent="."]
 unique_name_in_owner = true
@@ -285,16 +454,16 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Dim" type="ColorRect" parent="GameOver"]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.25, 0, 0, 0.6)
+color = Color(0.3, 0, 0, 0.6)
 
 [node name="Center" type="CenterContainer" parent="GameOver"]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -307,17 +476,91 @@ theme_override_styles/panel = SubResource("StyleBox_panel")
 
 [node name="VBox" type="VBoxContainer" parent="GameOver/Center/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 16
 
-[node name="GameOverLabel" type="Label" parent="GameOver/Center/Panel/VBox"]
-unique_name_in_owner = true
+[node name="Title" type="Label" parent="GameOver/Center/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 44
 text = "Вы погибли"
 horizontal_alignment = 1
 
 [node name="GameOverRestartButton" type="Button" parent="GameOver/Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(340, 76)
+custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
-text = "Ещё раз"
+text = "Заново"
+
+[node name="GameOverMenuButton" type="Button" parent="GameOver/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "В главное меню"
+
+[node name="LevelComplete" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="LevelComplete"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.15, 0.05, 0.6)
+
+[node name="Center" type="CenterContainer" parent="LevelComplete"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="LevelComplete/Center"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="VBox" type="VBoxContainer" parent="LevelComplete/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="CompleteTitle" type="Label" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "Уровень пройден!"
+horizontal_alignment = 1
+
+[node name="CompleteStats" type="Label" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Время: 0:00"
+horizontal_alignment = 1
+
+[node name="RecordLabel" type="Label" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 30
+text = "Новый рекорд!"
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "Следующий уровень"
+
+[node name="CompleteMenuButton" type="Button" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "В главное меню"

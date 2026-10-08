@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "deagle"
+display_name = "Desert Eagle"
+short_name = "Дигл"
+model = "deagle"
+sound = "deagle"
+damage = 50.0
+pellets = 1
+spread_deg = 0.4
+fire_interval = 0.45
+max_range = 90.0
+headshot_multiplier = 3.0
+impulse = 8.0
+gib_damage = 1000.0
+magazine = 7
+reload_time = 1.5
+infinite_ammo = false
+start_reserve = 21
+max_reserve = 42
+ammo_per_pickup = 14
+recoil_deg = 3.5
+shake = 0.3
+crosshair_kick = 18.0

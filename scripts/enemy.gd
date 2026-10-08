@@ -1,201 +1,424 @@
 class_name Enemy
 extends CharacterBody3D
-## Простой враг ближнего боя.
-## Идёт к игроку, перед ударом заметно замахивается (светится и откидывается назад),
-## чтобы игрок успел отпрыгнуть или сделать рывок. Получив удар, теряет замах.
+## Враг. Три вида: стрелок, псих с битой и громила (настраиваются в своих сценах).
+## Стоит на посту, пока не заметит игрока: увидит, услышит выстрел или словит пулю.
+## Перед выстрелом целится красным лазером — есть время уйти рывком или за укрытие.
 
-signal died(enemy: Enemy)
+signal died(enemy: Enemy, headshot: bool)
 
-enum State { IDLE, CHASE, WINDUP, RECOVER, HURT, DEAD }
+enum Kind { GUNNER, RUSHER, HEAVY }
+enum Phase { PAUSE, AIM, FIRE, WINDUP, RECOVER }
 
-@export var max_health := 4
-@export var move_speed := 3.8
-@export var acceleration := 20.0
-@export var turn_speed := 8.0
-@export var detect_radius := 40.0
-@export var attack_range := 1.7
-@export var attack_damage := 1
-@export var windup_time := 0.6
-@export var recover_time := 0.8
-@export var hurt_time := 0.35
-@export var gravity := 25.0
-@export var body_color := Color(0.85, 0.22, 0.2)
-@export var telegraph_color := Color(1.0, 0.85, 0.3)
+const WORLD_MASK := 1
+const PLAYER_MASK := 2
 
-var state := State.IDLE
-var health := 0
+@export var kind := Kind.GUNNER
+@export var max_health := 70.0
+@export var move_speed := 3.0
+@export var turn_speed := 7.0
+@export var gravity := 22.0
+@export var sight_range := 30.0
+@export var view_angle_deg := 150.0
+@export var alerted := false  ## Сразу знает, где игрок (так появляются враги из волн).
+@export var hold_position := true  ## Стрелок стоит на посту, пока видит игрока.
 
+@export_group("Стрельба")
+@export var damage := 7
+@export var aim_time := 0.8  ## Сколько горит лазер перед выстрелом.
+@export var burst := 1
+@export var burst_interval := 0.14
+@export var fire_pause := 1.6
+@export_range(0.0, 1.0) var accuracy := 0.65
+
+@export_group("Ближний бой")
+@export var melee_damage := 18
+@export var melee_range := 1.6
+@export var melee_windup := 0.45
+
+@export_group("Добыча")
+@export_range(0.0, 1.0) var drop_ammo_chance := 0.25
+@export_range(0.0, 1.0) var drop_health_chance := 0.12
+
+var health := 0.0
+
+var _awake := false
+var _dead := false
+var _phase := Phase.PAUSE
 var _timer := 0.0
-var _player: Node3D
-var _material: StandardMaterial3D
-var _flash_tween: Tween
+var _shots_left := 0
+var _player: Player
+var _sees_player := false
+var _think := 0.0
+var _last_seen := Vector3.ZERO
+var _lost_time := 0.0
+var _strafe_dir := 0.0
+var _strafe_timer := 0.0
+var _laser: MeshInstance3D
 
-@onready var _pivot: Node3D = $Pivot
-@onready var _body: MeshInstance3D = $Pivot/Body
+@onready var model: BlockyCharacter = $Model
 @onready var _collision: CollisionShape3D = $CollisionShape3D
 
 
 func _ready() -> void:
 	add_to_group("enemies")
 	health = max_health
-	# Свой материал у каждого врага, чтобы вспышки не красили всех сразу.
-	_material = StandardMaterial3D.new()
-	_material.albedo_color = body_color
-	_body.material_override = _material
+	_think = randf() * 0.2
+	_build_laser()
+	if alerted:
+		_wake.call_deferred(false)
 
 
 func _physics_process(delta: float) -> void:
-	if state == State.DEAD:
+	if _dead:
 		return
 	if not is_instance_valid(_player):
-		_player = get_tree().get_first_node_in_group("player") as Node3D
-
-	_timer -= delta
+		_player = get_tree().get_first_node_in_group("player") as Player
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	match state:
-		State.IDLE:
-			_idle_state(delta)
-		State.CHASE:
-			_chase_state(delta)
-		State.WINDUP:
-			_windup_state(delta)
-		State.RECOVER, State.HURT:
-			_slow_down(delta)
-			if _timer <= 0.0:
-				state = State.CHASE
+	_think -= delta
+	if _think <= 0.0:
+		_think = 0.2
+		_sees_player = _can_see_player()
+		if _sees_player:
+			_last_seen = _player.global_position
+
+	if not _awake:
+		_slow_down(delta)
+		if _sees_player and (_in_view() or _distance_to_player() < 6.0):
+			_wake()
+	elif not _player_alive():
+		_slow_down(delta)
+		_show_laser(false)
+		model.melee_pose = -1.0
+	elif kind == Kind.RUSHER:
+		_rusher_logic(delta)
+	else:
+		_shooter_logic(delta)
 
 	move_and_slide()
+	var speed_ratio := Vector2(velocity.x, velocity.z).length() / maxf(move_speed, 0.1)
+	model.animate(delta, speed_ratio, _awake and kind != Kind.RUSHER, _aim_pitch())
 
-	if global_position.y < -20.0:
-		_die()
+	if global_position.y < -25.0:
+		_die(BlockyCharacter.Death.FALL, Vector3.DOWN, 0.0)
 
 
 func is_alive() -> bool:
-	return state != State.DEAD
+	return not _dead
 
 
-func take_damage(amount: int, from_position: Vector3, knockback := 5.0) -> void:
-	if state == State.DEAD:
-		return
-	health -= amount
-	var push := global_position - from_position
-	push.y = 0.0
-	if push.length_squared() > 0.0001:
-		push = push.normalized()
-	velocity = push * knockback + Vector3.UP * 2.0
-	_reset_telegraph()
-	_flash()
-	if health <= 0:
-		_die()
-		return
-	state = State.HURT
-	_timer = hurt_time
+func is_head_hit(point: Vector3) -> bool:
+	return point.y - global_position.y >= BlockyCharacter.NECK_Y * model.scale.y
 
 
-# --- Состояния ----------------------------------------------------------------
-
-func _idle_state(delta: float) -> void:
-	_slow_down(delta)
-	if _player_is_valid() and _distance_to_player() <= detect_radius:
-		state = State.CHASE
+## Точка, в которую помощь прицеливания «доводит» выстрел.
+func get_aim_point(head: bool) -> Vector3:
+	return global_position + Vector3.UP * (1.72 if head else 1.15) * model.scale.y
 
 
-func _chase_state(delta: float) -> void:
-	if not _player_is_valid():
-		state = State.IDLE
-		return
-	var to_player := _flat_to_player()
-	var distance := to_player.length()
-	if distance <= attack_range:
-		_start_windup()
-		return
-	var direction := (to_player / maxf(distance, 0.001) + _separation()).normalized()
-	_set_horizontal_velocity(direction * move_speed, delta)
-	_turn_towards(direction, turn_speed, delta)
-
-
-func _start_windup() -> void:
-	state = State.WINDUP
-	_timer = windup_time
-
-
-func _windup_state(delta: float) -> void:
-	_slow_down(delta)
-	# Во время замаха враг медленно доворачивается — от удара можно уйти вбок.
-	if _player_is_valid():
-		_turn_towards(_flat_to_player(), turn_speed * 0.3, delta)
-	var progress := 1.0 - clampf(_timer / windup_time, 0.0, 1.0)
-	_material.albedo_color = body_color.lerp(telegraph_color, progress)
-	_pivot.rotation.x = 0.35 * progress
-	if _timer <= 0.0:
-		_strike()
-
-
-func _strike() -> void:
-	_reset_telegraph()
-	var forward := -_pivot.global_basis.z
-	forward.y = 0.0
-	forward = forward.normalized()
-	velocity += forward * 6.0
-	if _player_is_valid():
-		var to_player := _flat_to_player()
-		var in_range := to_player.length() <= attack_range + 0.6
-		var in_front := forward.dot(to_player.normalized()) > 0.4
-		if in_range and in_front and _player.has_method("take_damage"):
-			_player.take_damage(attack_damage, global_position)
-	state = State.RECOVER
-	_timer = recover_time
-
-
-func _die() -> void:
-	state = State.DEAD
-	remove_from_group("enemies")
-	_collision.set_deferred("disabled", true)
-	died.emit(self)
-	var tween := create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	tween.set_parallel(true)
-	tween.tween_property(_pivot, "scale", Vector3(1.4, 0.05, 1.4), 0.25)
-	tween.tween_property(_pivot, "position:y", -0.4, 0.25)
-	tween.chain().tween_callback(queue_free)
-
-
-# --- Вспомогательное ----------------------------------------------------------
-
-func _player_is_valid() -> bool:
-	if not is_instance_valid(_player):
+## Попадание от игрока. Возвращает true, если враг убит.
+func apply_shot(amount: float, headshot: bool, point: Vector3, direction: Vector3, weapon: WeaponData) -> bool:
+	if _dead:
 		return false
-	return not _player.has_method("is_alive") or _player.is_alive()
+	health -= amount
+	_wake()
+	model.flinch(0.75 if headshot else 0.45)
+	Fx.blood(point, direction, 24 if amount >= 40.0 else 12)
+	if health <= 0.0:
+		var mode := BlockyCharacter.Death.FALL
+		if amount >= weapon.gib_damage:
+			mode = BlockyCharacter.Death.GIB
+		elif headshot:
+			mode = BlockyCharacter.Death.HEADSHOT
+		_die(mode, direction, weapon.impulse)
+		return true
+	Audio.play_at("hit", point, -3.0)
+	# Попадание сбивает прицеливание. Громилу — только хедшот или мощный выстрел.
+	if _phase == Phase.AIM or _phase == Phase.WINDUP:
+		if kind != Kind.HEAVY or headshot or amount >= 40.0:
+			_phase = Phase.PAUSE
+			_timer = 0.35
+			_show_laser(false)
+			model.melee_pose = -1.0
+	return false
 
 
-func _flat_to_player() -> Vector3:
-	var to_player := _player.global_position - global_position
-	to_player.y = 0.0
-	return to_player
+## Враг слышит выстрел игрока, если тот достаточно близко.
+func hear_noise(position: Vector3, radius: float) -> void:
+	if not _awake and not _dead and global_position.distance_to(position) <= radius:
+		_wake()
+
+
+# --- Стрелок и громила --------------------------------------------------------
+
+func _shooter_logic(delta: float) -> void:
+	_face(_flat_to(_player.global_position), delta)
+	if not _sees_player:
+		_show_laser(false)
+		if _phase != Phase.PAUSE:
+			_phase = Phase.PAUSE
+			_timer = 0.4
+		_lost_time += delta
+		if not hold_position or _lost_time > 2.0:
+			_move_to(_last_seen, delta)
+		else:
+			_slow_down(delta)
+		return
+
+	_lost_time = 0.0
+	_timer -= delta
+	match _phase:
+		Phase.PAUSE:
+			_strafe(delta)
+			if _timer <= 0.0:
+				_phase = Phase.AIM
+				_timer = aim_time
+		Phase.AIM:
+			_slow_down(delta)
+			_show_laser(true)
+			if _timer <= 0.0:
+				_phase = Phase.FIRE
+				_shots_left = burst
+				_timer = 0.0
+		Phase.FIRE:
+			_slow_down(delta)
+			if _timer <= 0.0:
+				_fire()
+				_shots_left -= 1
+				_timer = burst_interval
+				if _shots_left <= 0:
+					_phase = Phase.PAUSE
+					_timer = fire_pause * randf_range(0.8, 1.25)
+					_show_laser(false)
+		_:
+			_phase = Phase.PAUSE
+
+
+func _fire() -> void:
+	var muzzle := model.get_muzzle_position()
+	var target := _player.global_position + Vector3.UP * 1.2
+	var distance := muzzle.distance_to(target)
+	var chance := accuracy * clampf(1.2 - distance / 35.0, 0.35, 1.0)
+	if Vector2(_player.velocity.x, _player.velocity.z).length() > 3.0:
+		chance *= 0.75
+	if _player.is_dodging():
+		chance = 0.0
+	var will_hit := randf() < chance
+	var aim := target
+	if not will_hit:
+		var side := (target - muzzle).cross(Vector3.UP).normalized()
+		aim += side * randf_range(0.7, 1.3) * (1.0 if randf() < 0.5 else -1.0) + Vector3.UP * randf_range(-0.3, 0.6)
+	var direction := (aim - muzzle).normalized()
+	var end := muzzle + direction * 80.0
+	var query := PhysicsRayQueryParameters3D.create(muzzle, end, WORLD_MASK | PLAYER_MASK, [get_rid()])
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit:
+		end = hit.position
+		if hit.collider is Player:
+			if will_hit:
+				(hit.collider as Player).take_damage(damage, global_position)
+		else:
+			Fx.sparks(end, hit.normal)
+	Fx.tracer(muzzle, end, Color(1.0, 0.45, 0.25))
+	Fx.muzzle_flash(muzzle, direction)
+	Audio.play_at("enemy_shot", muzzle, -2.0)
+	model.recoil(0.2)
+
+
+func _strafe(delta: float) -> void:
+	if hold_position:
+		_slow_down(delta)
+		return
+	_strafe_timer -= delta
+	if _strafe_timer <= 0.0:
+		_strafe_timer = randf_range(1.0, 2.5)
+		_strafe_dir = [-1.0, 0.0, 1.0].pick_random()
+	var side := global_basis.x * _strafe_dir
+	if _strafe_dir != 0.0 and _ground_ahead(side):
+		_set_horizontal_velocity(side * move_speed * 0.6, delta)
+	else:
+		_slow_down(delta)
+
+
+# --- Псих с битой --------------------------------------------------------------
+
+func _rusher_logic(delta: float) -> void:
+	var to_player := _flat_to(_player.global_position)
+	var distance := to_player.length()
+	match _phase:
+		Phase.WINDUP:
+			_slow_down(delta)
+			_face(to_player, delta)
+			_timer -= delta
+			model.melee_pose = 1.0 - clampf(_timer / melee_windup, 0.0, 1.0)
+			if _timer <= 0.0:
+				_strike(distance, to_player)
+		Phase.RECOVER:
+			_slow_down(delta)
+			_timer -= delta
+			if _timer < 0.3:
+				model.melee_pose = -1.0
+			if _timer <= 0.0:
+				_phase = Phase.PAUSE
+		_:
+			model.melee_pose = -1.0
+			if distance <= melee_range:
+				_phase = Phase.WINDUP
+				_timer = melee_windup
+				return
+			var direction := (to_player / maxf(distance, 0.01) + _separation()).normalized()
+			if _ground_ahead(direction):
+				_set_horizontal_velocity(direction * move_speed, delta)
+			else:
+				_slow_down(delta)
+			_face(direction, delta)
+
+
+func _strike(distance: float, to_player: Vector3) -> void:
+	model.melee_pose = 0.0
+	_phase = Phase.RECOVER
+	_timer = 0.6
+	Audio.play_at("swing", global_position)
+	var forward := -global_basis.z
+	if distance <= melee_range + 0.6 and forward.dot(to_player.normalized()) > 0.3:
+		_player.take_damage(melee_damage, global_position)
+		Audio.play_at("melee_hit", _player.global_position)
+
+
+# --- Общее ----------------------------------------------------------------------
+
+func _wake(alert_neighbors := true) -> void:
+	if _awake or _dead:
+		return
+	_awake = true
+	_phase = Phase.PAUSE
+	_timer = randf_range(0.3, 0.9)
+	if is_instance_valid(_player):
+		_last_seen = _player.global_position
+	if alert_neighbors:
+		# Будим соседей, но без цепной реакции на весь уровень.
+		for node in get_tree().get_nodes_in_group("enemies"):
+			var other := node as Enemy
+			if other and other != self and other.global_position.distance_to(global_position) < 10.0:
+				other._wake(false)
+
+
+func _die(mode: BlockyCharacter.Death, direction: Vector3, force: float) -> void:
+	_dead = true
+	remove_from_group("enemies")
+	_show_laser(false)
+	_collision.set_deferred("disabled", true)
+	model.break_apart(mode, direction, force)
+	match mode:
+		BlockyCharacter.Death.GIB:
+			Audio.play_at("gib", global_position + Vector3.UP)
+		BlockyCharacter.Death.HEADSHOT:
+			Audio.play_at("headshot", global_position + Vector3.UP * 1.7)
+		_:
+			Audio.play_at("death", global_position + Vector3.UP)
+	_drop_loot()
+	var headshot := mode == BlockyCharacter.Death.HEADSHOT
+	died.emit(self, headshot)
+	get_tree().call_group("level", "register_kill", headshot)
+	queue_free()
+
+
+func _drop_loot() -> void:
+	var roll := randf()
+	var pickup: Pickup = null
+	if roll < drop_health_chance:
+		pickup = Pickup.new()
+		pickup.kind = Pickup.Kind.HEALTH
+		pickup.heal_amount = 20
+	elif roll < drop_health_chance + drop_ammo_chance:
+		pickup = Pickup.new()
+		pickup.kind = Pickup.Kind.AMMO
+	if pickup and get_tree().current_scene:
+		get_tree().current_scene.add_child(pickup)
+		pickup.global_position = global_position + Vector3.UP * 0.1
+
+
+func _can_see_player() -> bool:
+	if not _player_alive():
+		return false
+	var eye := global_position + Vector3.UP * 1.6 * model.scale.y
+	var target := _player.global_position + Vector3.UP * 1.3
+	if eye.distance_to(target) > sight_range:
+		return false
+	var query := PhysicsRayQueryParameters3D.create(eye, target, WORLD_MASK)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
+func _in_view() -> bool:
+	var to_player := _flat_to(_player.global_position)
+	if to_player.length_squared() < 0.01:
+		return true
+	return rad_to_deg((-global_basis.z).angle_to(to_player)) <= view_angle_deg * 0.5
+
+
+func _player_alive() -> bool:
+	return is_instance_valid(_player) and _player.is_alive()
 
 
 func _distance_to_player() -> float:
-	return _flat_to_player().length()
+	return _flat_to(_player.global_position).length() if is_instance_valid(_player) else INF
 
 
-## Враги слегка расталкивают друг друга, чтобы не слипаться в одну кучу.
+func _flat_to(point: Vector3) -> Vector3:
+	var offset := point - global_position
+	offset.y = 0.0
+	return offset
+
+
+func _aim_pitch() -> float:
+	if not _awake or not _player_alive():
+		return 0.0
+	var offset := _player.global_position + Vector3.UP * 1.2 - (global_position + Vector3.UP * 1.4 * model.scale.y)
+	return clampf(atan2(offset.y, Vector2(offset.x, offset.z).length()), -0.9, 0.9)
+
+
+func _move_to(point: Vector3, delta: float) -> void:
+	var offset := _flat_to(point)
+	if offset.length() < 1.5:
+		_slow_down(delta)
+		return
+	var direction := (offset.normalized() + _separation()).normalized()
+	if _ground_ahead(direction):
+		_set_horizontal_velocity(direction * move_speed, delta)
+	else:
+		_slow_down(delta)
+
+
+## Есть ли пол впереди — чтобы враги не прыгали с платформ и крыш.
+func _ground_ahead(direction: Vector3) -> bool:
+	var from := global_position + direction.normalized() * 0.8 + Vector3.UP * 0.5
+	var query := PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 1.6, WORLD_MASK)
+	return not get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
 func _separation() -> Vector3:
 	var push := Vector3.ZERO
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var other := node as Node3D
-		if other == self or other == null:
+		if other == null or other == self:
 			continue
 		var away := global_position - other.global_position
 		away.y = 0.0
 		var distance := away.length()
-		if distance > 0.001 and distance < 1.5:
-			push += away / distance * (1.5 - distance)
+		if distance > 0.001 and distance < 1.4:
+			push += away / distance * (1.4 - distance)
 	return push
 
 
+func _face(direction: Vector3, delta: float) -> void:
+	if Vector2(direction.x, direction.z).length_squared() < 0.0001:
+		return
+	rotation.y = lerp_angle(rotation.y, atan2(-direction.x, -direction.z), 1.0 - exp(-turn_speed * delta))
+
+
 func _set_horizontal_velocity(target: Vector3, delta: float) -> void:
-	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(target, acceleration * delta)
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(target, 25.0 * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
@@ -204,21 +427,36 @@ func _slow_down(delta: float) -> void:
 	_set_horizontal_velocity(Vector3.ZERO, delta)
 
 
-func _turn_towards(direction: Vector3, speed: float, delta: float) -> void:
-	if Vector2(direction.x, direction.z).length_squared() < 0.0001:
+func _build_laser() -> void:
+	_laser = MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(0.018, 0.018, 1.0)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = Color(1.0, 0.1, 0.1, 0.75)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh.material = material
+	_laser.mesh = mesh
+	_laser.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_laser.top_level = true
+	_laser.visible = false
+	add_child(_laser)
+
+
+## Красный лазер от ствола к игроку — предупреждение о выстреле.
+func _show_laser(on: bool) -> void:
+	if _laser == null:
 		return
-	var target_angle := atan2(-direction.x, -direction.z)
-	_pivot.rotation.y = lerp_angle(_pivot.rotation.y, target_angle, 1.0 - exp(-speed * delta))
-
-
-func _reset_telegraph() -> void:
-	_material.albedo_color = body_color
-	_pivot.rotation.x = 0.0
-
-
-func _flash() -> void:
-	if _flash_tween:
-		_flash_tween.kill()
-	_material.albedo_color = Color.WHITE
-	_flash_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	_flash_tween.tween_property(_material, "albedo_color", body_color, 0.2)
+	_laser.visible = on and _player_alive()
+	if not _laser.visible:
+		return
+	var from := model.get_muzzle_position()
+	var to := _player.global_position + Vector3.UP * 1.2
+	var length := from.distance_to(to)
+	if length < 0.1:
+		return
+	_laser.global_transform = Transform3D(Basis.looking_at(to - from), (from + to) * 0.5)
+	_laser.scale = Vector3(1.0, 1.0, length)
+	# В последние мгновения лазер мигает — сейчас выстрелит.
+	if _phase == Phase.AIM and _timer < 0.25:
+		_laser.visible = int(_timer * 30.0) % 2 == 0

@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.38
+height = 1.95
+
+[node name="Rusher" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_enemy")
+kind = 1
+max_health = 55.0
+move_speed = 6.2
+turn_speed = 10.0
+melee_damage = 18
+melee_windup = 0.45
+drop_ammo_chance = 0.3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
+script = ExtResource("2_model")
+shirt_color = Color(0.72, 0.14, 0.12, 1)
+pants_color = Color(0.14, 0.14, 0.17, 1)
+hair_color = Color(0.55, 0.42, 0.22, 1)
+weapon = "bat"

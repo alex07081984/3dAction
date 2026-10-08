@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "pistol"
+display_name = "Пистолет"
+short_name = "Пист"
+model = "pistol"
+sound = "pistol"
+damage = 20.0
+pellets = 1
+spread_deg = 0.7
+fire_interval = 0.24
+max_range = 70.0
+headshot_multiplier = 4.0
+impulse = 3.5
+gib_damage = 1000.0
+magazine = 12
+reload_time = 1.1
+infinite_ammo = true
+start_reserve = 0
+max_reserve = 0
+ammo_per_pickup = 0
+recoil_deg = 1.0
+shake = 0.1
+crosshair_kick = 8.0

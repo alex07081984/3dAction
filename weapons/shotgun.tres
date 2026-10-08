@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "shotgun"
+display_name = "Дробовик"
+short_name = "Дробь"
+model = "shotgun"
+sound = "shotgun"
+damage = 12.0
+pellets = 9
+spread_deg = 6.0
+fire_interval = 0.85
+max_range = 40.0
+headshot_multiplier = 2.0
+impulse = 11.0
+gib_damage = 65.0
+magazine = 6
+reload_time = 2.0
+infinite_ammo = false
+start_reserve = 12
+max_reserve = 36
+ammo_per_pickup = 8
+recoil_deg = 5.0
+shake = 0.45
+crosshair_kick = 26.0
