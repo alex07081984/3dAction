@@ -27,7 +27,10 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="Model" type="Node3D" parent="."]
 transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
 script = ExtResource("2_model")
-shirt_color = Color(0.24, 0.24, 0.26, 1)
+outfit = "jacket"
+random_look = true
+shirt_color = Color(0.3, 0.3, 0.32, 1)
+jacket_color = Color(0.17, 0.12, 0.09, 1)
 pants_color = Color(0.2, 0.24, 0.34, 1)
 mask_color = Color(0.08, 0.08, 0.09, 1)
 weapon = "pistol"

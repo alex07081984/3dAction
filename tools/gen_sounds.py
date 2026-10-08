@@ -110,6 +110,36 @@ def tone(duration, freq, tau=0.2, attack=0.005, harmonics=(1.0, 0.3, 0.1)):
     return x * env(duration, tau, attack)
 
 
+def resonator(x, freq, bandwidth):
+    """Двухполюсный резонатор — форманта голоса."""
+    r = np.exp(-np.pi * bandwidth / SR)
+    c1 = 2 * r * np.cos(2 * np.pi * freq / SR)
+    c2 = -r * r
+    y = np.zeros_like(x)
+    y1 = y2 = 0.0
+    g = 1.0 - r
+    for i, v in enumerate(x):
+        y0 = g * v + c1 * y1 + c2 * y2
+        y[i] = y0
+        y2, y1 = y1, y0
+    return y
+
+
+def voice(duration, f0, f1, formants, vibrato=0.0, breath=0.2, rough=0.0):
+    """Гласная: пилообразный «голосовой» сигнал через форманты (крик, смех, рык)."""
+    t = t_axis(duration)
+    freq = np.linspace(f0, f1, len(t)) * (1 + vibrato * np.sin(2 * np.pi * 6.5 * t))
+    freq *= 1 + rough * lowpass(rng.uniform(-1, 1, len(t)), 40) * 4
+    phase = np.cumsum(freq) / SR
+    source = 2 * (phase % 1.0) - 1.0 + breath * noise(duration)
+    out = sum(resonator(source, f, bw) * a for f, bw, a in formants)
+    return out
+
+
+VOWEL_A = ((800, 90, 1.0), (1200, 110, 0.6), (2500, 160, 0.25))
+VOWEL_A_DARK = ((650, 90, 1.0), (1000, 100, 0.6), (2400, 150, 0.2))
+
+
 def main():
     save("pistol", finish(gunshot(0.45, 190, 70, 0.05, 0.012, 2200, 0.06, 700, 0.2, 0.35)))
     save("deagle", finish(gunshot(0.8, 150, 45, 0.09, 0.02, 1600, 0.11, 450, 0.42, 0.6), drive=2.2))
@@ -187,6 +217,49 @@ def main():
     save("level_complete", finish(win, gain=0.6, drive=1.0))
 
     save("ui_click", finish(click(0.05, 2500, 0.004) + tone(0.05, 1200, 0.01) * 0.3, gain=0.4, drive=1.0))
+
+    # Взрыв: глухой удар, рёв огня и треск обломков.
+    boom = sweep(1.8, 70, 24, 0.5) * env(1.8, 0.35, 0.004) * 1.4
+    boom += lowpass(noise(1.8), 380) * env(1.8, 0.5, 0.003) * 2.2
+    boom += highpass(noise(1.8), 1500) * env(1.8, 0.05, 0.001) * 0.8
+    for at in rng.uniform(0.1, 1.2, 14):
+        boom = place(boom, click(0.04, 1800, 0.008) * rng.uniform(0.2, 0.6), at)
+    save("explosion", finish(boom, gain=0.95, drive=2.6))
+
+    # Шипение газа из пробитого баллона.
+    hiss = highpass(noise(2.0), 2600) * (0.8 + 0.2 * np.sin(2 * np.pi * 17 * t_axis(2.0)))
+    hiss *= np.clip(t_axis(2.0) / 0.05, 0, 1) * np.clip((2.0 - t_axis(2.0)) / 0.2, 0, 1)
+    save("hiss", finish(hiss, gain=0.55, drive=1.0))
+
+    # Треск огня на горящей бочке.
+    fire = lowpass(noise(2.4), 700) * 0.6
+    for at in rng.uniform(0.0, 2.3, 40):
+        fire = place(fire, click(0.03, 1200, 0.006) * rng.uniform(0.3, 1.0), at)
+    fire *= np.clip(t_axis(2.4) / 0.2, 0, 1)
+    save("fire", finish(fire, gain=0.5, drive=1.2))
+
+    # Крик раненого: «А-а-а!» с дрожью в голосе.
+    scream = voice(1.0, 430, 330, VOWEL_A, vibrato=0.05, breath=0.35, rough=0.02)
+    scream *= np.clip(t_axis(1.0) / 0.04, 0, 1) * np.exp(-np.maximum(t_axis(1.0) - 0.55, 0) / 0.15)
+    save("scream", finish(scream, gain=0.7, drive=2.0))
+
+    # Смех Худого: «ха-ха-ха-ха», по слогу, тон понижается.
+    laugh = np.zeros(int(SR * 1.5))
+    for i in range(6):
+        f = 250 - i * 14
+        syllable = lowpass(noise(0.05), 3000) * env(0.05, 0.03) * 0.6
+        syllable = np.concatenate([syllable, voice(0.13, f, f * 0.9, VOWEL_A, breath=0.5) * env(0.13, 0.08, 0.01)])
+        laugh = place(laugh, syllable, 0.05 + i * 0.21)
+    save("laugh", finish(laugh, gain=0.75, drive=1.8))
+
+    # Рык Толстяка.
+    roar = voice(1.1, 120, 85, VOWEL_A_DARK, vibrato=0.03, breath=0.6, rough=0.08)
+    roar *= np.clip(t_axis(1.1) / 0.08, 0, 1) * np.exp(-np.maximum(t_axis(1.1) - 0.6, 0) / 0.2)
+    save("roar", finish(roar, gain=0.85, drive=3.0))
+
+    # Дымовая шашка Худого: хлопок и шипение.
+    smoke = sweep(0.9, 200, 60) * env(0.9, 0.05) + highpass(noise(0.9), 1500) * env(0.9, 0.35, 0.02) * 0.7
+    save("smoke", finish(smoke, gain=0.6, drive=1.5))
 
 
 if __name__ == "__main__":

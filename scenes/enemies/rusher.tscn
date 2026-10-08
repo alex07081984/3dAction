@@ -26,6 +26,10 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="Model" type="Node3D" parent="."]
 transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
 script = ExtResource("2_model")
+build = "thin"
+outfit = "tank"
+hair_style = "mohawk"
+random_look = true
 shirt_color = Color(0.72, 0.14, 0.12, 1)
 pants_color = Color(0.14, 0.14, 0.17, 1)
 hair_color = Color(0.55, 0.42, 0.22, 1)

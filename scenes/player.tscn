@@ -25,11 +25,16 @@ shape = SubResource("CapsuleShape3D_body")
 
 [node name="Model" type="Node3D" parent="."]
 script = ExtResource("2_model")
+outfit = "coat"
+hat = "fedora"
+beard = "stubble"
 skin_color = Color(0.9, 0.72, 0.58, 1)
-shirt_color = Color(0.16, 0.3, 0.55, 1)
-pants_color = Color(0.18, 0.18, 0.22, 1)
+shirt_color = Color(0.82, 0.82, 0.8, 1)
+jacket_color = Color(0.36, 0.31, 0.24, 1)
+pants_color = Color(0.13, 0.13, 0.15, 1)
 hair_color = Color(0.1, 0.07, 0.05, 1)
-vest_color = Color(0.13, 0.15, 0.13, 1)
+hat_color = Color(0.17, 0.15, 0.14, 1)
+shoe_color = Color(0.12, 0.08, 0.06, 1)
 
 [node name="CameraRig" type="Node3D" parent="."]
 top_level = true

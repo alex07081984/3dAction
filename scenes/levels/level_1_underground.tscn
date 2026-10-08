@@ -25,10 +25,12 @@
 [ext_resource type="Material" path="res://materials/rust.tres" id="23_rust"]
 [ext_resource type="Script" path="res://scripts/level_exit.gd" id="24_level_exit"]
 [ext_resource type="Material" path="res://materials/sign_green.tres" id="25_sign_green"]
-[ext_resource type="Script" path="res://scripts/level.gd" id="26_level"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="27_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="28_pistol"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="29_hud"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="26_explosive_barrel"]
+[ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="27_gas_cylinder"]
+[ext_resource type="Script" path="res://scripts/level.gd" id="28_level"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="29_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="30_pistol"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="31_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(16, 4, 16)
@@ -54,11 +56,11 @@ fog_light_color = Color(0.05, 0.06, 0.07, 1)
 fog_density = 0.02
 
 [node name="Level1Underground" type="Node3D"]
-script = ExtResource("26_level")
+script = ExtResource("28_level")
 level_index = 0
 title = "Подземка"
 objective = "Выберитесь из коллектора"
-start_weapons = Array[ExtResource("27_weapon_data")]([ExtResource("28_pistol")])
+start_weapons = Array[ExtResource("29_weapon_data")]([ExtResource("30_pistol")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -1919,6 +1921,35 @@ material = ExtResource("25_sign_green")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env_1")
 
+[node name="Explosives" type="Node3D" parent="."]
+
+[node name="Barrel" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0, -42)
+
+[node name="Barrel2" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, 8.5, 0, -36)
+
+[node name="Cylinder" parent="Explosives" instance=ExtResource("27_gas_cylinder")]
+transform = Transform3D(0.2756, 0, 0.9613, 0, 1, 0, -0.9613, 0, 0.2756, 27.84, 0, -41.04)
+
+[node name="Barrel3" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(-0.3584, 0, 0.9336, 0, 1, 0, -0.9336, 0, -0.3584, 26.43, 0, -168.15)
+
+[node name="Barrel4" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(-0.848, 0, 0.5299, 0, 1, 0, -0.5299, 0, -0.848, 26.79, 0, -156.59)
+
+[node name="Cylinder2" parent="Explosives" instance=ExtResource("27_gas_cylinder")]
+transform = Transform3D(-0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, -0.9962, 31.01, -1, -174.4)
+
+[node name="Barrel5" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(-0.7431, 0, -0.6691, 0, 1, 0, 0.6691, 0, -0.7431, -19.56, 0, -225.06)
+
+[node name="Barrel6" parent="Explosives" instance=ExtResource("26_explosive_barrel")]
+transform = Transform3D(-0.1908, 0, -0.9816, 0, 1, 0, 0.9816, 0, -0.1908, -10, 0, -196.5)
+
+[node name="Cylinder3" parent="Explosives" instance=ExtResource("27_gas_cylinder")]
+transform = Transform3D(0.4384, 0, -0.8988, 0, 1, 0, 0.8988, 0, 0.4384, -8.43, 4, -244.61)
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -2035,4 +2066,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4, -241.5)
 [node name="P37" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4, -245)
 
-[node name="HUD" parent="." instance=ExtResource("29_hud")]
+[node name="HUD" parent="." instance=ExtResource("31_hud")]

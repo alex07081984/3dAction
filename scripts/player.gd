@@ -257,7 +257,7 @@ func _shoot(weapon: WeaponData) -> void:
 	var space := get_world_3d().direct_space_state
 	var base_dir := (_aim_point - _aim_start).normalized()
 	var muzzle := model.get_muzzle_position()
-	var results := {}  # враг -> {"damage", "head", "point", "dir"}
+	var results := {}  # враг -> {"damage", "head", "point", "dir", "parts"}
 	var impact_shown := false
 
 	for i in weapon.pellets:
@@ -269,14 +269,21 @@ func _shoot(weapon: WeaponData) -> void:
 			end = hit.position
 			var enemy := hit.collider as Enemy
 			if enemy and enemy.is_alive():
-				var head := enemy.is_head_hit(end)
+				# Часть тела считаем по настоящей позе модели: так дробь отрывает руки и ноги.
+				var part := enemy.get_hit_part(_aim_start, dir)
+				var head := part == "head"
 				var damage := weapon.damage * (weapon.headshot_multiplier if head else 1.0) * _damage_bonus
 				if not results.has(enemy):
-					results[enemy] = {"damage": 0.0, "head": false, "point": end, "dir": dir}
+					results[enemy] = {"damage": 0.0, "head": false, "point": end, "dir": dir, "parts": {}}
 				results[enemy].damage += damage
 				results[enemy].head = results[enemy].head or head
+				results[enemy].parts[part] = results[enemy].parts.get(part, 0.0) + damage
 				if head:
 					results[enemy].point = end
+			elif hit.collider.has_method("take_hit"):
+				# Бочки и баллоны.
+				hit.collider.take_hit(weapon.damage * _damage_bonus, end, dir)
+				Fx.sparks(end, hit.normal)
 			elif not impact_shown or i % 3 == 0:
 				Fx.sparks(end, hit.normal)
 				Fx.bullet_hole(end, hit.normal)
@@ -287,7 +294,7 @@ func _shoot(weapon: WeaponData) -> void:
 
 	for enemy in results:
 		var info: Dictionary = results[enemy]
-		var killed: bool = enemy.apply_shot(info.damage, info.head, info.point, info.dir, weapon)
+		var killed: bool = enemy.apply_shot(info.damage, info.head, info.point, info.dir, weapon, info.parts)
 		hit_confirmed.emit(info.head, killed)
 
 	Fx.muzzle_flash(muzzle, base_dir)
@@ -321,7 +328,7 @@ func _update_aim() -> void:
 		direct = hit.collider as Enemy
 	if direct and direct.is_alive():
 		aim_target = direct
-		aim_is_head = direct.is_head_hit(_aim_point)
+		aim_is_head = direct.get_hit_part(_aim_start, forward) == "head"
 		return
 	if not Game.settings.get("aim_assist", true):
 		return

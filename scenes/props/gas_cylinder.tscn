@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/explosive.gd" id="1_explosive"]
+
+[sub_resource type="CylinderShape3D" id="Shape_cylinder"]
+height = 1.25
+radius = 0.16
+
+[sub_resource type="StandardMaterial3D" id="Mat_red"]
+albedo_color = Color(0.72, 0.1, 0.08, 1)
+metallic = 0.3
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="Mat_white"]
+albedo_color = Color(0.9, 0.9, 0.88, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_brass"]
+albedo_color = Color(0.75, 0.6, 0.25, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="CylinderMesh" id="Mesh_body"]
+material = SubResource("Mat_red")
+top_radius = 0.15
+bottom_radius = 0.15
+height = 1.0
+radial_segments = 12
+rings = 1
+
+[sub_resource type="SphereMesh" id="Mesh_dome"]
+material = SubResource("Mat_red")
+radius = 0.15
+height = 0.24
+radial_segments = 12
+rings = 4
+is_hemisphere = true
+
+[sub_resource type="CylinderMesh" id="Mesh_stripe"]
+material = SubResource("Mat_white")
+top_radius = 0.155
+bottom_radius = 0.155
+height = 0.07
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_valve"]
+material = SubResource("Mat_brass")
+top_radius = 0.035
+bottom_radius = 0.045
+height = 0.13
+radial_segments = 8
+rings = 1
+
+[node name="GasCylinder" type="RigidBody3D"]
+mass = 25.0
+script = ExtResource("1_explosive")
+kind = 1
+health = 15.0
+blast_radius = 5.0
+blast_damage = 130.0
+player_damage = 40
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.625, 0)
+shape = SubResource("Shape_cylinder")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh = SubResource("Mesh_body")
+
+[node name="Dome" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_dome")
+
+[node name="Stripe" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_stripe")
+
+[node name="Valve" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22, 0)
+cast_shadow = 0
+mesh = SubResource("Mesh_valve")

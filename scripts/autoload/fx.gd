@@ -87,6 +87,189 @@ func blood_fountain(parent: Node3D, local_position: Vector3, duration := 1.2) ->
 	tween.tween_callback(particles.queue_free)
 
 
+## Взрыв: вспышка света, огненный шар, дым, искры и копоть на полу.
+func explosion(position: Vector3, radius := 5.0) -> void:
+	var root := _root()
+	if root == null:
+		return
+	var holder := Node3D.new()
+	holder.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	root.add_child(holder)
+	holder.global_position = position
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.6, 0.25)
+	light.light_energy = 7.0
+	light.omni_range = radius * 2.6
+	holder.add_child(light)
+	var tween := light.create_tween()
+	tween.tween_property(light, "light_energy", 0.0, 0.6).set_ease(Tween.EASE_IN)
+	var fireball := _flame_particles(Color(1.0, 0.85, 0.4), 0.9, 28)
+	fireball.one_shot = true
+	fireball.explosiveness = 1.0
+	fireball.lifetime = 0.7
+	fireball.spread = 180.0
+	fireball.initial_velocity_min = radius * 0.6
+	fireball.initial_velocity_max = radius * 1.4
+	fireball.damping_min = radius * 1.5
+	fireball.damping_max = radius * 2.0
+	fireball.gravity = Vector3(0, 3.0, 0)
+	holder.add_child(fireball)
+	fireball.emitting = true
+	var smoke := _smoke_particles(1.4, 18)
+	smoke.one_shot = true
+	smoke.explosiveness = 0.85
+	smoke.lifetime = 2.6
+	smoke.spread = 180.0
+	smoke.initial_velocity_min = 1.0
+	smoke.initial_velocity_max = radius * 0.7
+	smoke.damping_min = 2.0
+	smoke.damping_max = 3.0
+	smoke.gravity = Vector3(0, 1.6, 0)
+	holder.add_child(smoke)
+	smoke.emitting = true
+	_burst(position, Vector3.UP, Color(1.0, 0.7, 0.3), 30, 16.0, 0.05, 0.9, 12.0, 90.0)
+	_burst(position, Vector3.UP, Color(0.15, 0.13, 0.12), 14, 9.0, 0.12, 1.4, 16.0, 70.0)
+	var hit := _raycast(position + Vector3.UP * 0.3, position + Vector3.DOWN * 3.0)
+	if not hit.is_empty():
+		_decal(hit.position, hit.normal, Color(0.03, 0.03, 0.03, 0.9), radius * 0.55)
+	_free_after(holder, 3.0)
+
+
+## Огонь, привязанный к узлу (горящая бочка, сопло улетающего баллона).
+func fire(parent: Node3D, local_position: Vector3, size := 1.0, light := true) -> Node3D:
+	var flames := _flame_particles(Color(1.0, 0.6, 0.2), 0.32 * size, 26)
+	flames.lifetime = 0.55
+	flames.direction = Vector3.UP
+	flames.spread = 14.0
+	flames.initial_velocity_min = 1.0 * size
+	flames.initial_velocity_max = 2.4 * size
+	flames.gravity = Vector3(0, 2.0, 0)
+	flames.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	flames.emission_sphere_radius = 0.18 * size
+	parent.add_child(flames)
+	flames.position = local_position
+	flames.emitting = true
+	var smoke := _smoke_particles(0.5 * size, 10)
+	smoke.lifetime = 1.6
+	smoke.direction = Vector3.UP
+	smoke.spread = 12.0
+	smoke.initial_velocity_min = 1.0
+	smoke.initial_velocity_max = 2.0
+	smoke.gravity = Vector3(0, 0.8, 0)
+	flames.add_child(smoke)
+	smoke.position = Vector3(0, 0.4 * size, 0)
+	smoke.emitting = true
+	if light:
+		var glow := OmniLight3D.new()
+		glow.light_color = Color(1.0, 0.55, 0.2)
+		glow.light_energy = 2.2
+		glow.omni_range = 5.0
+		flames.add_child(glow)
+		glow.position = Vector3(0, 0.3, 0)
+		var flicker := glow.create_tween().set_loops()
+		flicker.tween_property(glow, "light_energy", 1.4, 0.08)
+		flicker.tween_property(glow, "light_energy", 2.4, 0.11)
+	return flames
+
+
+## Струя газа из пробитого баллона.
+func gas_jet(parent: Node3D, local_position: Vector3, direction: Vector3) -> Node3D:
+	var jet := _smoke_particles(0.18, 30)
+	jet.material_override = _particle_material("gas")
+	jet.lifetime = 0.45
+	jet.local_coords = false
+	jet.direction = direction
+	jet.spread = 10.0
+	jet.initial_velocity_min = 6.0
+	jet.initial_velocity_max = 9.0
+	jet.gravity = Vector3.ZERO
+	jet.damping_min = 8.0
+	jet.damping_max = 10.0
+	parent.add_child(jet)
+	jet.position = local_position
+	jet.emitting = true
+	return jet
+
+
+func _flame_particles(color: Color, size: float, amount: int) -> CPUParticles3D:
+	var particles := CPUParticles3D.new()
+	var mesh := SphereMesh.new()
+	mesh.radius = size * 0.5
+	mesh.height = size
+	mesh.radial_segments = 6
+	mesh.rings = 3
+	particles.mesh = mesh
+	particles.material_override = _particle_material("fire")
+	particles.amount = amount
+	particles.scale_amount_min = 0.5
+	particles.scale_amount_max = 1.2
+	particles.scale_amount_curve = _grow_shrink_curve()
+	var ramp := Gradient.new()
+	ramp.set_color(0, color)
+	ramp.set_color(1, Color(0.5, 0.05, 0.0, 0.0))
+	ramp.add_point(0.45, Color(1.0, 0.35, 0.05, 0.85))
+	particles.color_ramp = ramp
+	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	particles.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	return particles
+
+
+func _smoke_particles(size: float, amount: int) -> CPUParticles3D:
+	var particles := CPUParticles3D.new()
+	var mesh := SphereMesh.new()
+	mesh.radius = size * 0.5
+	mesh.height = size
+	mesh.radial_segments = 6
+	mesh.rings = 3
+	particles.mesh = mesh
+	particles.material_override = _particle_material("smoke")
+	particles.amount = amount
+	particles.scale_amount_min = 0.6
+	particles.scale_amount_max = 1.4
+	particles.scale_amount_curve = _grow_curve()
+	var ramp := Gradient.new()
+	ramp.set_color(0, Color(0.22, 0.21, 0.2, 0.7))
+	ramp.set_color(1, Color(0.1, 0.1, 0.1, 0.0))
+	particles.color_ramp = ramp
+	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	particles.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	return particles
+
+
+func _particle_material(kind: String) -> StandardMaterial3D:
+	var key := "particles_" + kind
+	if not _materials.has(key):
+		var material := StandardMaterial3D.new()
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.vertex_color_use_as_albedo = true
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		if kind == "fire":
+			material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		if kind == "gas":
+			material.albedo_color = Color(0.9, 0.92, 0.95, 0.35)
+		_materials[key] = material
+	return _materials[key]
+
+
+func _grow_shrink_curve() -> Curve:
+	if not _materials.has("curve_grow_shrink"):
+		var curve := Curve.new()
+		curve.add_point(Vector2(0.0, 0.4))
+		curve.add_point(Vector2(0.3, 1.0))
+		curve.add_point(Vector2(1.0, 0.2))
+		_materials["curve_grow_shrink"] = curve
+	return _materials["curve_grow_shrink"]
+
+
+func _grow_curve() -> Curve:
+	if not _materials.has("curve_grow"):
+		var curve := Curve.new()
+		curve.add_point(Vector2(0.0, 0.3))
+		curve.add_point(Vector2(1.0, 1.0))
+		_materials["curve_grow"] = curve
+	return _materials["curve_grow"]
+
+
 ## Лужа крови на полу под точкой.
 func blood_pool(position: Vector3, size := 1.0) -> void:
 	var hit := _raycast(position + Vector3.UP * 0.5, position + Vector3.DOWN * 3.0)

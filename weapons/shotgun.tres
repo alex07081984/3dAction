@@ -17,6 +17,7 @@ max_range = 40.0
 headshot_multiplier = 2.0
 impulse = 11.0
 gib_damage = 65.0
+sever_damage = 22.0
 magazine = 6
 reload_time = 2.0
 infinite_ammo = false
