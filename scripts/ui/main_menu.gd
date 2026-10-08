@@ -21,7 +21,13 @@ func _ready() -> void:
 	%BackButton.pressed.connect(_show_main)
 	_settings.closed.connect(_show_main)
 	var next := mini(Game.unlocked_levels, Game.LEVELS.size()) - 1
-	_play_button.text = "Играть" if next == 0 and Game.records.is_empty() else "Продолжить: %s" % Game.LEVELS[next].title
+	if Game.town_liberated:
+		_play_button.text = "В город"
+	elif next == 0 and Game.records.is_empty():
+		_play_button.text = "Играть"
+	else:
+		_play_button.text = "Продолжить: %s" % Game.LEVELS[next].title
+	%MoneyLabel.text = "$ %d" % Game.money
 	_build_level_list()
 	_show_main()
 
@@ -34,8 +40,11 @@ func _process(delta: float) -> void:
 
 func _on_play() -> void:
 	Audio.play("ui_click")
-	# Продолжаем с последнего открытого уровня.
-	Game.start_level(mini(Game.unlocked_levels, Game.LEVELS.size()) - 1)
+	if Game.town_liberated:
+		Game.go_to_town()
+	else:
+		# Продолжаем с последнего открытого уровня.
+		Game.start_level(mini(Game.unlocked_levels, Game.LEVELS.size()) - 1)
 
 
 func _build_level_list() -> void:
@@ -43,15 +52,17 @@ func _build_level_list() -> void:
 		child.queue_free()
 	for index in Game.LEVELS.size():
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(520, 84)
+		button.custom_minimum_size = Vector2(720, 70)
 		var title: String = Game.LEVELS[index].title
 		if Game.is_level_unlocked(index):
 			var record: Variant = Game.records.get(index)
+			button.text = "%d. %s" % [index + 1, title]
+			if index != Game.TOWN_INDEX and Game.tier_of(index) > 0:
+				button.text += "   · сложность %d" % (Game.tier_of(index) + 1)
 			if record is Dictionary:
-				button.text = "%d. %s   —   рекорд %s, хедшоты: %d" % [index + 1, title,
-						Game.format_time(record.time), int(record.headshots)]
-			else:
-				button.text = "%d. %s" % [index + 1, title]
+				button.text += "   · рекорд %s" % Game.format_time(record.time)
+			if index == Game.TOWN_INDEX and Game.town_liberated:
+				button.text = "%d. %s   · ваша база" % [index + 1, title]
 			button.pressed.connect(Game.start_level.bind(index))
 		else:
 			button.text = "%d. %s   (закрыт)" % [index + 1, title]

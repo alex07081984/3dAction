@@ -165,5 +165,119 @@ def main():
     tiles("office_wall", (200, 200, 195), (185, 185, 180), 1, var=0.05)
 
 
+def asphalt(name, size=128):
+    n = fbm(size, 8, 4) * 0.6 + rng.random((size, size)) * 0.4
+    save_png(name, colorize(n, (42, 43, 46), (78, 78, 80)))
+
+
+def paving(name, size=128):
+    """Тротуарная плитка: прямоугольники вразбежку."""
+    n = fbm(size, 8, 3)
+    img = colorize(n, (150, 146, 138), (178, 174, 166))
+    y, x = np.mgrid[0:size, 0:size]
+    h = size // 8
+    row = y // h
+    off = (row % 2) * (size // 8)
+    seam = ((y % h) < 2) | (((x + off) % (size // 4)) < 2)
+    img[seam] = (110, 106, 100)
+    save_png(name, img)
+
+
+def plaster(name, size=128):
+    n = fbm(size, 8, 5)
+    save_png(name, colorize(n * 0.5 + 0.5, (205, 200, 192), (240, 236, 228)))
+
+
+def facade(name, size=128):
+    """Фасад жилого дома: штукатурка и окна 2x2 на текстуру (одно окно ≈ 2.5 м)."""
+    n = fbm(size, 8, 4)
+    img = colorize(n * 0.4 + 0.6, (200, 195, 188), (235, 232, 225))
+    cell = size // 2
+    for r in range(2):
+        for c in range(2):
+            y0, x0 = r * cell + 16, c * cell + 18
+            img[y0 - 3:y0 + 33, x0 - 3:x0 + 31] = (120, 115, 110)
+            lit = rng.random() < 0.3
+            img[y0:y0 + 30, x0:x0 + 28] = (240, 210, 140) if lit else (60, 75, 95)
+            img[y0 + 14:y0 + 16, x0:x0 + 28] = (120, 115, 110)
+            img[y0:y0 + 30, x0 + 13:x0 + 15] = (120, 115, 110)
+    save_png(name, img)
+
+
+def roof_tiles(name, size=128):
+    n = fbm(size, 8, 3)
+    img = colorize(n, (110, 45, 35), (150, 70, 50))
+    y, x = np.mgrid[0:size, 0:size]
+    h = size // 8
+    row = y // h
+    off = (row % 2) * (size // 16)
+    img[(y % h) < 3] *= 0.6
+    img[((x + off) % (size // 8)) < 2] *= 0.75
+    save_png(name, img)
+
+
+def grass(name, size=128):
+    n = fbm(size, 8, 4) * 0.6 + rng.random((size, size)) * 0.4
+    save_png(name, colorize(n, (45, 85, 35), (85, 130, 55)))
+
+
+def hedge(name, size=128):
+    n = fbm(size, 16, 3) * 0.5 + rng.random((size, size)) * 0.5
+    save_png(name, colorize(n, (25, 60, 25), (55, 100, 45)))
+
+
+def wallpaper(name, size=128):
+    y, x = np.mgrid[0:size, 0:size]
+    stripes = ((x // 8) % 2 == 0)
+    base = np.where(stripes[..., None], np.array([150, 40, 45]), np.array([125, 30, 38])).astype(float)
+    # Золотой узор-ромб.
+    d = (np.abs((x % 32) - 16) + np.abs((y % 32) - 16))
+    base[(d > 10) & (d < 13)] = (200, 165, 80)
+    base *= (0.9 + 0.1 * fbm(size, 8, 2))[..., None]
+    save_png(name, base)
+
+
+def parquet(name, size=128):
+    """Паркет «ёлочкой»."""
+    y, x = np.mgrid[0:size, 0:size]
+    n = fbm(size, 8, 3)
+    block = ((x // 16) + (y // 64)) % 2
+    grain = np.where(block == 0, np.sin(y / 3.0), np.sin(x / 3.0)) * 0.5 + 0.5
+    img = colorize(grain * 0.4 + n * 0.6, (110, 70, 35), (165, 115, 65))
+    img[(x % 16) < 1] *= 0.6
+    img[(y % 64) < 1] *= 0.6
+    save_png(name, img)
+
+
+def stone(name, size=128):
+    """Каменная кладка особняка."""
+    n = fbm(size, 8, 4)
+    img = colorize(n, (140, 132, 120), (190, 182, 168))
+    y, x = np.mgrid[0:size, 0:size]
+    h = size // 4
+    row = y // h
+    off = (row % 2) * (size // 4)
+    seam = ((y % h) < 3) | (((x + off) % (size // 2)) < 3)
+    stone_id = row * 8 + ((x + off) // (size // 2))
+    shade = rng.uniform(0.85, 1.08, 64)[stone_id % 64]
+    img *= shade[..., None]
+    img[seam] = (90, 85, 78)
+    save_png(name, img)
+
+
+def extra():
+    asphalt("asphalt")
+    paving("paving")
+    plaster("plaster")
+    facade("facade")
+    roof_tiles("roof_tiles")
+    grass("grass")
+    hedge("hedge")
+    wallpaper("wallpaper")
+    parquet("parquet")
+    stone("stone")
+
+
 if __name__ == "__main__":
     main()
+    extra()

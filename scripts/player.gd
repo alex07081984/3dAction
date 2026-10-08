@@ -42,6 +42,8 @@ var current_weapon: WeaponData
 ## Враг под прицелом (с учётом помощи в прицеливании) — для красного прицела и автоогня.
 var aim_target: Node3D
 var aim_is_head := false
+## Зона действия, в которой стоит игрок (вход на уровень, дверь дома и т. п.).
+var interactable: Interactable
 
 var _ammo := {}  # id оружия -> {"mag": int, "reserve": int}
 var _fire_cooldown := 0.0
@@ -52,6 +54,7 @@ var _dodge_dir := Vector3.ZERO
 var _invincible := 0.0
 var _dead := false
 var _spawn_position := Vector3.ZERO
+var _damage_bonus := 1.0
 var _aim_start := Vector3.ZERO
 var _aim_point := Vector3.ZERO
 
@@ -61,6 +64,9 @@ var _aim_point := Vector3.ZERO
 
 func _ready() -> void:
 	add_to_group("player")
+	# Бонусы от улучшений недвижимости.
+	max_health += roundi(Game.perk("max_health"))
+	_damage_bonus = 1.0 + Game.perk("damage")
 	health = max_health
 	_spawn_position = global_position
 	# Поворот, заданный на уровне, отдаём камере, а само тело не вращаем.
@@ -87,6 +93,8 @@ func _physics_process(delta: float) -> void:
 		start_reload()
 	if Input.is_action_just_pressed("switch_weapon"):
 		switch_weapon()
+	if Input.is_action_just_pressed("interact") and is_instance_valid(interactable) and interactable.active:
+		interactable.interact(self)
 
 	var direction := _get_move_direction()
 	if _dodge_left > 0.0:
@@ -125,6 +133,15 @@ func is_alive() -> bool:
 	return not _dead
 
 
+func set_interactable(zone: Interactable) -> void:
+	interactable = zone
+
+
+func clear_interactable(zone: Interactable) -> void:
+	if interactable == zone:
+		interactable = null
+
+
 func is_dodging() -> bool:
 	return _dodge_left > 0.0
 
@@ -140,6 +157,7 @@ func get_ammo(weapon: WeaponData) -> Dictionary:
 func take_damage(amount: int, from_position: Vector3) -> void:
 	if _dead or _invincible > 0.0:
 		return
+	amount = maxi(roundi(amount * (1.0 - Game.perk("armor"))), 1)
 	health = maxi(health - amount, 0)
 	_invincible = hurt_invincibility
 	health_changed.emit(health, max_health)
@@ -169,7 +187,8 @@ func give_weapon(weapon: WeaponData, announce := true) -> bool:
 			picked_up.emit("Патроны: %s" % weapon.display_name)
 		return added
 	weapons.append(weapon)
-	_ammo[weapon.id] = {"mag": weapon.magazine, "reserve": weapon.start_reserve}
+	var reserve := roundi(weapon.start_reserve * (1.0 + Game.perk("ammo")))
+	_ammo[weapon.id] = {"mag": weapon.magazine, "reserve": mini(reserve, weapon.max_reserve)}
 	_select(weapon)
 	if announce:
 		picked_up.emit("Новое оружие: %s!" % weapon.display_name)
@@ -251,7 +270,7 @@ func _shoot(weapon: WeaponData) -> void:
 			var enemy := hit.collider as Enemy
 			if enemy and enemy.is_alive():
 				var head := enemy.is_head_hit(end)
-				var damage := weapon.damage * (weapon.headshot_multiplier if head else 1.0)
+				var damage := weapon.damage * (weapon.headshot_multiplier if head else 1.0) * _damage_bonus
 				if not results.has(enemy):
 					results[enemy] = {"damage": 0.0, "head": false, "point": end, "dir": dir}
 				results[enemy].damage += damage

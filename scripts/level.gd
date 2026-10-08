@@ -29,7 +29,9 @@ func _ready() -> void:
 	hud.bind_player(player)
 	hud.restart_requested.connect(Game.restart_level)
 	hud.menu_requested.connect(Game.go_to_menu)
-	hud.next_requested.connect(func() -> void: Game.start_level(level_index + 1))
+	hud.town_requested.connect(Game.go_to_town)
+	hud.next_requested.connect(_on_next_requested)
+	hud.set_town_available(Game.town_liberated and level_index != Game.TOWN_INDEX)
 	player.died.connect(_on_player_died)
 
 	for zone in find_children("*", "WaveZone"):
@@ -41,7 +43,9 @@ func _ready() -> void:
 	for light in find_children("*", "DirectionalLight3D"):
 		(light as DirectionalLight3D).shadow_enabled = shadows
 
-	hud.show_message(title, objective)
+	var tier: int = Game.current_tier
+	hud.show_message(title, objective if tier == 0 else "Сложность %d · награда ×%.1f" % [tier + 1, Game.reward_multiplier()])
+	hud.set_objective(objective)
 
 
 func _process(delta: float) -> void:
@@ -54,18 +58,33 @@ func register_kill(headshot: bool) -> void:
 	if headshot:
 		headshots += 1
 	hud.set_kills(kills)
+	hud.show_money_popup(Game.reward_kill(headshot))
 
 
 func complete() -> void:
 	if _finished or not player.is_alive():
 		return
 	_finished = true
-	var record := Game.complete_level(level_index, time, kills, headshots)
+	var result := Game.complete_level(level_index, time, kills, headshots)
 	Audio.play("level_complete")
-	hud.show_level_complete(title, time, kills, headshots, record, Game.has_next_level(level_index))
+	var next_text := ""
+	if Game.town_liberated:
+		next_text = "В город"
+	elif Game.has_next_level(level_index):
+		next_text = "Следующий уровень"
+	var heading := "Эпизод 1 пройден!" if level_index == Game.TOWN_INDEX else "%s пройден!" % title
+	hud.show_level_complete(heading, time, kills, headshots, result.reward, result.record, next_text)
+
+
+func _on_next_requested() -> void:
+	if Game.town_liberated:
+		Game.go_to_town()
+	else:
+		Game.start_level(level_index + 1)
 
 
 func _on_player_died() -> void:
+	Game.save_data()
 	get_tree().create_timer(1.5, false).timeout.connect(hud.show_game_over)
 
 

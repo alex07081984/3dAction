@@ -15,6 +15,8 @@ const MAX_DEBRIS := 36
 
 static var _debris: Array = []
 static var _material_cache := {}
+static var _mesh_cache := {}
+static var _vertex_material: StandardMaterial3D
 
 @export var skin_color := Color(0.92, 0.74, 0.6)
 @export var shirt_color := Color(0.25, 0.45, 0.85)
@@ -31,7 +33,7 @@ var muzzle: Node3D
 
 var _hips: Node3D
 var _chest: Node3D
-var _torso: MeshInstance3D
+var _torso: Node3D
 var _neck: Node3D
 var _arm_l: Node3D
 var _arm_r: Node3D
@@ -96,6 +98,7 @@ func set_weapon(kind: String) -> void:
 	if kind.is_empty() or _hand == null:
 		return
 	_gun = build_weapon_model(kind)
+	_no_shadow(_gun)
 	_hand.add_child(_gun)
 	muzzle = _gun.get_node("Muzzle")
 
@@ -165,33 +168,36 @@ static func build_weapon_model(kind: String) -> Node3D:
 	var dark := Color(0.13, 0.13, 0.15)
 	var wood := Color(0.45, 0.28, 0.14)
 	var muzzle_at := Vector3(0, 0.07, -0.22)
+	var boxes := []
 	match kind:
 		"pistol":
-			add_box(gun, Vector3(0.06, 0.09, 0.24), Vector3(0, 0.07, -0.08), dark)
-			add_box(gun, Vector3(0.05, 0.14, 0.07), Vector3(0, 0.0, 0.02), Color(0.08, 0.08, 0.08))
+			boxes = [[Vector3(0.06, 0.09, 0.24), Vector3(0, 0.07, -0.08), dark],
+					[Vector3(0.05, 0.14, 0.07), Vector3(0, 0.0, 0.02), Color(0.08, 0.08, 0.08)]]
 		"deagle":
 			var steel := Color(0.72, 0.73, 0.77)
-			add_box(gun, Vector3(0.075, 0.11, 0.33), Vector3(0, 0.08, -0.11), steel)
-			add_box(gun, Vector3(0.06, 0.15, 0.08), Vector3(0, -0.01, 0.03), Color(0.08, 0.08, 0.08))
-			add_box(gun, Vector3(0.05, 0.04, 0.05), Vector3(0, 0.15, 0.0), steel)
+			boxes = [[Vector3(0.075, 0.11, 0.33), Vector3(0, 0.08, -0.11), steel],
+					[Vector3(0.06, 0.15, 0.08), Vector3(0, -0.01, 0.03), Color(0.08, 0.08, 0.08)],
+					[Vector3(0.05, 0.04, 0.05), Vector3(0, 0.15, 0.0), steel]]
 			muzzle_at = Vector3(0, 0.08, -0.29)
 		"shotgun":
-			add_box(gun, Vector3(0.07, 0.11, 0.3), Vector3(0, 0.06, -0.05), dark)
-			add_box(gun, Vector3(0.05, 0.05, 0.62), Vector3(0, 0.09, -0.5), dark)
-			add_box(gun, Vector3(0.08, 0.07, 0.22), Vector3(0, 0.03, -0.38), wood)
-			add_box(gun, Vector3(0.06, 0.12, 0.32), Vector3(0, 0.03, 0.22), wood)
+			boxes = [[Vector3(0.07, 0.11, 0.3), Vector3(0, 0.06, -0.05), dark],
+					[Vector3(0.05, 0.05, 0.62), Vector3(0, 0.09, -0.5), dark],
+					[Vector3(0.08, 0.07, 0.22), Vector3(0, 0.03, -0.38), wood],
+					[Vector3(0.06, 0.12, 0.32), Vector3(0, 0.03, 0.22), wood]]
 			muzzle_at = Vector3(0, 0.09, -0.82)
 		"rifle":
 			var olive := Color(0.2, 0.22, 0.17)
-			add_box(gun, Vector3(0.07, 0.13, 0.6), Vector3(0, 0.07, -0.2), olive)
-			add_box(gun, Vector3(0.04, 0.04, 0.3), Vector3(0, 0.09, -0.62), dark)
-			add_box(gun, Vector3(0.05, 0.16, 0.08), Vector3(0, -0.06, -0.12), dark)
-			add_box(gun, Vector3(0.06, 0.11, 0.25), Vector3(0, 0.04, 0.2), olive)
+			boxes = [[Vector3(0.07, 0.13, 0.6), Vector3(0, 0.07, -0.2), olive],
+					[Vector3(0.04, 0.04, 0.3), Vector3(0, 0.09, -0.62), dark],
+					[Vector3(0.05, 0.16, 0.08), Vector3(0, -0.06, -0.12), dark],
+					[Vector3(0.06, 0.11, 0.25), Vector3(0, 0.04, 0.2), olive]]
 			muzzle_at = Vector3(0, 0.09, -0.78)
 		"bat":
-			add_box(gun, Vector3(0.06, 0.06, 0.5), Vector3(0, 0.0, -0.2), wood)
-			add_box(gun, Vector3(0.1, 0.1, 0.42), Vector3(0, 0.0, -0.62), wood.lightened(0.15))
+			boxes = [[Vector3(0.06, 0.06, 0.5), Vector3(0, 0.0, -0.2), wood],
+					[Vector3(0.1, 0.1, 0.42), Vector3(0, 0.0, -0.62), wood.lightened(0.15)]]
 			muzzle_at = Vector3(0, 0, -0.8)
+	if not boxes.is_empty():
+		add_part_mesh(gun, boxes)
 	var marker := Marker3D.new()
 	marker.name = "Muzzle"
 	marker.position = muzzle_at
@@ -200,40 +206,103 @@ static func build_weapon_model(kind: String) -> Node3D:
 
 
 # --- Построение модели -------------------------------------------------------
+# Каждая часть тела — один меш с цветами в вершинах: так персонаж рисуется
+# за 6–7 вызовов вместо двух десятков, а одинаковые враги делят одни и те же меши.
 
 func _build() -> void:
 	_hips = _pivot(self, "Hips", Vector3(0, 0.9, 0))
 	_leg_l = _pivot(_hips, "HipL", Vector3(-0.14, 0, 0))
 	_leg_r = _pivot(_hips, "HipR", Vector3(0.14, 0, 0))
-	for leg in [_leg_l, _leg_r]:
-		add_box(leg, Vector3(0.22, 0.78, 0.24), Vector3(0, -0.39, 0), pants_color)
-		add_box(leg, Vector3(0.23, 0.12, 0.3), Vector3(0, -0.84, -0.03), shoe_color)
+	var leg := [[Vector3(0.22, 0.78, 0.24), Vector3(0, -0.39, 0), pants_color],
+			[Vector3(0.23, 0.12, 0.3), Vector3(0, -0.84, -0.03), shoe_color]]
+	add_part_mesh(_leg_l, leg)
+	add_part_mesh(_leg_r, leg)
 
 	_chest = _pivot(_hips, "Chest", Vector3.ZERO)
-	_torso = add_box(_chest, Vector3(0.56, 0.62, 0.3), Vector3(0, 0.31, 0), shirt_color)
-	add_box(_torso, Vector3(0.58, 0.08, 0.32), Vector3(0, -0.27, 0), Color(0.12, 0.1, 0.08))
+	_torso = _pivot(_chest, "Torso", Vector3(0, 0.31, 0))
+	var torso := [[Vector3(0.56, 0.62, 0.3), Vector3.ZERO, shirt_color],
+			[Vector3(0.58, 0.08, 0.32), Vector3(0, -0.27, 0), Color(0.12, 0.1, 0.08)]]
 	if vest_color.a > 0.0:
-		add_box(_torso, Vector3(0.6, 0.44, 0.36), Vector3(0, 0.05, 0), vest_color)
+		torso.append([Vector3(0.6, 0.44, 0.36), Vector3(0, 0.05, 0), vest_color])
+	add_part_mesh(_torso, torso)
 
 	_neck = _pivot(_chest, "Neck", Vector3(0, 0.62, 0))
 	var masked := mask_color.a > 0.0
-	var head := add_box(_neck, Vector3(0.38, 0.38, 0.38), Vector3(0, 0.21, 0), mask_color if masked else skin_color)
+	var head := [[Vector3(0.38, 0.38, 0.38), Vector3(0, 0.21, 0), mask_color if masked else skin_color]]
 	if masked:
-		add_box(head, Vector3(0.3, 0.09, 0.02), Vector3(0, 0.03, -0.19), skin_color)
+		head.append([Vector3(0.3, 0.09, 0.02), Vector3(0, 0.24, -0.19), skin_color])
 	else:
-		add_box(head, Vector3(0.4, 0.12, 0.4), Vector3(0, 0.17, 0.01), hair_color)
+		head.append([Vector3(0.4, 0.12, 0.4), Vector3(0, 0.38, 0.01), hair_color])
 	for x in [-0.08, 0.08]:
-		add_box(head, Vector3(0.06, 0.05, 0.02), Vector3(x, 0.03, -0.2), Color(0.05, 0.05, 0.05))
+		head.append([Vector3(0.06, 0.05, 0.02), Vector3(x, 0.24, -0.2), Color(0.05, 0.05, 0.05)])
+	add_part_mesh(_neck, head)
 
 	_arm_l = _pivot(_chest, "ShoulderL", Vector3(-0.37, 0.56, 0))
 	_arm_r = _pivot(_chest, "ShoulderR", Vector3(0.37, 0.56, 0))
-	for arm in [_arm_l, _arm_r]:
-		add_box(arm, Vector3(0.17, 0.56, 0.19), Vector3(0, -0.26, 0), shirt_color)
-		add_box(arm, Vector3(0.15, 0.13, 0.17), Vector3(0, -0.6, 0), skin_color)
+	var arm := [[Vector3(0.17, 0.56, 0.19), Vector3(0, -0.26, 0), shirt_color],
+			[Vector3(0.15, 0.13, 0.17), Vector3(0, -0.6, 0), skin_color]]
+	add_part_mesh(_arm_l, arm)
+	add_part_mesh(_arm_r, arm)
 	# Кисть правой руки повёрнута так, чтобы ствол смотрел вдоль руки.
 	_hand = _pivot(_arm_r, "Grip", Vector3(0, -0.62, 0))
 	_hand.rotation.x = -PI / 2.0
+	for part in [_arm_l, _arm_r, _neck]:
+		_no_shadow(part)
 	set_weapon(weapon)
+
+
+## Добавляет к узлу один меш из нескольких цветных коробок: [[размер, смещение, цвет], ...].
+static func add_part_mesh(parent: Node3D, boxes: Array) -> MeshInstance3D:
+	var key := str(boxes)
+	if not _mesh_cache.has(key):
+		var tool := SurfaceTool.new()
+		tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for box in boxes:
+			_add_cube(tool, box[0], box[1], box[2])
+		tool.set_material(_vertex_color_material())
+		_mesh_cache[key] = tool.commit()
+	var instance := MeshInstance3D.new()
+	instance.name = "Mesh"
+	instance.mesh = _mesh_cache[key]
+	parent.add_child(instance)
+	return instance
+
+
+## Тени отбрасывают только торс и ноги: на телефоне это заметно экономит отрисовку.
+static func _no_shadow(part: Node3D) -> void:
+	for child in part.get_children():
+		if child is MeshInstance3D:
+			(child as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+static func _add_cube(tool: SurfaceTool, size: Vector3, offset: Vector3, color: Color) -> void:
+	var half := size * 0.5
+	# Для каждой грани: нормаль и две оси вдоль грани (u × v = нормаль).
+	var faces := [
+		[Vector3.RIGHT, Vector3.UP, Vector3.BACK], [Vector3.LEFT, Vector3.BACK, Vector3.UP],
+		[Vector3.UP, Vector3.BACK, Vector3.RIGHT], [Vector3.DOWN, Vector3.RIGHT, Vector3.BACK],
+		[Vector3.BACK, Vector3.RIGHT, Vector3.UP], [Vector3.FORWARD, Vector3.UP, Vector3.RIGHT],
+	]
+	for face in faces:
+		var normal: Vector3 = face[0]
+		var center: Vector3 = offset + normal * half
+		var u: Vector3 = face[1] * half
+		var v: Vector3 = face[2] * half
+		var corners := [center - u - v, center + u - v, center + u + v, center - u + v]
+		# В Godot лицевая сторона треугольника — по часовой стрелке.
+		for index in [0, 2, 1, 0, 3, 2]:
+			tool.set_normal(normal)
+			tool.set_color(color)
+			tool.add_vertex(corners[index])
+
+
+static func _vertex_color_material() -> StandardMaterial3D:
+	if _vertex_material == null:
+		_vertex_material = StandardMaterial3D.new()
+		_vertex_material.vertex_color_use_as_albedo = true
+		_vertex_material.vertex_color_is_srgb = true
+		_vertex_material.roughness = 0.8
+	return _vertex_material
 
 
 func _pivot(parent: Node3D, node_name: String, at: Vector3) -> Node3D:

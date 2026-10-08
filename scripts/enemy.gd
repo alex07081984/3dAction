@@ -61,6 +61,7 @@ var _laser: MeshInstance3D
 
 func _ready() -> void:
 	add_to_group("enemies")
+	_apply_difficulty()
 	health = max_health
 	_think = randf() * 0.2
 	_build_laser()
@@ -425,6 +426,19 @@ func _set_horizontal_velocity(target: Vector3, delta: float) -> void:
 
 func _slow_down(delta: float) -> void:
 	_set_horizontal_velocity(Vector3.ZERO, delta)
+
+
+## На повторных прохождениях враги крепче, больнее бьют, метче и быстрее целятся.
+func _apply_difficulty() -> void:
+	var tier: int = Game.current_tier
+	if tier <= 0:
+		return
+	max_health *= Game.enemy_health_multiplier()
+	damage = roundi(damage * Game.enemy_damage_multiplier())
+	melee_damage = roundi(melee_damage * Game.enemy_damage_multiplier())
+	accuracy = minf(accuracy + 0.04 * tier, 0.95)
+	aim_time *= maxf(0.6, 1.0 - 0.06 * tier)
+	move_speed *= 1.0 + 0.03 * tier
 
 
 func _build_laser() -> void:

@@ -57,13 +57,14 @@ func _next_wave() -> void:
 	if not is_inside_tree():
 		return
 	wave += 1
-	var count := enemies_in_first_wave + (wave - 1) * extra_per_wave
+	# На повторных прохождениях в каждой волне больше врагов.
+	var count := enemies_in_first_wave + (wave - 1) * extra_per_wave + Game.current_tier
 	_alive = count
 	wave_started.emit(self, wave, waves)
 	var points := _spawns.get_children()
 	for i in count:
 		var scene := gunner_scene
-		if wave == waves and i < heavy_in_last_wave and heavy_scene:
+		if wave == waves and i < heavy_in_last_wave + int(Game.current_tier / 3.0) and heavy_scene:
 			scene = heavy_scene
 		elif randf() < rusher_share and rusher_scene:
 			scene = rusher_scene

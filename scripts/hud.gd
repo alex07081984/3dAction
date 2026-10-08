@@ -7,6 +7,7 @@ extends CanvasLayer
 signal restart_requested
 signal menu_requested
 signal next_requested
+signal town_requested
 
 var _player: Player
 var _message_tween: Tween
@@ -17,6 +18,9 @@ var _last_health := -1
 var _low_health := false
 var _pulse := 0.0
 var _infinity := "∞"
+var _money_tween: Tween
+var _entrance_level := -1
+var _property_id := ""
 
 @onready var _health_bar: ProgressBar = %HealthBar
 @onready var _health_label: Label = %HealthLabel
@@ -39,6 +43,13 @@ var _infinity := "∞"
 @onready var _complete_stats: Label = %CompleteStats
 @onready var _record_label: Label = %RecordLabel
 @onready var _next_button: Button = %NextButton
+@onready var _money_label: Label = %MoneyLabel
+@onready var _money_popup: Label = %MoneyPopup
+@onready var _interact_button: TouchActionButton = %InteractButton
+@onready var _interact_prompt: Label = %InteractPrompt
+@onready var _entrance_panel: Control = %EntrancePanel
+@onready var _property_panel: Control = %PropertyPanel
+@onready var _upgrade_list: VBoxContainer = %UpgradeList
 
 
 func _ready() -> void:
@@ -51,9 +62,20 @@ func _ready() -> void:
 	%GameOverMenuButton.pressed.connect(_emit.bind(menu_requested))
 	%NextButton.pressed.connect(_emit.bind(next_requested))
 	%CompleteMenuButton.pressed.connect(_emit.bind(menu_requested))
+	%TownButton.pressed.connect(_emit.bind(town_requested))
+	%GameOverTownButton.pressed.connect(_emit.bind(town_requested))
+	%EntranceStartButton.pressed.connect(_start_entrance)
+	%EntranceCancelButton.pressed.connect(_close_panels)
+	%PropertyCloseButton.pressed.connect(_close_panels)
+	%PropertyBuyButton.pressed.connect(_buy_property)
 	_settings.closed.connect(_close_settings)
-	for overlay in [_pause_menu, _settings, _game_over, _complete]:
+	add_to_group("hud")
+	for overlay in [_pause_menu, _settings, _game_over, _complete, _entrance_panel, _property_panel]:
 		overlay.hide()
+	set_town_available(false)
+	Game.economy_changed.connect(_update_money)
+	_update_money()
+	_money_popup.modulate.a = 0.0
 	_message.modulate.a = 0.0
 	_subtitle.modulate.a = 0.0
 	_toast.modulate.a = 0.0
@@ -84,6 +106,14 @@ func _process(delta: float) -> void:
 		_crosshair.on_target = _player.aim_target != null
 		_crosshair.on_head = _crosshair.on_target and _player.aim_is_head
 		_crosshair.visible = _player.is_alive()
+		# Кнопка «Действие» появляется, когда игрок стоит в зоне входа или у двери.
+		var zone := _player.interactable
+		var show_action := is_instance_valid(zone) and _player.is_alive()
+		if show_action:
+			_interact_prompt.text = zone.get_prompt()
+			_interact_button.text = zone.get_button_text()
+		_interact_prompt.visible = show_action
+		_interact_button.visible = show_action and zone.active
 	# При низком здоровье края экрана пульсируют красным.
 	if _low_health and _player and _player.is_alive() and (_flash_tween == null or not _flash_tween.is_running()):
 		_pulse += delta * 4.0
@@ -109,6 +139,9 @@ func _notification(what: int) -> void:
 func toggle_pause() -> void:
 	if _settings.visible:
 		_close_settings()
+		return
+	if _entrance_panel.visible or _property_panel.visible:
+		_close_panels()
 		return
 	set_paused(not get_tree().paused)
 
@@ -139,6 +172,129 @@ func set_objective(text: String) -> void:
 
 func set_kills(count: int) -> void:
 	_kills_label.text = "Убито: %d" % count
+
+
+func set_kills_visible(value: bool) -> void:
+	_kills_label.visible = value
+
+
+## Кнопки «В город» показываются, когда город уже освобождён.
+func set_town_available(value: bool) -> void:
+	%TownButton.visible = value
+	%GameOverTownButton.visible = value
+	%RestartButton.visible = not (Game.town_liberated and Game.current_level == Game.TOWN_INDEX)
+
+
+func show_money_popup(amount: int) -> void:
+	if amount <= 0:
+		return
+	_money_popup.text = "+$%d" % amount
+	if _money_tween:
+		_money_tween.kill()
+	_money_popup.modulate.a = 1.0
+	_money_tween = create_tween()
+	_money_tween.tween_interval(0.8)
+	_money_tween.tween_property(_money_popup, "modulate:a", 0.0, 0.4)
+
+
+# --- Город: входы на уровни и недвижимость ---------------------------------------------
+
+func show_entrance(level_index: int) -> void:
+	_entrance_level = level_index
+	var title: String = Game.LEVELS[level_index].title
+	%EntranceTitle.text = title
+	var tier := Game.tier_of(level_index)
+	var text := "Сложность: %d из %d\nНаграда за прохождение: $%d\nДеньги за убийства: ×%.1f" % [
+			tier + 1, Game.MAX_TIER + 1, Game.level_reward(level_index), Game.reward_multiplier(tier)]
+	var record: Variant = Game.records.get(level_index)
+	if record is Dictionary:
+		text += "\nРекорд: %s" % Game.format_time(record.time)
+	%EntranceInfo.text = text
+	_open_panel(_entrance_panel)
+
+
+func show_property(property_id: String) -> void:
+	_property_id = property_id
+	_refresh_property()
+	_open_panel(_property_panel)
+
+
+func _refresh_property() -> void:
+	var item := Game.property(_property_id)
+	var owned := Game.owns_property(_property_id)
+	%PropertyTitle.text = item.title
+	var buy := %PropertyBuyButton as Button
+	buy.visible = not owned
+	if owned:
+		%PropertyInfo.text = "Это ваше жильё. Улучшения видны внутри и работают на всех заданиях.\nДеньги: $%d" % Game.money
+	elif not Game.is_property_available(_property_id):
+		%PropertyInfo.text = "Сначала купите жильё попроще."
+		buy.disabled = true
+		buy.text = "Недоступно"
+	else:
+		%PropertyInfo.text = "Цена: $%d\nУ вас: $%d" % [int(item.price), Game.money]
+		buy.disabled = Game.money < int(item.price)
+		buy.text = "Купить за $%d" % int(item.price)
+	for child in _upgrade_list.get_children():
+		child.queue_free()
+	if not owned:
+		return
+	for upgrade in item.upgrades:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 16)
+		var label := Label.new()
+		label.text = "%s\n%s" % [upgrade.title, upgrade.text]
+		label.custom_minimum_size = Vector2(380, 0)
+		label.add_theme_font_size_override("font_size", 22)
+		row.add_child(label)
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(220, 70)
+		if Game.has_upgrade(_property_id, upgrade.id):
+			button.text = "Куплено"
+			button.disabled = true
+		else:
+			button.text = "$%d" % int(upgrade.price)
+			button.disabled = Game.money < int(upgrade.price)
+			button.pressed.connect(_buy_upgrade.bind(upgrade.id))
+		row.add_child(button)
+		_upgrade_list.add_child(row)
+
+
+func _buy_property() -> void:
+	if Game.buy_property(_property_id):
+		Audio.play("weapon_pickup")
+		show_toast("Куплено: %s!" % Game.property(_property_id).title)
+	_refresh_property()
+
+
+func _buy_upgrade(upgrade_id: String) -> void:
+	if Game.buy_upgrade(_property_id, upgrade_id):
+		Audio.play("pickup")
+	_refresh_property()
+
+
+func _start_entrance() -> void:
+	Audio.play("ui_click")
+	_close_panels()
+	Game.start_level(_entrance_level)
+
+
+func _open_panel(panel: Control) -> void:
+	Audio.play("ui_click")
+	get_tree().paused = true
+	_touch_controls.hide()
+	panel.show()
+
+
+func _close_panels() -> void:
+	_entrance_panel.hide()
+	_property_panel.hide()
+	get_tree().paused = false
+	_touch_controls.show()
+
+
+func _update_money() -> void:
+	_money_label.text = "$ %d" % Game.money
 
 
 func show_message(title: String, subtitle := "") -> void:
@@ -173,14 +329,15 @@ func show_game_over() -> void:
 	get_tree().paused = true
 
 
-func show_level_complete(title: String, time: float, kills: int, headshots: int, record: bool, has_next: bool) -> void:
+func show_level_complete(heading: String, time: float, kills: int, headshots: int, reward: int, record: bool,
+		next_text: String) -> void:
 	_hide_gameplay()
-	%CompleteTitle.text = "%s пройден!" % title
-	_complete_stats.text = "Время: %s\nУбито: %d\nХедшоты: %d" % [Game.format_time(time), kills, headshots]
+	%CompleteTitle.text = heading
+	_complete_stats.text = "Время: %s\nУбито: %d · хедшоты: %d\nНаграда: $%d (всего $%d)" % [
+			Game.format_time(time), kills, headshots, reward, Game.money]
 	_record_label.visible = record
-	_next_button.visible = has_next
-	if not has_next:
-		%CompleteTitle.text = "Игра пройдена!"
+	_next_button.visible = next_text != ""
+	_next_button.text = next_text
 	_complete.show()
 	get_tree().paused = true
 
@@ -233,7 +390,7 @@ func _hide_gameplay() -> void:
 
 
 func _blocking_overlay_visible() -> bool:
-	return _game_over.visible or _complete.visible
+	return _game_over.visible or _complete.visible or _entrance_panel.visible or _property_panel.visible
 
 
 func _emit(sig: Signal) -> void:

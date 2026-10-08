@@ -2,7 +2,9 @@ extends Node
 ## Автопроверка игры. Запускается через tests/smoke_test.gd (см. там).
 ## Проверяет меню, все уровни (в том числе что маршрут проходим), стрельбу, хедшоты,
 ## разрыв тела дробовиком, врагов, подбор предметов, сенсорное управление,
-## места с волнами, выход с уровня, паузу и смерть.
+## места с волнами, выход с уровня, паузу и смерть, а также экономику:
+## деньги, сложность повторов, освобождение города, базу, входы на уровни,
+## покупку жилья, улучшения и их бонусы.
 
 var _failed := 0
 var _passed := 0
@@ -18,13 +20,12 @@ func _run() -> void:
 	await get_tree().process_frame
 	_game = get_node("/root/Game")
 	_game.save_enabled = false
-	_game.unlocked_levels = 1
-	_game.records = {}
+	_game.reset_progress()
 	_game.settings.aim_assist = true
 	_game.settings.auto_fire = false
 
 	await _test_menu()
-	for index in 3:
+	for index in _game.LEVELS.size():
 		await _test_level_structure(index)
 	await _test_combat()
 	await _test_enemies_fight_back()
@@ -32,6 +33,10 @@ func _run() -> void:
 	await _test_wave_zone_and_exit()
 	await _test_roof_exit_locked()
 	await _test_pause_and_death()
+	await _test_difficulty_and_money()
+	await _test_town_liberation()
+	await _test_hub_and_entrances()
+	await _test_property_and_perks()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -44,7 +49,7 @@ func _test_menu() -> void:
 	await _frames(6)
 	_check(get_tree().current_scene != null and get_tree().current_scene.name == "MainMenu", "главное меню загружается")
 	var list := get_tree().current_scene.get_node("%LevelList")
-	_check(list.get_child_count() == 3, "в меню 3 уровня")
+	_check(list.get_child_count() == 5, "в меню 5 уровней")
 	_check(not (list.get_child(0) as Button).disabled and (list.get_child(1) as Button).disabled,
 			"открыт только первый уровень")
 
@@ -61,8 +66,10 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	_check(level.has_node("Exit"), "%s: есть выход" % title)
-	_check(level.player.weapons.size() == index + 1, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
+	if index != _game.TOWN_INDEX:
+		_check(level.has_node("Exit"), "%s: есть выход" % title)
+	var expected_weapons: int = [1, 2, 3, 3, 3][index]
+	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
 	_check(problems.is_empty(), "%s: маршрут от старта до выхода проходим %s" % [title, problems])
 
@@ -247,6 +254,8 @@ func _test_wave_zone_and_exit() -> void:
 	_check(level.hud.get_node("%LevelComplete").visible, "выход завершает уровень")
 	_check(_game.unlocked_levels >= 2, "открывается следующий уровень")
 	_check(_game.records.has(0), "рекорд уровня сохранён")
+	_check(_game.money >= 150, "за прохождение начислены деньги ($%d)" % _game.money)
+	_check(_game.tier_of(0) == 1, "следующий заход на уровень сложнее")
 
 
 func _test_roof_exit_locked() -> void:
@@ -286,6 +295,105 @@ func _test_pause_and_death() -> void:
 	_game.restart_level()
 	await _frames(5)
 	_check(not get_tree().paused and get_tree().current_scene != level, "рестарт перезагружает уровень")
+
+
+# --- Экономика, город и база ---------------------------------------------------------
+
+func _test_difficulty_and_money() -> void:
+	_game.reset_progress()
+	_game.completions[0] = 2
+	_game.start_level(0)
+	await _frames(8)
+	_check(_game.current_tier == 2, "повторный заход идёт на сложности 3")
+	var gunner: Enemy = null
+	for node in get_tree().get_nodes_in_group("enemies"):
+		if node.kind == Enemy.Kind.GUNNER:
+			gunner = node
+			break
+	_check(gunner != null and is_equal_approx(gunner.max_health, 70.0 * 1.6), "враги крепче на повторе (%s)" % (gunner.max_health if gunner else 0.0))
+	var before: int = _game.money
+	gunner.apply_shot(1000.0, false, gunner.global_position, Vector3.FORWARD, load("res://weapons/pistol.tres"))
+	await _frames(2)
+	_check(_game.money - before == 20, "за убийство на повторе платят больше ($%d)" % (_game.money - before))
+
+
+func _test_town_liberation() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 5
+	var level := await _fresh_level(_game.TOWN_INDEX, false)
+	_check(not level.get("hub_mode"), "в первый раз город захвачен бандой")
+	var zones := level.find_children("*", "WaveZone")
+	_check(zones.size() == 3, "в городе три района с волнами")
+	for zone in zones:
+		_teleport(level.player, zone.global_position)
+		await _frames(5)
+		await _clear_zone(zone)
+	await _seconds(3.5)
+	_check(level.hud.get_node("%LevelComplete").visible, "после трёх районов город освобождён")
+	_check(_game.town_liberated, "город стал базой")
+	_check(level.hud.get_node("%NextButton").text == "В город", "кнопка «В город» после эпизода")
+
+
+func _test_hub_and_entrances() -> void:
+	_game.town_liberated = true
+	_game.completions[1] = 1
+	var level := await _fresh_level(_game.TOWN_INDEX, false)
+	_check(level.get("hub_mode"), "город открывается как база")
+	_check(get_tree().get_nodes_in_group("enemies").is_empty(), "на базе нет врагов")
+	var entrances := level.find_children("*", "LevelEntrance")
+	_check(entrances.size() == 4, "в городе 4 входа на уровни")
+	var metro: LevelEntrance = null
+	for entrance in entrances:
+		if entrance.level_index == 1:
+			metro = entrance
+	_teleport(level.player, metro.global_position)
+	await _frames(5)
+	_check(level.player.interactable == metro, "у входа в метро появляется кнопка действия")
+	Input.action_press("interact")
+	await _frames(2)
+	Input.action_release("interact")
+	await _frames(2)
+	_check(level.hud.get_node("%EntrancePanel").visible, "открывается окно задания")
+	level.hud.get_node("%EntranceStartButton").pressed.emit()
+	await _frames(8)
+	var metro_level := get_tree().current_scene as Level
+	_check(metro_level != null and metro_level.level_index == 1 and _game.current_tier == 1,
+			"из города запускается метро на сложности 2")
+
+
+func _test_property_and_perks() -> void:
+	_game.town_liberated = true
+	_game.money = 30000
+	var level := await _fresh_level(_game.TOWN_INDEX, false)
+	var shack := level.get_node("Properties/shack") as Property
+	var door := shack.get_node("Door") as CSGShape3D
+	_check(door.visible and door.use_collision, "дверь хибары закрыта, пока не куплена")
+	_teleport(level.player, level.get_node("Entrances/ShackDoor").global_position)
+	await _frames(5)
+	Input.action_press("interact")
+	await _frames(2)
+	Input.action_release("interact")
+	await _frames(2)
+	_check(level.hud.get_node("%PropertyPanel").visible, "открывается окно покупки")
+	level.hud.get_node("%PropertyBuyButton").pressed.emit()
+	await _frames(3)
+	_check(_game.owns_property("shack") and _game.money == 29000, "хибара куплена за $1000")
+	_check(not door.visible and not door.use_collision, "дверь купленной хибары открыта")
+	var rows := level.hud.get_node("%UpgradeList").get_children()
+	_check(rows.size() == 3, "в окне три улучшения")
+	(rows[0].get_child(1) as Button).pressed.emit()
+	await _frames(3)
+	_check(_game.has_upgrade("shack", "bed"), "улучшение «кровать» куплено")
+	_check(shack.get_node("Furniture/bed").visible, "кровать появилась в хибаре")
+	_check(not shack.get_node("Furniture/stash").visible, "некупленного улучшения нет")
+	_check(not _game.buy_property("mansion"), "особняк нельзя купить раньше квартиры")
+	level.hud._close_panels()
+
+	var town := await _fresh_level(_game.TOWN_INDEX, false)
+	var spawn := (town.get_node("Properties/shack") as Property).get_spawn()
+	_check(town.player.global_position.distance_to(spawn.global_position) < 1.0, "на базе игрок появляется дома")
+	var mission := await _fresh_level(0)
+	_check(mission.player.max_health == 110, "кровать даёт +10 к здоровью на заданиях")
 
 
 # --- Помощники -------------------------------------------------------------------
