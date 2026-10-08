@@ -172,6 +172,31 @@ func fire(parent: Node3D, local_position: Vector3, size := 1.0, light := true) -
 	return flames
 
 
+## Облако дыма (дымовая шашка Худого).
+func smoke_cloud(position: Vector3) -> void:
+	var root := _root()
+	if root == null:
+		return
+	var smoke := _smoke_particles(1.6, 24)
+	smoke.one_shot = true
+	smoke.explosiveness = 0.9
+	smoke.lifetime = 2.4
+	smoke.spread = 180.0
+	smoke.initial_velocity_min = 0.5
+	smoke.initial_velocity_max = 3.0
+	smoke.damping_min = 1.5
+	smoke.damping_max = 2.5
+	smoke.gravity = Vector3(0, 0.5, 0)
+	var ramp := Gradient.new()
+	ramp.set_color(0, Color(0.6, 0.6, 0.62, 0.9))
+	ramp.set_color(1, Color(0.4, 0.4, 0.42, 0.0))
+	smoke.color_ramp = ramp
+	root.add_child(smoke)
+	smoke.global_position = position
+	smoke.emitting = true
+	_free_after(smoke, 3.0)
+
+
 ## Струя газа из пробитого баллона.
 func gas_jet(parent: Node3D, local_position: Vector3, direction: Vector3) -> Node3D:
 	var jet := _smoke_particles(0.18, 30)

@@ -88,6 +88,14 @@ func _on_player_died() -> void:
 	get_tree().create_timer(1.5, false).timeout.connect(hud.show_game_over)
 
 
+## Босс побеждён: либо уровень пройден сразу, либо открывается выход.
+func on_boss_defeated(boss: Boss) -> void:
+	if boss.completes_level:
+		get_tree().create_timer(3.0, false).timeout.connect(complete)
+	else:
+		hud.set_objective(objective)
+
+
 func _on_zone_started(zone: WaveZone) -> void:
 	hud.show_message(zone.title, "Продержитесь!")
 

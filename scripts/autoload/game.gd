@@ -52,6 +52,7 @@ var settings := {
 	"aim_assist": true,
 	"auto_fire": false,
 	"shadows": true,
+	"noir": true,
 }
 var unlocked_levels := 1
 ## Рекорды: индекс уровня -> {"time": секунды, "kills": убийства, "headshots": хедшоты}.

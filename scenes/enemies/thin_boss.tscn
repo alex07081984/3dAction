@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/boss.gd" id="1_boss"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="2_model"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/gunner.tscn" id="3_gunner"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/rusher.tscn" id="4_rusher"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="5_heavy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.36
+height = 2.15
+
+[node name="ThinBoss" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_boss")
+boss_name = "Худой"
+phase_health = 300.0
+final_weapon = "deagle"
+final_damage = 24
+hides = true
+henchmen_per_phase = 4
+completes_level = true
+reward = 400
+gunner_scene = ExtResource("3_gunner")
+rusher_scene = ExtResource("4_rusher")
+heavy_scene = ExtResource("5_heavy")
+kind = 2
+move_speed = 3.4
+turn_speed = 9.0
+sight_range = 35.0
+damage = 8
+aim_time = 0.65
+burst = 2
+burst_interval = 0.2
+fire_pause = 1.3
+accuracy = 0.62
+drop_ammo_chance = 0.0
+drop_health_chance = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.075, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1.08, 0, 0, 0, 1.08, 0, 0, 0, 1.08, 0, 0, 0)
+script = ExtResource("2_model")
+build = "thin"
+outfit = "suit"
+hair_style = "slick"
+beard = "mustache"
+eyewear = "shades"
+skin_color = Color(0.9, 0.79, 0.72, 1)
+shirt_color = Color(0.86, 0.86, 0.84, 1)
+jacket_color = Color(0.06, 0.06, 0.07, 1)
+tie_color = Color(0.42, 0.03, 0.04, 1)
+pants_color = Color(0.07, 0.07, 0.08, 1)
+hair_color = Color(0.04, 0.04, 0.04, 1)
+shoe_color = Color(0.05, 0.05, 0.05, 1)
+weapon = "pistol"

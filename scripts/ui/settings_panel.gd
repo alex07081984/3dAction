@@ -11,6 +11,7 @@ signal closed
 @onready var _aim_assist: CheckButton = %AimAssist
 @onready var _auto_fire: CheckButton = %AutoFire
 @onready var _shadows: CheckButton = %Shadows
+@onready var _noir: CheckButton = %Noir
 
 
 func _ready() -> void:
@@ -20,6 +21,7 @@ func _ready() -> void:
 	_aim_assist.toggled.connect(func(on: bool) -> void: Game.set_setting("aim_assist", on))
 	_auto_fire.toggled.connect(func(on: bool) -> void: Game.set_setting("auto_fire", on))
 	_shadows.toggled.connect(_on_shadows)
+	_noir.toggled.connect(func(on: bool) -> void: Game.set_setting("noir", on))
 	%DoneButton.pressed.connect(_on_done)
 	visibility_changed.connect(_sync)
 
@@ -35,6 +37,7 @@ func _sync() -> void:
 	_aim_assist.set_pressed_no_signal(bool(Game.settings.aim_assist))
 	_auto_fire.set_pressed_no_signal(bool(Game.settings.auto_fire))
 	_shadows.set_pressed_no_signal(bool(Game.settings.shadows))
+	_noir.set_pressed_no_signal(bool(Game.settings.get("noir", true)))
 	_update_labels()
 
 

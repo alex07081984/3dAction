@@ -1,7 +1,8 @@
 extends Node
 ## Автопроверка игры. Запускается через tests/smoke_test.gd (см. там).
 ## Проверяет меню, все уровни (в том числе что маршрут проходим), стрельбу, хедшоты,
-## разрыв тела дробовиком, врагов, подбор предметов, сенсорное управление,
+## разрыв тела дробовиком, отрыв рук и ног, модели с суставами, бочки и баллоны,
+## боссов (фазы, подмога, прятки), врагов, подбор предметов, сенсорное управление,
 ## места с волнами, выход с уровня, паузу и смерть, а также экономику:
 ## деньги, сложность повторов, освобождение города, базу, входы на уровни,
 ## покупку жилья, улучшения и их бонусы.
@@ -28,10 +29,14 @@ func _run() -> void:
 	for index in _game.LEVELS.size():
 		await _test_level_structure(index)
 	await _test_combat()
+	await _test_models()
+	await _test_dismemberment()
+	await _test_explosives()
 	await _test_enemies_fight_back()
 	await _test_touch()
 	await _test_wave_zone_and_exit()
-	await _test_roof_exit_locked()
+	await _test_fat_boss()
+	await _test_thin_boss()
 	await _test_pause_and_death()
 	await _test_difficulty_and_money()
 	await _test_town_liberation()
@@ -66,8 +71,15 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	if index != _game.TOWN_INDEX:
+	if index == 3:
+		_check(level.get_node_or_null("Enemies/ThinBoss") is Boss, "%s: хозяин особняка — Худой" % title)
+	elif index != _game.TOWN_INDEX:
 		_check(level.has_node("Exit"), "%s: есть выход" % title)
+	if index == 2:
+		_check(level.get_node_or_null("Enemies/FatBoss") is Boss, "%s: на крыше ждёт Толстяк" % title)
+	var explosives := level.get_node_or_null("Explosives")
+	_check(explosives != null and explosives.get_child_count() >= 8,
+			"%s: бочки и баллоны (%d)" % [title, explosives.get_child_count() if explosives else 0])
 	var expected_weapons: int = [1, 2, 3, 3, 3][index]
 	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
@@ -258,20 +270,243 @@ func _test_wave_zone_and_exit() -> void:
 	_check(_game.tier_of(0) == 1, "следующий заход на уровень сложнее")
 
 
-func _test_roof_exit_locked() -> void:
+# --- Модели, раны, взрывы ---------------------------------------------------------
+
+func _test_models() -> void:
+	var level := await _fresh_level(0)
+	var player := level.player
+	var gunner := _spawn_enemy(level, "gunner", player.global_position + Vector3(0, 0, -6))
+	gunner.sight_range = 0.5  # пусть стоит спокойно, руки вниз
+	await _frames(3)
+	var model := gunner.model
+	_check(model.has_limb("arm_l") and model.has_limb("leg_r") and model.find_child("Knee", true, false) != null
+			and model.find_child("Elbow", true, false) != null, "у человечков руки и ноги с локтями и коленями")
+	var eye := player.global_position + Vector3.UP * 1.6
+	_check(model.get_hit_part(eye, model.get_head_center() - eye) == "head", "луч в лицо попадает в голову")
+	_check(model.get_hit_part(eye, model.get_chest_center() - eye) == "torso", "луч в грудь попадает в корпус")
+	var knee := (model.find_child("HipL", true, false) as Node3D).get_node("Knee") as Node3D
+	_check(model.get_hit_part(eye, knee.global_position - eye) == "leg_l", "луч в колено попадает в ногу")
+	var fat := (load("res://scenes/enemies/fat_boss.tscn") as PackedScene).instantiate() as Boss
+	var thin := (load("res://scenes/enemies/thin_boss.tscn") as PackedScene).instantiate() as Boss
+	level.add_child(fat)
+	level.add_child(thin)
+	fat.global_position = player.global_position + Vector3(-30, 0, 0)
+	thin.global_position = player.global_position + Vector3(-34, 0, 0)
+	await _frames(2)
+	var fat_torso := fat.model.find_child("Torso", true, false).get_child(0) as MeshInstance3D
+	var thin_torso := thin.model.find_child("Torso", true, false).get_child(0) as MeshInstance3D
+	_check(fat_torso.get_aabb().size.x > thin_torso.get_aabb().size.x * 1.5, "Толстяк толстый, Худой худой")
+	fat.queue_free()
+	thin.queue_free()
+
+
+func _test_dismemberment() -> void:
+	var level := await _fresh_level(0)
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	player.give_weapon(load("res://weapons/shotgun.tres"), false)
+	await _seconds(0.4)
+	var kills := level.kills
+
+	# Заряд дроби в ногу: нога отлетает, враг прыгает на одной, потом падает.
+	var hopper: Enemy = null
+	var attempts := 0
+	for attempt in 8:
+		attempts += 1
+		var enemy := _spawn_enemy(level, "gunner", player.global_position + Vector3(0.3, 0, -4.5))
+		await _frames(3)
+		var knee := (enemy.model.find_child("HipL", true, false) as Node3D).get_node("Knee") as Node3D
+		await _aim_at(player, knee.global_position)
+		await _fire(player)
+		if is_instance_valid(enemy) and enemy.is_wounded():
+			hopper = enemy
+			break
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+		await _frames(2)
+	_check(hopper != null and hopper.model.wound.begins_with("leg"), "дробь в ногу отрывает ногу (выстрелов: %d)" % attempts)
+	if hopper:
+		_check(_debris_with_node(level, "HipL") + _debris_with_node(level, "HipR") > 0, "оторванная нога лежит отдельно")
+		var ground := hopper.global_position.y
+		var highest := ground
+		for i in 90:
+			await get_tree().physics_frame
+			if is_instance_valid(hopper):
+				highest = maxf(highest, hopper.global_position.y)
+		_check(highest > ground + 0.2, "без ноги враг прыгает на одной (%.2f м)" % (highest - ground))
+		await _seconds(6.5)
+		_check(not is_instance_valid(hopper), "раненый истекает кровью и падает")
+		_check(level.kills > kills, "смерть от раны засчитана")
+
+	# Дробь в руку (урон по частям тела как от выстрела сбоку): рука с пистолетом отлетает.
+	var shotgun: WeaponData = load("res://weapons/shotgun.tres")
+	var clutcher := _spawn_enemy(level, "gunner", player.global_position + Vector3(0, 0, -6.5))
+	clutcher.sight_range = 0.5
+	await _frames(3)
+	var arm_hit := clutcher.global_position + Vector3.UP * 1.2
+	clutcher.apply_shot(36.0, false, arm_hit, Vector3.FORWARD, shotgun, {"arm_r": 24.0, "torso": 12.0})
+	if not clutcher.model.wound.begins_with("arm"):
+		clutcher = null
+	_check(clutcher != null, "дробь в руку отрывает руку")
+	if clutcher:
+		_check(not clutcher.model.has_limb(clutcher.model.wound), "руки на месте нет")
+		if clutcher.model.wound == "arm_r":
+			_check(clutcher.model.muzzle == null, "оружие улетело вместе с рукой")
+		await _seconds(1.0)
+		_check(is_instance_valid(clutcher) and clutcher.is_alive(), "без руки враг ещё жив и держится за плечо")
+		await _aim_at(player, clutcher.get_aim_point(false))
+		await _fire(player)
+		await _frames(3)
+		_check(not is_instance_valid(clutcher), "раненого можно добить")
+
+
+func _spawn_prop(level: Node, scene_name: String, at: Vector3) -> Explosive:
+	var prop := (load("res://scenes/props/%s.tscn" % scene_name) as PackedScene).instantiate() as Explosive
+	level.add_child(prop)
+	prop.global_position = at
+	return prop
+
+
+func _test_explosives() -> void:
+	var level := await _fresh_level(0)
+	for node in get_tree().get_nodes_in_group("explosives"):
+		node.queue_free()
+	var player := level.player
+	player.max_health = 1000
+	player.health = 1000
+	_teleport(player, Vector3(-1, 0, -31))
+	var barrel := _spawn_prop(level, "explosive_barrel", Vector3(-0.5, 0, -36))
+	var neighbour := _spawn_prop(level, "explosive_barrel", Vector3(1.5, 0, -37))
+	var victims := []
+	for at in [Vector3(-1.5, 0, -37.2), Vector3(0.8, 0, -35.2)]:
+		var enemy := _spawn_enemy(level, "gunner", at)
+		enemy.sight_range = 0.5
+		victims.append(enemy)
+	await _frames(5)
+	var kills := level.kills
+	await _aim_at(player, barrel.global_position + Vector3.UP * 0.5)
+	await _fire(player)
+	_check(is_instance_valid(barrel) and barrel.get("_burning"), "от пули бочка загорается")
+	await _seconds(2.6)
+	_check(not is_instance_valid(barrel), "горящая бочка взрывается")
+	_check(victims.all(func(e: Variant) -> bool: return not is_instance_valid(e)), "взрыв убивает врагов рядом")
+	_check(level.kills >= kills + 2, "убийства взрывом засчитаны")
+	_check(not is_instance_valid(neighbour), "соседняя бочка взрывается следом")
+	_check(player.health < 1000, "взрыв ранит и игрока (%d)" % player.health)
+
+	var cylinder := _spawn_prop(level, "gas_cylinder", Vector3(-3, 0, -36))
+	await _frames(5)
+	await _aim_at(player, cylinder.global_position + Vector3.UP * 0.6)
+	await _fire(player)
+	_check(is_instance_valid(cylinder) and cylinder.get("_leaking"), "пробитый баллон шипит")
+	var start := cylinder.global_position
+	await _seconds(0.75)
+	_check(is_instance_valid(cylinder) and not cylinder.freeze and cylinder.global_position.distance_to(start) > 0.3,
+			"баллон срывается с места и летит")
+	await _seconds(2.5)
+	_check(not is_instance_valid(cylinder), "улетевший баллон взрывается")
+
+
+# --- Боссы ---------------------------------------------------------------------
+
+func _boss_henchmen() -> Array:
+	return get_tree().get_nodes_in_group("enemies").filter(
+			func(e: Node) -> bool: return not e is Boss and e.health_drop_amount == 25)
+
+
+func _test_fat_boss() -> void:
 	var level := await _fresh_level(2, false)
 	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	var hud := level.hud
 	var exit := level.get_node("Exit")
 	_teleport(player, exit.global_position)
 	await _frames(5)
-	_check(not level.hud.get_node("%LevelComplete").visible, "эвакуация закрыта, пока крыша не зачищена")
-	var zone := level.get_node("ZoneRoof") as WaveZone
-	_teleport(player, zone.global_position)
-	await _frames(5)
-	await _clear_zone(zone)
+	_check(not hud.get_node("%LevelComplete").visible, "эвакуация закрыта, пока жив Толстяк")
+	var boss := level.get_node("Enemies/FatBoss") as Boss
+	_teleport(player, Vector3(-10, 25, -214))
+	await _seconds(1.0)
+	_check(hud.get_node("%BossBar").visible, "полоса здоровья босса на экране")
+	var deagle: WeaponData = load("res://weapons/deagle.tres")
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	_check(boss.is_alive() and boss.phase == 2, "Толстяк не умирает, а переходит во 2-ю фазу")
+	await _seconds(3.5)
+	var henchmen := _boss_henchmen()
+	_check(henchmen.size() >= 4, "на новой фазе приходит подмога (%d)" % henchmen.size())
+	_check(henchmen.all(func(e: Variant) -> bool: return e.drop_health_chance >= 0.5), "с прислужников босса чаще падают аптечки")
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	_check(boss.phase == 3 and boss.model.weapon == "shotgun", "в 3-й фазе Толстяк берёт дробовик")
+	await _seconds(2.0)
+	var money: int = _game.money
+	boss.apply_shot(100000.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	await _frames(3)
+	_check(not is_instance_valid(boss), "Толстяк побеждён")
+	_check(_game.money > money, "за босса платят премию ($%d)" % (_game.money - money))
+	_check(not hud.get_node("%BossBar").visible, "полоса босса скрыта")
 	_teleport(player, exit.global_position)
 	await _frames(5)
-	_check(level.hud.get_node("%LevelComplete").visible, "после финальной волны вертолёт забирает игрока")
+	_check(hud.get_node("%LevelComplete").visible, "после Толстяка вертолёт забирает игрока")
+
+
+## Подходим к спрятавшемуся боссу так, чтобы он был на виду.
+func _approach(player: Player, boss: Boss) -> void:
+	var space := boss.get_world_3d().direct_space_state
+	for distance in [3.0, 2.0, 4.5]:
+		for i in 12:
+			var direction := Vector3.FORWARD.rotated(Vector3.UP, TAU * i / 12.0)
+			var spot: Vector3 = boss.global_position + direction * distance
+			var floor_hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(spot + Vector3.UP, spot + Vector3.DOWN, 1))
+			if floor_hit.is_empty() or absf(floor_hit.position.y - boss.global_position.y) > 0.2:
+				continue
+			var head := boss.global_position + Vector3.UP * 1.6
+			if not space.intersect_ray(PhysicsRayQueryParameters3D.create(head, spot + Vector3.UP * 1.3, 1)).is_empty():
+				continue
+			var shape := PhysicsShapeQueryParameters3D.new()
+			var capsule := CapsuleShape3D.new()
+			capsule.radius = 0.4
+			capsule.height = 1.8
+			shape.shape = capsule
+			shape.transform = Transform3D(Basis(), spot + Vector3.UP * 1.0)
+			shape.collision_mask = 1
+			if not space.intersect_shape(shape, 1).is_empty():
+				continue
+			_teleport(player, spot)
+			return
+
+
+func _test_thin_boss() -> void:
+	var level := await _fresh_level(3, false)
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	var hud := level.hud
+	var boss := level.get_node("Enemies/ThinBoss") as Boss
+	var study := boss.global_position
+	_teleport(player, Vector3(0, 5, -253))
+	await _seconds(1.0)
+	_check(hud.get_node("%BossBar").visible, "Худой замечает игрока в кабинете")
+	var deagle: WeaponData = load("res://weapons/deagle.tres")
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	await _frames(3)
+	_check(boss.hidden and boss.global_position.distance_to(study) > 8.0, "после фазы Худой прячется в другой комнате")
+	_check(hud.get_node("%ObjectiveLabel").text.contains("Найдите"), "задание: найти Худого")
+	await _seconds(3.0)
+	_check(_boss_henchmen().size() >= 4, "по особняку снова ходят прислужники")
+	await _approach(player, boss)
+	await _seconds(0.8)
+	_check(not boss.hidden, "найденный Худой выходит на бой")
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	await _frames(3)
+	_check(boss.hidden and boss.phase == 3, "после 2-й фазы Худой снова прячется")
+	_check(boss.model.weapon == "deagle", "в 3-й фазе у Худого Desert Eagle")
+	await _approach(player, boss)
+	await _seconds(0.8)
+	boss.apply_shot(100000.0, true, boss.global_position + Vector3.UP * 2.0, Vector3.FORWARD, deagle)
+	await _seconds(3.5)
+	_check(not is_instance_valid(boss), "Худой побеждён")
+	_check(hud.get_node("%LevelComplete").visible, "победа над Худым завершает особняк")
 
 
 func _test_pause_and_death() -> void:

@@ -188,20 +188,28 @@ def plaster(name, size=128):
     save_png(name, colorize(n * 0.5 + 0.5, (205, 200, 192), (240, 236, 228)))
 
 
-def facade(name, size=128):
-    """Фасад жилого дома: штукатурка и окна 2x2 на текстуру (одно окно ≈ 2.5 м)."""
-    n = fbm(size, 8, 4)
+def facade(name, size=256):
+    """Фасад жилого дома: штукатурка и окна 4x4 на текстуру (одно окно ≈ 2.5 м).
+    Рядом сохраняется карта свечения <name>_lit: горящие окна ночного города."""
+    local = np.random.default_rng(11)
+    n = fbm(size, 16, 4)
     img = colorize(n * 0.4 + 0.6, (200, 195, 188), (235, 232, 225))
-    cell = size // 2
-    for r in range(2):
-        for c in range(2):
+    lit_map = np.zeros((size, size, 3))
+    cell = size // 4
+    for r in range(4):
+        for c in range(4):
             y0, x0 = r * cell + 16, c * cell + 18
             img[y0 - 3:y0 + 33, x0 - 3:x0 + 31] = (120, 115, 110)
-            lit = rng.random() < 0.3
+            lit = local.random() < 0.38
+            warmth = local.uniform(0.75, 1.0)
             img[y0:y0 + 30, x0:x0 + 28] = (240, 210, 140) if lit else (60, 75, 95)
-            img[y0 + 14:y0 + 16, x0:x0 + 28] = (120, 115, 110)
-            img[y0:y0 + 30, x0 + 13:x0 + 15] = (120, 115, 110)
+            if lit:
+                lit_map[y0:y0 + 30, x0:x0 + 28] = (255 * warmth, 200 * warmth, 120 * warmth)
+            for frame in (img, lit_map):
+                frame[y0 + 14:y0 + 16, x0:x0 + 28] = (120, 115, 110) if frame is img else (0, 0, 0)
+                frame[y0:y0 + 30, x0 + 13:x0 + 15] = (120, 115, 110) if frame is img else (0, 0, 0)
     save_png(name, img)
+    save_png(name + "_lit", lit_map)
 
 
 def roof_tiles(name, size=128):

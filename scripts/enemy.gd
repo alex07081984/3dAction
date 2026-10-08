@@ -44,6 +44,7 @@ const PLAYER_MASK := 2
 @export var health_drop_amount := 20
 
 var health := 0.0
+var shot_sound := "enemy_shot"
 
 var _awake := false
 var _dead := false
@@ -153,6 +154,11 @@ func apply_shot(amount: float, headshot: bool, point: Vector3, direction: Vector
 	# Заряд дроби в ногу или руку отрывает её, даже если урона хватило бы на смерть:
 	# человечек ещё попрыгает или покорчится, а потом упадёт.
 	var limb := "" if is_wounded() else _limb_to_sever(parts, weapon, amount)
+	if limb != "" and health <= 0.0 and amount >= weapon.gib_damage:
+		# Смертельный заряд в упор разрывает тело целиком. Исключение — выстрел
+		# по ногам: тогда отлетает нога, а враг ещё попрыгает.
+		if not limb.begins_with("leg") or parts[limb] < amount * 0.6:
+			limb = ""
 	if limb != "":
 		_take_wound(limb, direction, weapon.impulse)
 		return true
@@ -220,7 +226,7 @@ func _limb_to_sever(parts: Dictionary, weapon: WeaponData, total: float) -> Stri
 			continue
 		var need := weapon.sever_damage * (1.3 if part.begins_with("leg") else 1.0) * model.scale.x
 		var damage: float = parts[part]
-		if damage >= need and damage >= total * 0.3 and damage > best_damage:
+		if damage >= need and damage >= total * 0.4 and damage > best_damage:
 			best = part
 			best_damage = damage
 	return best
@@ -345,7 +351,7 @@ func _fire() -> void:
 				hit.collider.take_hit(float(damage), end, direction)
 	Fx.tracer(muzzle, end, Color(1.0, 0.45, 0.25))
 	Fx.muzzle_flash(muzzle, direction)
-	Audio.play_at("enemy_shot", muzzle, -2.0)
+	Audio.play_at(shot_sound, muzzle, -2.0)
 	model.recoil(0.2)
 
 

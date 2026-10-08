@@ -74,6 +74,8 @@ func _ready() -> void:
 		overlay.hide()
 	set_town_available(false)
 	Game.economy_changed.connect(_update_money)
+	Game.settings_changed.connect(_apply_noir)
+	_apply_noir()
 	_update_money()
 	_money_popup.modulate.a = 0.0
 	_message.modulate.a = 0.0
@@ -170,12 +172,27 @@ func set_objective(text: String) -> void:
 	_objective_label.text = text
 
 
+## Полоса здоровья босса: имя, фаза и доля здоровья в текущей фазе.
+func update_boss(boss_name: String, fraction: float, phase: int, phases: int, status := "") -> void:
+	%BossBar.visible = true
+	%BossName.text = "%s · фаза %d из %d%s" % [boss_name, phase, phases, ("  (%s)" % status) if status != "" else ""]
+	%BossHealth.value = fraction * 100.0
+
+
+func hide_boss() -> void:
+	%BossBar.visible = false
+
+
 func set_kills(count: int) -> void:
 	_kills_label.text = "Убито: %d" % count
 
 
 func set_kills_visible(value: bool) -> void:
 	_kills_label.visible = value
+
+
+func _apply_noir() -> void:
+	%NoirFilter.visible = bool(Game.settings.get("noir", true))
 
 
 ## Кнопки «В город» показываются, когда город уже освобождён.
