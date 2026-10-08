@@ -1,0 +1,13 @@
+# Кэш и служебные файлы Godot 4
+.godot/
+/android/
+
+# Сборки
+/build/
+*.apk
+*.aab
+*.idsig
+
+# Ключи подписи никогда не коммитим
+*.keystore
+*.jks

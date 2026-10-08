@@ -1,0 +1,8 @@
+# Единые переводы строк, чтобы правки с телефона и ПК не конфликтовали
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary
+*.glb binary
