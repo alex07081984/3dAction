@@ -7,7 +7,8 @@ uniform float saturation : hint_range(0.0, 1.0) = 0.12;
 uniform float red_keep : hint_range(0.0, 1.0) = 1.0;
 uniform float contrast : hint_range(0.5, 2.0) = 1.25;
 uniform float pivot : hint_range(0.0, 1.0) = 0.3;  // тёмное темнеет меньше, светлое ярче
-uniform float brightness : hint_range(0.5, 1.5) = 1.1;
+uniform float brightness : hint_range(0.5, 1.5) = 1.18;
+uniform float lift : hint_range(0.0, 0.2) = 0.03;  // приподнять самые тёмные места, чтобы не было «дыр»
 uniform float vignette : hint_range(0.0, 2.0) = 0.9;
 uniform float grain : hint_range(0.0, 0.2) = 0.035;
 uniform vec3 tint : source_color = vec3(0.94, 0.97, 1.0);
@@ -23,6 +24,7 @@ void fragment() {
 	vec3 col = mix(vec3(luma) * tint, c, mix(saturation, 1.0, redness * red_keep));
 	col = (col - pivot) * contrast + pivot;
 	col *= brightness;
+	col = col * (1.0 - lift) + lift;
 	vec2 d = UV - 0.5;
 	col *= clamp(1.0 - dot(d, d) * vignette * 1.6, 0.0, 1.0);
 	col += (hash(floor(UV * 480.0) + fract(TIME) * 61.0) - 0.5) * grain;

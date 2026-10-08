@@ -34,6 +34,8 @@ static var _mesh_cache := {}
 static var _vertex_material: StandardMaterial3D
 
 @export_enum("normal", "fat", "thin", "bulky") var build := "normal"
+@export_range(0.7, 1.2, 0.01) var leg_length := 1.0  ## Длина ног (1 — обычная).
+@export_range(0.7, 1.2, 0.01) var torso_length := 1.0  ## Высота туловища (1 — обычная).
 @export_enum("tshirt", "tank", "shirt", "hoodie", "jacket", "suit", "coat") var outfit := "tshirt"
 @export_enum("short", "buzz", "long", "slick", "mohawk", "bald") var hair_style := "short"
 @export_enum("none", "cap", "beanie", "fedora", "helmet", "bandana") var hat := "none"
@@ -531,9 +533,16 @@ func _build() -> void:
 	_w = proportions[0]
 	_d = proportions[1]
 	_l = proportions[2]
-	_thigh = 0.43 * proportions[3]
-	_shin = 0.38 * proportions[3]
+	_thigh = 0.43 * proportions[3] * leg_length
+	_shin = 0.38 * proportions[3] * leg_length
 	_hip_y = _thigh + _shin + 0.085
+	_waist = 0.08 * torso_length
+	_neck_y = 0.54 * torso_length
+	_shoulder_y = 0.47 * torso_length
+	# Руки растут вместе с телом, чтобы кисти не висели у колен.
+	var arm := (leg_length + torso_length) * 0.5
+	_upper = 0.29 * arm
+	_fore = 0.25 * arm
 	_hip_x = 0.09 * _w + 0.015
 	_shoulder_x = 0.21 * _w + 0.075 * _l
 
@@ -547,8 +556,8 @@ func _build() -> void:
 		_limbs["leg_l" if side < 0.0 else "leg_r"] = [hip, knee]
 
 	_chest = _pivot(_hips, "Chest", Vector3(0, _waist, 0))
-	_torso = _pivot(_chest, "Torso", Vector3(0, 0.28, 0))
-	_add_part(_torso, _torso_boxes())
+	_torso = _pivot(_chest, "Torso", Vector3(0, 0.28 * torso_length, 0))
+	_add_part(_torso, _stretch_y(_torso_boxes(), torso_length))
 	_neck = _pivot(_chest, "Neck", Vector3(0, _neck_y, 0))
 	_add_part(_neck, _head_boxes(), false)
 
@@ -678,11 +687,26 @@ func _pelvis_boxes() -> Array:
 	if outfit == "coat":
 		# Полы плаща: спереди разрез, чтобы ноги свободно шагали.
 		var coat := jacket_color
-		boxes.append([Vector3(0.4 * _w, 0.46, 0.05), Vector3(0, -0.15, 0.115 * _d), coat, 0.015])
+		var length := 0.46 * leg_length
+		var center := 0.08 - length * 0.5
+		boxes.append([Vector3(0.4 * _w, length, 0.05), Vector3(0, center, 0.115 * _d), coat, 0.015])
 		for side in [-1.0, 1.0]:
-			boxes.append([Vector3(0.05, 0.46, 0.25 * _d), Vector3(side * 0.19 * _w, -0.15, 0.0), coat, 0.015])
-			boxes.append([Vector3(0.12 * _w, 0.46, 0.04), Vector3(side * 0.14 * _w, -0.15, -0.12 * _d), coat, 0.015])
+			boxes.append([Vector3(0.05, length, 0.25 * _d), Vector3(side * 0.19 * _w, center, 0.0), coat, 0.015])
+			boxes.append([Vector3(0.12 * _w, length, 0.04), Vector3(side * 0.14 * _w, center, -0.12 * _d), coat, 0.015])
 	return boxes
+
+
+## Растягивает или сплющивает набор коробок по высоте.
+static func _stretch_y(boxes: Array, factor: float) -> Array:
+	if is_equal_approx(factor, 1.0):
+		return boxes
+	var result := []
+	for box: Array in boxes:
+		var copy := box.duplicate()
+		copy[0] = Vector3(box[0].x, box[0].y * factor, box[0].z)
+		copy[1] = Vector3(box[1].x, box[1].y * factor, box[1].z)
+		result.append(copy)
+	return result
 
 
 func _thigh_boxes() -> Array:
