@@ -22,12 +22,17 @@ const LEVELS := [
 	{"title": "Алькатрас", "scene": "res://scenes/levels/level_8_prison.tscn", "reward": 600},
 	{"title": "Мост Золотые Ворота", "scene": "res://scenes/levels/level_9_bridge.tscn", "reward": 700},
 	{"title": "Сан-Франциско", "scene": "res://scenes/levels/level_10_san_francisco.tscn", "reward": 900},
+	# Эпизод 3: Аляска.
+	{"title": "Золотой прииск", "scene": "res://scenes/levels/level_11_gold_mine.tscn", "reward": 800},
+	{"title": "Заброшенный городок", "scene": "res://scenes/levels/level_12_ghost_town.tscn", "reward": 1000},
+	{"title": "Аляска", "scene": "res://scenes/levels/level_13_alaska.tscn", "reward": 1200},
 ]
 ## Эпизоды: уровни идут по порядку с first до city, а город в конце нужно освободить —
 ## после этого он становится базой с входами на уровни эпизода. Между базами летают самолёты.
 const EPISODES := [
 	{"title": "Эпизод 1", "first": 0, "city": 4},
 	{"title": "Эпизод 2 · Сан-Франциско", "first": 5, "city": 9},
+	{"title": "Эпизод 3 · Аляска", "first": 10, "city": 12},
 ]
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
@@ -63,6 +68,14 @@ const PROPERTIES := [
 				"text": "+25% патронов в запасе"},
 		{"id": "punching_bag", "title": "Боксёрская груша", "price": 3000, "perk": "max_health", "value": 15.0,
 				"text": "+15 к здоровью"},
+	]},
+	{"id": "cabin", "city": 12, "title": "Бревенчатый дом у озера", "price": 12000, "upgrades": [
+		{"id": "stove", "title": "Печь и медвежья шкура", "price": 3000, "perk": "max_health", "value": 15.0,
+				"text": "+15 к здоровью"},
+		{"id": "workbench", "title": "Верстак оружейника", "price": 4500, "perk": "damage", "value": 0.1,
+				"text": "+10% урона"},
+		{"id": "gold_pan", "title": "Лоток старателя", "price": 3500, "perk": "money", "value": 0.1,
+				"text": "+10% денег за задания"},
 	]},
 ]
 

@@ -47,6 +47,7 @@ func _run() -> void:
 	await _test_rifle_and_grenades()
 	await _test_new_bosses()
 	await _test_living_town()
+	await _test_episode_three()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -79,7 +80,7 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac"}
+	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac", 11: "Sniper"}
 	if bosses.has(index):
 		_check(level.get_node_or_null("Enemies/" + bosses[index]) is Boss, "%s: босс %s" % [title, bosses[index]])
 	var boss_ends_level: bool = bosses.has(index) and (level.get_node("Enemies/" + bosses[index]) as Boss).completes_level
@@ -88,7 +89,7 @@ func _test_level_structure(index: int) -> void:
 	var explosives := level.get_node_or_null("Explosives")
 	_check(explosives != null and explosives.get_child_count() >= 8,
 			"%s: бочки и баллоны (%d)" % [title, explosives.get_child_count() if explosives else 0])
-	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 4][index]
+	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5][index]
 	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
 	_check(problems.is_empty(), "%s: маршрут от старта до выхода проходим %s" % [title, problems])
@@ -485,7 +486,7 @@ func _test_episode_two() -> void:
 	_game.completions[4] = 1
 	_check(_game.is_level_unlocked(5) and not _game.is_level_unlocked(6), "после первого города открыт эпизод 2")
 	var town := await _fresh_level(_game.TOWN_INDEX)
-	var airport := town.find_children("*", "TravelPoint")
+	var airport := town.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.episode == 2)
 	_check(airport.size() == 1 and airport[0].active, "в первом городе открыт аэропорт в Сан-Франциско")
 	_check(_game.travel_target(2) == 5, "перелёт ведёт на первый уровень эпизода 2 — порт")
 	var port := await _fresh_level(5)
@@ -622,6 +623,116 @@ func _test_living_town() -> void:
 	walker.take_hit(20.0, walker.global_position + Vector3.UP, Vector3.FORWARD)
 	await _frames(2)
 	_check(_game.money == money - Civilian.PENALTY, "за мирного жителя — штраф")
+
+
+func _test_episode_three() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 11
+	_game.town_liberated = true
+	_game.liberated_cities = [9]
+	_check(_game.episode_of(10) == 3 and _game.is_episode_open(3), "после Сан-Франциско открыт эпизод 3 · Аляска")
+	var sf := await _fresh_level(9)
+	var planes := sf.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.episode == 3 and t.active)
+	_check(planes.size() == 1, "из Сан-Франциско летает самолёт на Аляску")
+	_check(_game.travel_target(3) == 10, "перелёт на Аляску ведёт на прииск")
+	var town := await _fresh_level(_game.TOWN_INDEX)
+	_check(town.find_children("*", "TravelPoint").any(func(t: Variant) -> bool: return t.episode == 3 and t.active),
+			"из первого города тоже можно улететь на Аляску")
+
+	# Прииск: снег, ящики с динамитом, снайперы на крышах.
+	var mine := await _fresh_level(10, false)
+	var snow := mine.get_node_or_null("Snow")
+	_check(snow is Rain and snow.snow, "на Аляске идёт снег")
+	var tnt := mine.get_node("Explosives").get_children().filter(func(n: Node) -> bool: return String(n.name).begins_with("Tnt"))
+	_check(tnt.size() >= 3 and tnt[0] is Explosive, "на прииске ящики с динамитом (%d)" % tnt.size())
+	var marksmen := mine.get_node("Enemies").get_children().filter(func(n: Node) -> bool: return n is Enemy and n.scope_glint)
+	_check(marksmen.size() >= 2 and marksmen.all(func(e: Variant) -> bool: return e.stationary and e.sight_range >= 60.0),
+			"на крышах сидят снайперы (%d)" % marksmen.size())
+	mine.complete()
+	await _frames(3)
+	_check(mine.hud.get_node("%NextButton").text == "Следующий уровень" and _game.is_level_unlocked(11),
+			"после прииска — заброшенный городок")
+
+	# Заброшенный городок: винтовка охотника у старта и оптика.
+	var ghost := await _fresh_level(11, false)
+	var player := ghost.player
+	player.max_health = 100000
+	player.health = 100000
+	var rifle_pickup: Pickup = null
+	for node in ghost.get_node("Pickups").get_children():
+		if node is Pickup and node.weapon and node.weapon.id == "sniper":
+			rifle_pickup = node
+	_check(rifle_pickup != null and rifle_pickup.global_position.distance_to(player.global_position) < 8.0,
+			"снайперская винтовка лежит у старта")
+	_check(not player.has_scope() and not ghost.hud.get_node("%ScopeButton").visible, "пока винтовки нет, нет и оптики")
+	if rifle_pickup:
+		_teleport(player, Vector3(rifle_pickup.global_position.x, player.global_position.y, rifle_pickup.global_position.z + 0.9))
+	await _frames(10)
+	_check(player.current_weapon != null and player.current_weapon.id == "sniper", "игрок подобрал снайперскую винтовку")
+	_check(ghost.hud.get_node("%ScopeButton").visible, "появилась кнопка «Прицел»")
+	player.toggle_scope()
+	await _seconds(0.6)
+	var fov := player.camera_rig.camera.fov
+	_check(player.scoped and fov < 30.0 and not player.model.visible, "оптика приближает: обзор %d°" % roundi(fov))
+	_check(ghost.hud.get_node("%Crosshair").scoped, "на экране — сетка оптического прицела")
+	var target := _spawn_enemy(ghost, "gunner", Vector3(15, 5, -10))
+	target.sight_range = 0.5
+	await _frames(3)
+	await _aim_at(player, target.get_aim_point(false))
+	await _fire(player)
+	_check(not is_instance_valid(target) or not target.is_alive() or target.is_wounded(),
+			"снайперская винтовка с одного выстрела убивает (или отрывает руку)")
+	player.switch_weapon()
+	await _seconds(0.5)
+	_check(not player.scoped and player.camera_rig.camera.fov > 60.0, "при смене оружия оптика убирается")
+
+	# Босс Снайпер: блик прицела и перебежки с вышки на вышку.
+	var boss := ghost.get_node("Enemies/Sniper") as Boss
+	_check(boss.relocates and boss.stationary and boss.model.weapon == "sniper", "Снайпер с винтовкой ждёт на колокольне")
+	_teleport(player, Vector3(30, 0, -104))
+	var glint := false
+	for i in 5 * 60:
+		await get_tree().physics_frame
+		if boss._glint and boss._glint.visible:
+			glint = true
+			break
+	_check(boss._awake and glint, "Снайпер целится — сверкает блик оптики")
+	var deagle: WeaponData = load("res://weapons/deagle.tres")
+	var nest := boss.global_position
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	await _frames(3)
+	var nests := ghost.get_node("BossNests").get_children()
+	_check(boss.global_position.distance_to(nest) > 10.0
+			and nests.any(func(n: Node3D) -> bool: return n.global_position.distance_to(boss.global_position) < 0.5),
+			"после фазы Снайпер перебегает на другую вышку")
+	await _seconds(1.8)
+	boss.apply_shot(boss.health + 1.0, false, boss.global_position + Vector3.UP, Vector3.FORWARD, deagle)
+	await _seconds(1.8)
+	_check(boss.phase == 3 and boss.shot_sound == "sniper", "3-я фаза Снайпера")
+	boss.apply_shot(boss.health + 1.0, true, boss.global_position + Vector3.UP * 1.7, Vector3.FORWARD, deagle)
+	await _seconds(3.5)
+	_check((not is_instance_valid(boss) or boss.defeated) and _game.is_level_unlocked(12), "победа над Снайпером завершает уровень")
+
+	# Аляска: освобождение и база.
+	var alaska := await _fresh_level(12, false)
+	_check(not alaska.get("hub_mode") and alaska.find_children("*", "WaveZone").size() == 3,
+			"Аляску сначала надо освободить: три района")
+	alaska.complete()
+	await _frames(3)
+	_check(alaska.hud.get_node("%CompleteTitle").text == "Эпизод 3 пройден!", "освобождение Аляски завершает эпизод 3")
+	_check(_game.is_liberated(12) and _game.travel_target(3) == 12, "Аляска стала базой")
+	var hub := await _fresh_level(12)
+	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
+	_check(hub.get("hub_mode") and doors.size() == 2, "на базе Аляски входы на прииск и в городок (%d)" % doors.size())
+	var flights := hub.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.active)
+	_check(flights.size() == 2, "с аэродрома летают в первый город и Сан-Франциско (%d)" % flights.size())
+	_check(hub.get_node("Snow") is Rain, "на базе идёт снег")
+	_game.money = 20000
+	_check(_game.is_property_available("cabin") and _game.buy_property("cabin") and _game.buy_upgrade("cabin", "stove"),
+			"бревенчатый дом у озера и печь покупаются")
+	var cabin := await _fresh_level(12)
+	_check(cabin.player.global_position.distance_to(Vector3(-51, 0, 48)) < 2.0, "на базе Аляски появляемся дома")
+	_check(cabin.get_node("Properties/cabin/Furniture/stove").visible, "печь стоит в доме")
 
 
 ## Подходим к спрятавшемуся боссу так, чтобы он был на виду.

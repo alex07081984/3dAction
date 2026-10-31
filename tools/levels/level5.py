@@ -362,6 +362,8 @@ for c in STREETS:
 # --- Эпизод 2: выезды из города (открываются по мере прохождения) --------------------------
 L.interactable("travel_point", "Airport", "Entrances", (58.5, 1.5, 0), (3, 3, 6), episode="2")
 L.label("АЭРОПОРТ → САН-ФРАНЦИСКО", (60.4, 3.6, 0), yaw=-90, size=56, color="Color(1, 0.85, 0.3, 1)")
+L.interactable("travel_point", "AirportAlaska", "Entrances", (58.5, 1.5, 36), (3, 3, 6), episode="3")
+L.label("АЭРОПОРТ → АЛЯСКА", (60.4, 3.6, 36), yaw=-90, size=56, color="Color(0.6, 0.9, 1, 1)")
 for name in ("Rain", "Civilians", "Traffic"):
     L.node(name, "Node3D", ".", script=L.ext_res("Script", f"res://scripts/town/{name.lower()}.gd"))
 

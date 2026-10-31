@@ -24,6 +24,7 @@ const PLAYER_MASK := 2
 @export var alerted := false  ## Сразу знает, где игрок (так появляются враги из волн).
 @export var hold_position := true  ## Стрелок стоит на посту, пока видит игрока.
 @export var can_be_dismembered := true  ## Можно ли оторвать руку или ногу (боссам нельзя).
+@export var stationary := false  ## Никогда не сходит с места (снайперы на крышах и вышках).
 
 @export_group("Стрельба")
 @export var damage := 7
@@ -32,6 +33,11 @@ const PLAYER_MASK := 2
 @export var burst_interval := 0.14
 @export var fire_pause := 1.6
 @export_range(0.0, 1.0) var accuracy := 0.65
+## Дальше этого расстояния меткость падает (у снайперов — больше).
+@export var effective_range := 35.0
+@export var shot_sound := "enemy_shot"
+## Блик оптики: пока снайпер целится, на нём сверкает яркая точка — видно издалека.
+@export var scope_glint := false
 
 @export_group("Ближний бой")
 @export var melee_damage := 18
@@ -44,7 +50,6 @@ const PLAYER_MASK := 2
 @export var health_drop_amount := 20
 
 var health := 0.0
-var shot_sound := "enemy_shot"
 
 var _awake := false
 var _dead := false
@@ -59,6 +64,8 @@ var _lost_time := 0.0
 var _strafe_dir := 0.0
 var _strafe_timer := 0.0
 var _laser: MeshInstance3D
+var _glint: MeshInstance3D
+static var _glint_cache: Texture2D
 var _wound_left := 0.0
 var _hop_timer := 0.0
 var _scream_timer := 0.0
@@ -74,6 +81,8 @@ func _ready() -> void:
 	health = max_health
 	_think = randf() * 0.2
 	_build_laser()
+	if scope_glint:
+		_build_glint()
 	if alerted:
 		_wake.call_deferred(false)
 
@@ -287,7 +296,9 @@ func _shooter_logic(delta: float) -> void:
 			_phase = Phase.PAUSE
 			_timer = 0.4
 		_lost_time += delta
-		if not hold_position or _lost_time > 2.0:
+		if stationary:
+			_slow_down(delta)
+		elif not hold_position or _lost_time > 2.0:
 			_move_to(_last_seen, delta)
 		else:
 			_slow_down(delta)
@@ -326,7 +337,7 @@ func _fire() -> void:
 	var muzzle := model.get_muzzle_position()
 	var target := _player.global_position + Vector3.UP * 1.2
 	var distance := muzzle.distance_to(target)
-	var chance := accuracy * clampf(1.2 - distance / 35.0, 0.35, 1.0)
+	var chance := accuracy * clampf(1.2 - distance / effective_range, 0.35, 1.0)
 	if Vector2(_player.velocity.x, _player.velocity.z).length() > 3.0:
 		chance *= 0.75
 	if _player.is_dodging():
@@ -337,7 +348,7 @@ func _fire() -> void:
 		var side := (target - muzzle).cross(Vector3.UP).normalized()
 		aim += side * randf_range(0.7, 1.3) * (1.0 if randf() < 0.5 else -1.0) + Vector3.UP * randf_range(-0.3, 0.6)
 	var direction := (aim - muzzle).normalized()
-	var end := muzzle + direction * 80.0
+	var end := muzzle + direction * maxf(80.0, sight_range + 10.0)
 	var query := PhysicsRayQueryParameters3D.create(muzzle, end, WORLD_MASK | PLAYER_MASK, [get_rid()])
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit:
@@ -356,7 +367,7 @@ func _fire() -> void:
 
 
 func _strafe(delta: float) -> void:
-	if hold_position:
+	if hold_position or stationary:
 		_slow_down(delta)
 		return
 	_strafe_timer -= delta
@@ -585,8 +596,60 @@ func _build_laser() -> void:
 	add_child(_laser)
 
 
+func _build_glint() -> void:
+	_glint = MeshInstance3D.new()
+	var mesh := QuadMesh.new()
+	mesh.size = Vector2(0.5, 0.5)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	material.no_depth_test = false
+	material.albedo_texture = _glint_texture()
+	material.albedo_color = Color(1.0, 0.85, 0.55)
+	mesh.material = material
+	_glint.mesh = mesh
+	_glint.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_glint.top_level = true
+	_glint.visible = false
+	add_child(_glint)
+
+
+static func _glint_texture() -> Texture2D:
+	if _glint_cache:
+		return _glint_cache
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(1, 1, 1, 1))
+	gradient.set_color(1, Color(1, 1, 1, 0))
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(0.5, 0.0)
+	texture.width = 32
+	texture.height = 32
+	_glint_cache = texture
+	return texture
+
+
+## Блик оптики рядом с головой снайпера: чем дальше камера, тем он крупнее.
+func _update_glint(on: bool) -> void:
+	if _glint == null:
+		return
+	_glint.visible = on and _player_alive()
+	if not _glint.visible:
+		return
+	var point := global_position + Vector3.UP * 1.55 * model.scale.y - global_basis.z * 0.35
+	var camera := get_viewport().get_camera_3d()
+	var distance := camera.global_position.distance_to(point) if camera else 10.0
+	var pulse := 0.8 + 0.4 * sin(Time.get_ticks_msec() * 0.02)
+	_glint.global_transform = Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * clampf(distance * 0.03, 0.4, 3.0) * pulse), point)
+
+
 ## Красный лазер от ствола к игроку — предупреждение о выстреле.
 func _show_laser(on: bool) -> void:
+	_update_glint(on)
 	if _laser == null:
 		return
 	_laser.visible = on and _player_alive()

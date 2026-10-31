@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "sniper"
+display_name = "Снайперская винтовка"
+short_name = "Снайп"
+model = "sniper"
+sound = "sniper"
+damage = 110.0
+pellets = 1
+spread_deg = 0.05
+fire_interval = 1.1
+max_range = 160.0
+headshot_multiplier = 3.0
+impulse = 12.0
+gib_damage = 1000.0
+sever_damage = 80.0
+scope_fov = 22.0
+magazine = 5
+reload_time = 2.5
+infinite_ammo = false
+start_reserve = 15
+max_reserve = 40
+ammo_per_pickup = 10
+recoil_deg = 6.0
+shake = 0.35
+crosshair_kick = 30.0

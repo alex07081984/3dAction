@@ -129,6 +129,9 @@ size = Vector3(3, 3, 6)
 [sub_resource type="BoxShape3D" id="Box_19"]
 size = Vector3(3, 3, 6)
 
+[sub_resource type="BoxShape3D" id="Box_20"]
+size = Vector3(3, 3, 6)
+
 [sub_resource type="ShaderMaterial" id="SkyMat_10"]
 shader = ExtResource("62_night_sky")
 shader_parameter/moon_direction = Vector3(-0.4045, 0.5878, -0.7006)
@@ -1852,6 +1855,14 @@ text = "АЭРОПОРТ"
 font_size = 64
 outline_size = 12
 
+[node name="Label12" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 60.4, 3.6, 36)
+pixel_size = 0.01
+modulate = Color(0.6, 0.9, 1, 1)
+text = "АЭРОПОРТ → АЛЯСКА"
+font_size = 56
+outline_size = 12
+
 [node name="SFHill" type="CSGCombiner3D" parent="Geometry"]
 use_collision = true
 
@@ -1943,7 +1954,7 @@ light_color = Color(1, 0.85, 0.65, 1)
 light_energy = 1.8
 omni_range = 16
 
-[node name="Label12" type="Label3D" parent="Props"]
+[node name="Label13" type="Label3D" parent="Props"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 19.5, -103.4)
 pixel_size = 0.01
 modulate = Color(0.85, 0.9, 1, 1)
@@ -2320,6 +2331,14 @@ episode = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/Airport"]
 shape = SubResource("Box_19")
+
+[node name="AirportAlaska" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, 36)
+script = ExtResource("53_travel_point")
+episode = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/AirportAlaska"]
+shape = SubResource("Box_20")
 
 [node name="StreetLamps" type="Node3D" parent="."]
 script = ExtResource("54_street_lamps")

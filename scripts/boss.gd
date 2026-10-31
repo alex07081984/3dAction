@@ -5,6 +5,8 @@ extends Enemy
 ## Толстяк (крыша небоскрёба) с каждой фазой злее, а в последней берёт дробовик и прёт напролом.
 ## Худой (особняк) после каждой фазы бросает дымовую шашку и прячется в другой комнате:
 ## ищите его по смеху. В последней фазе стреляет из Desert Eagle.
+## Снайпер (заброшенный городок) сидит на вышках и после каждой фазы перебегает
+## на другую позицию: ищите блик оптики и красный лазер.
 
 signal cleared(boss: Boss)  ## Босс побеждён (на это смотрит выход с уровня).
 
@@ -14,6 +16,8 @@ signal cleared(boss: Boss)  ## Босс побеждён (на это смотр
 @export var final_weapon := "shotgun"  ## Оружие последней фазы: shotgun или deagle.
 @export var final_damage := 40  ## Урон в последней фазе (у дробовика — весь заряд в упор).
 @export var hides := false  ## Прятаться после каждой фазы (Худой).
+## Снайпер: после каждой фазы (и если долго не видит игрока) перебегает на другую позицию из hide_points.
+@export var relocates := false
 @export var hide_points: NodePath  ## Узел с Marker3D, где можно спрятаться. Имя маркера — подсказка игроку.
 @export var henchman_points: NodePath  ## Узел с Marker3D, откуда приходят прислужники.
 @export var henchmen_per_phase := 4
@@ -39,6 +43,7 @@ var _hidden_time := 0.0
 var _hide_name := ""
 var _charging := false
 var _grenade_timer := 3.0
+var _nest: Node3D
 
 
 func _ready() -> void:
@@ -58,6 +63,10 @@ func _physics_process(delta: float) -> void:
 		_hide_logic(delta)
 	elif grenade_interval > 0.0 and _awake and _transition <= 0.0:
 		_grenade_logic(delta)
+	if relocates and _awake and _transition <= 0.0 and _lost_time > 7.0 and _player_alive():
+		# Потерял игрока из виду — ищет новую позицию.
+		_lost_time = 0.0
+		_relocate(false)
 	super._physics_process(delta)
 
 
@@ -134,15 +143,21 @@ func _next_phase() -> void:
 		_enter_final_phase()
 	else:
 		# С каждой фазой злее: длиннее очереди, меньше пауз, меньше стоит на месте.
-		burst += 2
+		# Снайпер вместо очередей целится быстрее.
+		if relocates:
+			aim_time *= 0.85
+		else:
+			burst += 2
+			hold_position = false
 		fire_pause *= 0.8
 		accuracy = minf(accuracy + 0.05, 0.9)
-		hold_position = false
 	_spawn_henchmen()
 	if blackout:
 		_blackout()
 	if hides:
 		_vanish()
+	elif relocates:
+		_relocate(true)
 	else:
 		Audio.play_at("roar", _head(), 6.0)
 		_hud("show_message", "%s в ярости!" % boss_name, "Фаза %d из %d · подмога!" % [phase, phases])
@@ -153,8 +168,13 @@ func _enter_final_phase() -> void:
 	model.set_weapon(final_weapon)
 	damage = roundi(final_damage * Game.enemy_damage_multiplier())
 	burst = maxi(final_burst, 1)
-	hold_position = false
-	if final_weapon == "shotgun":
+	hold_position = relocates
+	if final_weapon == "sniper":
+		shot_sound = "sniper"
+		aim_time = maxf(aim_time * 0.8, 0.7)
+		fire_pause = 1.2
+		accuracy = minf(accuracy + 0.08, 0.9)
+	elif final_weapon == "shotgun":
 		_charging = true
 		shot_sound = "shotgun"
 		move_speed *= 1.7
@@ -222,6 +242,51 @@ func _blackout() -> void:
 		for light in lights:
 			if is_instance_valid(light):
 				light.visible = true)
+
+
+# --- Позиции Снайпера --------------------------------------------------------------
+
+## Дымовая шашка — и снайпер уже на другой вышке. Сразу снова целится.
+func _relocate(new_phase: bool) -> void:
+	var point := _pick_nest()
+	if point == null:
+		if new_phase:
+			_hud("show_message", "%s в ярости!" % boss_name, "Фаза %d из %d" % [phase, phases])
+		return
+	Fx.smoke_cloud(global_position + Vector3.UP)
+	Audio.play_at("smoke", global_position + Vector3.UP)
+	global_position = point.global_position
+	rotation.y = point.global_rotation.y
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()
+	_nest = point
+	_phase = Phase.PAUSE
+	_timer = 1.2
+	_show_laser(false)
+	var where := String(point.name)
+	if new_phase:
+		_hud("show_message", "%s сменил позицию!" % boss_name, "Фаза %d из %d · он теперь: %s" % [phase, phases, where])
+	else:
+		_hud("show_message", "%s перебежал" % boss_name, "Ищите блик прицела: %s" % where)
+	_hud("set_objective", "Убейте: %s (%s)" % [boss_name, where])
+
+
+## Другая позиция, подальше от игрока (но не дальше, чем он видит).
+func _pick_nest() -> Node3D:
+	var holder := get_node_or_null(hide_points)
+	if holder == null:
+		return null
+	var options: Array[Node3D] = []
+	for child in holder.get_children():
+		var point := child as Node3D
+		if point == null or point == _nest or point.global_position.distance_to(global_position) < 6.0:
+			continue
+		if _player_alive():
+			var distance := point.global_position.distance_to(_player.global_position)
+			if distance < 14.0 or distance > sight_range - 5.0:
+				continue
+		options.append(point)
+	return options.pick_random() if not options.is_empty() else null
 
 
 # --- Прятки (Худой) -------------------------------------------------------------

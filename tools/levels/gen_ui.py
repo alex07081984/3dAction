@@ -215,6 +215,7 @@ def hud():
         ("SwitchButton", "switch_weapon", "Пист", 22, (-195, -405, -85, -295), False, "Color(0.4, 0.8, 1, 0.25)"),
         ("InteractButton", "interact", "Войти", 24, (-600, -230, -460, -90), False, "Color(0.3, 1, 0.45, 0.35)"),
         ("GrenadeButton", "grenade", "Гран 2", 18, (-455, -400, -355, -300), False, "Color(0.5, 1, 0.4, 0.28)"),
+        ("ScopeButton", "aim_scope", "Прицел", 18, (-305, -520, -195, -410), False, "Color(1, 0.85, 0.3, 0.3)"),
     ]
     for name, action, text, size, offsets, drag, color in buttons:
         props = dict(mouse_filter=2, script=button, action=f'&"{action}"', text=text, font_size=size)
@@ -222,10 +223,10 @@ def hud():
             props["pass_drag"] = True
         if color:
             props["color"] = color
-        if name == "InteractButton":
+        if name in ("InteractButton", "ScopeButton"):
             props["visible"] = False
         s.node(name, "Control", "TouchControls", layout="bottom_right", offsets=offsets,
-               unique=(name in ("SwitchButton", "InteractButton", "GrenadeButton")), **props)
+               unique=(name in ("SwitchButton", "InteractButton", "GrenadeButton", "ScopeButton")), **props)
     s.node("InteractPrompt", "Label", "TouchControls", layout="bottom_right", offsets=(-900, -290, -160, -240),
            unique=True, visible=False, theme_override_font_sizes__font_size=24, horizontal_alignment=1,
            theme_override_colors__font_color="Color(0.75, 1, 0.8, 1)", autowrap_mode=3)

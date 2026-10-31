@@ -23,9 +23,12 @@ extends Node3D
 @export var max_pitch_deg := 60.0
 
 var camera: Camera3D
+## Угол обзора в оптическом прицеле (0 — прицел не используется).
+var scope_fov := 0.0
 
 var _shake := 0.0
 var _kick := 0.0
+var _base_fov := 70.0
 
 @onready var _shoulder: SpringArm3D = $ShoulderArm
 @onready var _arm: SpringArm3D = $ShoulderArm/Shoulder/SpringArm3D
@@ -34,6 +37,7 @@ var _kick := 0.0
 func _ready() -> void:
 	top_level = true
 	camera = $ShoulderArm/Shoulder/SpringArm3D/Camera3D
+	_base_fov = camera.fov
 	if target == null:
 		target = get_parent() as Node3D
 	if target is CollisionObject3D:
@@ -67,6 +71,13 @@ func _physics_process(delta: float) -> void:
 	if look != Vector2.ZERO:
 		_rotate_by(look * stick_speed * delta * _sensitivity())
 
+	# Оптика: камера приближается к плечу и сужает обзор.
+	var blend := 1.0 - exp(-16.0 * delta)
+	var scoped := scope_fov > 0.0
+	camera.fov = lerpf(camera.fov, scope_fov if scoped else _base_fov, blend)
+	_arm.spring_length = lerpf(_arm.spring_length, 0.0 if scoped else distance, blend)
+	_shoulder.spring_length = lerpf(_shoulder.spring_length, 0.12 if scoped else shoulder_offset, blend)
+
 	# Отдача подбрасывает камеру и плавно возвращается.
 	_kick = move_toward(_kick, 0.0, delta * 0.35)
 	camera.rotation.x = _kick
@@ -98,6 +109,20 @@ func get_aim_ray() -> Array:
 	return [camera.project_ray_origin(center), camera.project_ray_normal(center)]
 
 
+## Включить оптику с таким углом обзора (0 — выключить).
+func set_scope(fov: float) -> void:
+	scope_fov = fov
+
+
+func is_scoped() -> bool:
+	return scope_fov > 0.0
+
+
+## Насколько сейчас приближено (1 — обычный вид). Нужен для чувствительности и помощи в прицеливании.
+func zoom_ratio() -> float:
+	return clampf(camera.fov / _base_fov, 0.05, 1.0) if camera else 1.0
+
+
 func add_recoil(degrees: float) -> void:
 	_kick = minf(_kick + deg_to_rad(degrees), deg_to_rad(12.0))
 
@@ -120,4 +145,5 @@ func _rotate_by(amount: Vector2) -> void:
 
 
 func _sensitivity() -> float:
-	return float(Game.settings.get("sensitivity", 1.0))
+	# В оптике поворачиваем медленнее, иначе прицел скачет.
+	return float(Game.settings.get("sensitivity", 1.0)) * zoom_ratio()

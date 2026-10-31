@@ -460,6 +460,16 @@ def extra_sounds():
     save("music_explore", finish(explore_track(), gain=0.75, drive=1.0))
     save("music_combat", finish(combat_track(), gain=0.8, drive=1.2))
     save("magnum", finish(gunshot(0.9, 130, 40, 0.1, 0.022, 1500, 0.12, 420, 0.5, 0.65), drive=2.4))
+    # Снайперская винтовка: тяжёлый выстрел с долгим эхом в горах и лязг затвора.
+    sniper = pad(gunshot(1.5, 105, 32, 0.13, 0.03, 1300, 0.15, 360, 1.0, 0.8), 1.5)
+    sniper = place(sniper, click(0.05, 1800, 0.01) * 0.35, 0.75)
+    sniper = place(sniper, click(0.05, 2400, 0.008) * 0.3, 0.95)
+    save("sniper", finish(sniper, drive=2.6))
+    # Ветер для снега: шум с медленными порывами (период кратен длине — петля без шва).
+    t = t_axis(6.0)
+    gusts = 0.55 + 0.3 * np.sin(2 * np.pi * t / 6.0) + 0.15 * np.sin(2 * np.pi * 3 * t / 6.0 + 1.0)
+    wind = lowpass(noise(6.0), 700) * 0.8 + highpass(lowpass(noise(6.0), 2200), 900) * 0.25
+    save("wind", finish(wind * gusts, gain=0.5, drive=1.0))
 
 
 if __name__ == "__main__":

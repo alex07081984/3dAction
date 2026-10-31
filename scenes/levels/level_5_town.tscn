@@ -107,21 +107,24 @@ size = Vector3(3, 3, 3)
 size = Vector3(3, 3, 6)
 
 [sub_resource type="BoxShape3D" id="Box_10"]
-size = Vector3(2.4, 3, 3)
+size = Vector3(3, 3, 6)
 
 [sub_resource type="BoxShape3D" id="Box_11"]
-size = Vector3(2.6, 3, 3.6)
+size = Vector3(2.4, 3, 3)
 
 [sub_resource type="BoxShape3D" id="Box_12"]
-size = Vector3(3.6, 3, 2.6)
+size = Vector3(2.6, 3, 3.6)
 
 [sub_resource type="BoxShape3D" id="Box_13"]
-size = Vector3(20, 4, 20)
+size = Vector3(3.6, 3, 2.6)
 
 [sub_resource type="BoxShape3D" id="Box_14"]
-size = Vector3(18, 4, 18)
+size = Vector3(20, 4, 20)
 
 [sub_resource type="BoxShape3D" id="Box_15"]
+size = Vector3(18, 4, 18)
+
+[sub_resource type="BoxShape3D" id="Box_16"]
 size = Vector3(18, 4, 18)
 
 [sub_resource type="ShaderMaterial" id="SkyMat_5"]
@@ -3368,6 +3371,22 @@ text = "АЭРОПОРТ → САН-ФРАНЦИСКО"
 font_size = 56
 outline_size = 12
 
+[node name="AirportAlaska" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, 36)
+script = ExtResource("50_travel_point")
+episode = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/AirportAlaska"]
+shape = SubResource("Box_10")
+
+[node name="Label11" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 60.4, 3.6, 36)
+pixel_size = 0.01
+modulate = Color(0.6, 0.9, 1, 1)
+text = "АЭРОПОРТ → АЛЯСКА"
+font_size = 56
+outline_size = 12
+
 [node name="Rain" type="Node3D" parent="."]
 script = ExtResource("51_rain")
 
@@ -3406,7 +3425,7 @@ script = ExtResource("55_property_door")
 property_id = "shack"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/ShackDoor"]
-shape = SubResource("Box_10")
+shape = SubResource("Box_11")
 
 [node name="Base" type="Node3D" parent="Properties/shack/Furniture"]
 
@@ -3496,7 +3515,7 @@ script = ExtResource("55_property_door")
 property_id = "apartment"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/ApartmentDoor"]
-shape = SubResource("Box_11")
+shape = SubResource("Box_12")
 
 [node name="Base" type="Node3D" parent="Properties/apartment/Furniture"]
 
@@ -3595,7 +3614,7 @@ script = ExtResource("55_property_door")
 property_id = "mansion"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/MansionDoor"]
-shape = SubResource("Box_12")
+shape = SubResource("Box_13")
 
 [node name="Base" type="Node3D" parent="Properties/mansion/Furniture"]
 
@@ -3822,7 +3841,7 @@ rusher_scene = ExtResource("65_rusher")
 heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneSquare"]
-shape = SubResource("Box_13")
+shape = SubResource("Box_14")
 
 [node name="Spawns" type="Node3D" parent="ZoneSquare"]
 
@@ -3854,7 +3873,7 @@ rusher_scene = ExtResource("65_rusher")
 heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneEast"]
-shape = SubResource("Box_14")
+shape = SubResource("Box_15")
 
 [node name="Spawns" type="Node3D" parent="ZoneEast"]
 
@@ -3886,7 +3905,7 @@ rusher_scene = ExtResource("65_rusher")
 heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneTownHall"]
-shape = SubResource("Box_15")
+shape = SubResource("Box_16")
 
 [node name="Spawns" type="Node3D" parent="ZoneTownHall"]
 

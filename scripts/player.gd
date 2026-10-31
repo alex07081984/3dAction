@@ -12,6 +12,7 @@ signal shot_fired(weapon: WeaponData)
 signal hit_confirmed(headshot: bool, killed: bool)
 signal picked_up(text: String)
 signal grenades_changed(count: int)
+signal scope_changed(on: bool)
 signal died
 
 const WORLD_MASK := 1
@@ -62,6 +63,8 @@ var _aim_start := Vector3.ZERO
 var _aim_point := Vector3.ZERO
 var grenades := 0
 var _grenade_cooldown := 0.0
+## Смотрим в оптический прицел снайперской винтовки.
+var scoped := false
 
 @onready var model: BlockyCharacter = $Model
 @onready var camera_rig: CameraRig = $CameraRig
@@ -101,6 +104,8 @@ func _physics_process(delta: float) -> void:
 		switch_weapon()
 	if Input.is_action_just_pressed("grenade"):
 		throw_grenade()
+	if Input.is_action_just_pressed("aim_scope"):
+		toggle_scope()
 	if Input.is_action_just_pressed("interact") and is_instance_valid(interactable) and interactable.active:
 		interactable.interact(self)
 
@@ -110,7 +115,8 @@ func _physics_process(delta: float) -> void:
 		velocity.z = _dodge_dir.z * dodge_speed
 	else:
 		var accel := acceleration if is_on_floor() else air_acceleration
-		var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(direction * move_speed, accel * delta)
+		var speed := move_speed * (0.45 if scoped else 1.0)
+		var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(direction * speed, accel * delta)
 		velocity.x = horizontal.x
 		velocity.z = horizontal.z
 		if Input.is_action_just_pressed("jump") and is_on_floor():
@@ -123,8 +129,8 @@ func _physics_process(delta: float) -> void:
 	var speed_ratio := Vector2(velocity.x, velocity.z).length() / move_speed
 	model.animate(delta, speed_ratio, true, camera_rig.get_pitch())
 	model.scale.y = 0.75 if _dodge_left > 0.0 else 1.0
-	# Если камеру прижало стеной к спине, прячем персонажа, чтобы он не закрывал обзор.
-	model.visible = camera_rig.camera.global_position.distance_to(global_position + Vector3.UP * 1.4) > 0.9
+	# Если камеру прижало стеной к спине (или смотрим в оптику), прячем персонажа, чтобы он не закрывал обзор.
+	model.visible = not scoped and camera_rig.camera.global_position.distance_to(global_position + Vector3.UP * 1.4) > 0.9
 
 	_update_aim()
 	var wants_fire := Input.is_action_pressed("fire")
@@ -156,6 +162,25 @@ func is_dodging() -> bool:
 
 func is_reloading() -> bool:
 	return _reload_left > 0.0
+
+
+func has_scope() -> bool:
+	return current_weapon != null and current_weapon.scope_fov > 0.0
+
+
+## Оптика снайперской винтовки: вкл/выкл. Без винтовки ничего не делает.
+func toggle_scope() -> void:
+	set_scoped(not scoped)
+
+
+func set_scoped(on: bool) -> void:
+	on = on and has_scope() and not _dead and _reload_left <= 0.0
+	if on == scoped:
+		return
+	scoped = on
+	camera_rig.set_scope(current_weapon.scope_fov if on else 0.0)
+	Audio.play("switch", -8.0, 1.5 if on else 1.2)
+	scope_changed.emit(on)
 
 
 func get_ammo(weapon: WeaponData) -> Dictionary:
@@ -258,6 +283,7 @@ func start_reload() -> void:
 		return
 	if not current_weapon.infinite_ammo and state.reserve <= 0:
 		return
+	set_scoped(false)
 	_reload_left = current_weapon.reload_time
 	reload_started.emit(current_weapon.reload_time)
 	Audio.play("reload", -3.0)
@@ -291,8 +317,12 @@ func _shoot(weapon: WeaponData) -> void:
 	var results := {}  # враг -> {"damage", "head", "point", "dir", "parts"}
 	var impact_shown := false
 
+	# Снайперская винтовка без оптики стреляет с большим разбросом.
+	var spread := weapon.spread_deg
+	if weapon.scope_fov > 0.0 and not scoped:
+		spread = maxf(spread, weapon.hip_spread_deg)
 	for i in weapon.pellets:
-		var dir := _spread(base_dir, weapon.spread_deg)
+		var dir := _spread(base_dir, spread)
 		var end := _aim_start + dir * weapon.max_range
 		var query := PhysicsRayQueryParameters3D.create(_aim_start, end, WORLD_MASK | ENEMY_MASK, [get_rid()])
 		var hit := space.intersect_ray(query)
@@ -365,7 +395,8 @@ func _update_aim() -> void:
 	if not Game.settings.get("aim_assist", true):
 		return
 
-	var best_angle := deg_to_rad(aim_assist_deg)
+	# В оптике помощь в прицеливании сужается вместе с обзором.
+	var best_angle := deg_to_rad(aim_assist_deg) * camera_rig.zoom_ratio()
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy == null or not enemy.is_alive():
@@ -401,6 +432,7 @@ func _spread(direction: Vector3, degrees: float) -> Vector3:
 # --- Вспомогательное ----------------------------------------------------------
 
 func _select(weapon: WeaponData) -> void:
+	set_scoped(false)
 	current_weapon = weapon
 	_reload_left = 0.0
 	_fire_cooldown = 0.25
@@ -462,6 +494,7 @@ func _try_dodge() -> void:
 	var direction := _get_move_direction()
 	if direction.length_squared() < 0.01:
 		direction = camera_rig.get_yaw_basis() * Vector3.BACK
+	set_scoped(false)
 	_dodge_dir = direction.normalized()
 	_dodge_left = dodge_time
 	_dodge_cooldown_left = dodge_cooldown
@@ -475,6 +508,7 @@ func _apply_gravity(delta: float) -> void:
 
 
 func _die(from_position: Vector3) -> void:
+	set_scoped(false)
 	_dead = true
 	aim_target = null
 	var direction := global_position - from_position

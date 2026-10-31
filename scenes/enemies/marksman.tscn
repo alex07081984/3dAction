@@ -1,0 +1,45 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.38
+height = 1.95
+
+[node name="Marksman" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_enemy")
+sight_range = 70.0
+kind = 0
+max_health = 70.0
+move_speed = 3.0
+damage = 22
+aim_time = 1.4
+burst = 1
+fire_pause = 2.4
+accuracy = 0.82
+effective_range = 80.0
+shot_sound = "sniper"
+scope_glint = true
+stationary = true
+drop_ammo_chance = 0.35
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
+script = ExtResource("2_model")
+outfit = "coat"
+hat = "beanie"
+random_look = true
+beard = "beard"
+jacket_color = Color(0.32, 0.24, 0.16, 1)
+shirt_color = Color(0.5, 0.12, 0.1, 1)
+pants_color = Color(0.2, 0.2, 0.24, 1)
+hat_color = Color(0.35, 0.3, 0.25, 1)
+glove_color = Color(0.15, 0.12, 0.1, 1)
+weapon = "sniper"

@@ -221,6 +221,7 @@ building(44, 57, 44, 57, 6, "plank")
 L.label("ПАРОМ НА АЛЬКАТРАС", (-50, 3.6, 59.6), yaw=180, size=56, color="Color(0.85, 0.9, 1, 1)")
 L.label("К МОСТУ ЗОЛОТЫЕ ВОРОТА", (-60.4, 3.6, 0), yaw=90, size=56, color="Color(1, 0.5, 0.35, 1)")
 L.label("АЭРОПОРТ", (60.4, 3.6, 0), yaw=-90, size=64, color="Color(1, 0.85, 0.3, 1)")
+L.label("АЭРОПОРТ → АЛЯСКА", (60.4, 3.6, 36), yaw=-90, size=56, color="Color(0.6, 0.9, 1, 1)")
 
 # --- Холм: крутая улица, канатный трамвай, башня на вершине ---------------------------------
 L.room("SFHill", -16, 16, -112, -95, HILL, 1.1, "paving", "stone", None, openings={"S": [(-5, 5)]})
@@ -276,6 +277,7 @@ L.interactable("level_entrance", "CasinoDoor", "Entrances", (6, 1.5, -18), (3, 3
 L.interactable("level_entrance", "Ferry", "Entrances", (-50, 1.5, 58.5), (6, 3, 3), level_index="7")
 L.interactable("level_entrance", "BridgeRoad", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="8")
 L.interactable("travel_point", "Airport", "Entrances", (58.5, 1.5, 0), (3, 3, 6), episode="1")
+L.interactable("travel_point", "AirportAlaska", "Entrances", (58.5, 1.5, 36), (3, 3, 6), episode="3")
 
 # --- Фонари, дождь, прохожие, машины -----------------------------------------------------------
 lamps = L.group("StreetLamps")

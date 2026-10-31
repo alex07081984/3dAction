@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://textures/concrete_dark.png" id="1_tex"]
+
+[resource]
+albedo_color = Color(0.6, 0.62, 0.68, 1)
+albedo_texture = ExtResource("1_tex")
+roughness = 0.95
+uv1_scale = Vector3(0.09, 0.07, 0.09)
+uv1_triplanar = true

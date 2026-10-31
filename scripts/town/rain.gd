@@ -2,10 +2,12 @@ class_name Rain
 extends Node3D
 ## Дождь вокруг камеры: капли-штрихи, брызги на земле и шум дождя.
 ## Под крышей (в домах) капли не идут и шум тише.
+## С snow = true вместо дождя медленно падает снег и воет ветер (Аляска).
 
 @export var amount := 600
 @export var area := 16.0
 @export var volume_db := -13.0
+@export var snow := false
 
 var _drops: CPUParticles3D
 var _splashes: CPUParticles3D
@@ -15,6 +17,9 @@ var _covered := false
 
 
 func _ready() -> void:
+	if snow:
+		_make_snow()
+		return
 	_drops = _particles(Vector3(0.015, 0.55, 0.015), Color(0.75, 0.8, 0.9, 0.35), amount)
 	_drops.lifetime = 0.9
 	_drops.emission_box_extents = Vector3(area, 0.5, area)
@@ -31,7 +36,31 @@ func _ready() -> void:
 	_splashes.initial_velocity_min = 0.6
 	_splashes.initial_velocity_max = 1.3
 	_splashes.gravity = Vector3(0, -6, 0)
-	var source := load("res://audio/rain.wav") as AudioStreamWAV
+	_start_sound("res://audio/rain.wav")
+
+
+## Снежинки: крупнее и медленнее капель, кружатся и сносятся ветром.
+func _make_snow() -> void:
+	_drops = _particles(Vector3(0.06, 0.06, 0.06), Color(0.95, 0.97, 1.0, 0.85), amount)
+	_drops.lifetime = 5.0
+	_drops.preprocess = 5.0
+	_drops.emission_box_extents = Vector3(area * 1.2, 4.0, area * 1.2)
+	_drops.direction = Vector3(0.35, -1, 0.1)
+	_drops.spread = 25.0
+	_drops.initial_velocity_min = 1.2
+	_drops.initial_velocity_max = 2.4
+	_drops.gravity = Vector3.ZERO
+	_drops.angular_velocity_min = -180.0
+	_drops.angular_velocity_max = 180.0
+	_drops.scale_amount_min = 0.6
+	_drops.scale_amount_max = 1.4
+	_splashes = _particles(Vector3(0.02, 0.02, 0.02), Color(1, 1, 1, 0.0), 1)
+	_splashes.emitting = false
+	_start_sound("res://audio/wind.wav")
+
+
+func _start_sound(path: String) -> void:
+	var source := load(path) as AudioStreamWAV
 	if source:
 		var stream := source.duplicate() as AudioStreamWAV
 		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
@@ -48,7 +77,7 @@ func _process(delta: float) -> void:
 	if camera == null:
 		return
 	var ahead := camera.global_position - camera.global_basis.z * 6.0
-	_drops.global_position = ahead + Vector3.UP * 9.0
+	_drops.global_position = ahead + Vector3.UP * (5.0 if snow else 9.0)
 	_splashes.global_position = Vector3(ahead.x, 0.03, ahead.z)
 	_check -= delta
 	if _check <= 0.0:
@@ -58,7 +87,7 @@ func _process(delta: float) -> void:
 		if covered != _covered:
 			_covered = covered
 			_drops.emitting = not covered
-			_splashes.emitting = not covered
+			_splashes.emitting = not covered and not snow
 			if _sound:
 				create_tween().tween_property(_sound, "volume_db", volume_db - (10.0 if covered else 0.0), 0.5)
 

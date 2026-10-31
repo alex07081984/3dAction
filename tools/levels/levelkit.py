@@ -258,16 +258,15 @@ class Level:
         self.node(kind.capitalize() if not weapon else weapon.capitalize(), "Area3D", "Pickups", **props)
 
     def explosives(self, spots, pattern="BBC"):
-        """Бочки (B) и газовые баллоны (C) по очереди по шаблону."""
+        """Бочки (B), газовые баллоны (C) и ящики динамита (T) по очереди по шаблону."""
         if not getattr(self, "_explosives_group", False):
             self.group("Explosives")
             self._explosives_group = True
+        kinds = {"B": ("explosive_barrel", "Barrel"), "C": ("gas_cylinder", "Cylinder"), "T": ("tnt_crate", "Tnt")}
         for i, pos in enumerate(spots):
-            kind = pattern[i % len(pattern)]
-            path = "explosive_barrel" if kind == "B" else "gas_cylinder"
+            path, name = kinds[pattern[i % len(pattern)]]
             scene = self.ext_res("PackedScene", f"res://scenes/props/{path}.tscn")
-            self.node("Barrel" if kind == "B" else "Cylinder", None, "Explosives", instance=scene,
-                      transform=xform(pos, rot_y(i * 37.0)))
+            self.node(name, None, "Explosives", instance=scene, transform=xform(pos, rot_y(i * 37.0)))
 
     def markers(self, group, points):
         """Группа маркеров: [(имя, (x, y, z), поворот)] — места пряток, точки появления."""
@@ -281,15 +280,15 @@ class Level:
         self.node(name, None, "Enemies", instance=scene, transform=xform(pos, rot_y(yaw_to(pos, look_at))), **props)
 
     def wave_zone(self, name, center, size, spawns, barriers, title="Засада!", waves=2, first=4, extra=2,
-                  rusher=0.3, heavy=0):
+                  rusher=0.3, heavy=0, gunner_kind="gunner", rusher_kind="rusher", heavy_kind="heavy"):
         script = self.ext_res("Script", "res://scripts/wave_zone.gd")
         shape = self.sub_res("BoxShape3D", {"size": f"Vector3({f(size[0])}, {f(size[1])}, {f(size[2])})"}, "Box")
         z = self.node(name, "Area3D", ".", transform=xform(center), script=script, title=f'"{title}"',
                       waves=str(waves), enemies_in_first_wave=str(first), extra_per_wave=str(extra),
                       rusher_share=f(rusher), heavy_in_last_wave=str(heavy),
-                      gunner_scene=self.ext_res("PackedScene", "res://scenes/enemies/gunner.tscn"),
-                      rusher_scene=self.ext_res("PackedScene", "res://scenes/enemies/rusher.tscn"),
-                      heavy_scene=self.ext_res("PackedScene", "res://scenes/enemies/heavy.tscn"))
+                      gunner_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{gunner_kind}.tscn"),
+                      rusher_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{rusher_kind}.tscn"),
+                      heavy_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{heavy_kind}.tscn"))
         self.node("CollisionShape3D", "CollisionShape3D", z, shape=shape)
         sp = self.node("Spawns", "Node3D", z)
         for p in spawns:

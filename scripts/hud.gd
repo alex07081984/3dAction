@@ -98,6 +98,7 @@ func bind_player(player: Player) -> void:
 	player.picked_up.connect(show_toast)
 	player.grenades_changed.connect(_on_grenades_changed)
 	_on_grenades_changed(player.grenades)
+	player.scope_changed.connect(_on_scope_changed)
 	set_health(player.health, player.max_health)
 	if player.current_weapon:
 		_on_weapon_changed(player.current_weapon)
@@ -369,6 +370,13 @@ func _on_weapon_changed(weapon: WeaponData) -> void:
 	_weapon_label.text = weapon.display_name
 	_switch_button.text = weapon.short_name
 	_reload_bar.hide()
+	# Кнопка оптики видна только у снайперской винтовки.
+	%ScopeButton.visible = weapon.scope_fov > 0.0
+
+
+func _on_scope_changed(on: bool) -> void:
+	_crosshair.scoped = on
+	%ScopeButton.text = "Без\nоптики" if on else "Прицел"
 
 
 func _on_ammo_changed(_weapon: WeaponData, magazine: int, reserve: int) -> void:
