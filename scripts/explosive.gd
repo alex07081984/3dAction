@@ -118,7 +118,12 @@ static func blast(source: Node3D, center: Vector3, radius: float, damage: float,
 		var offset := body.global_position - center
 		if offset.length() < radius and not body.freeze:
 			body.apply_central_impulse((offset.normalized() + Vector3.UP * 0.6) * body.mass * 8.0 * (1.0 - offset.length() / radius))
+	for node in tree.get_nodes_in_group("civilians"):
+		var civilian := node as Node3D
+		if civilian and civilian.global_position.distance_to(center) < radius:
+			civilian.call("take_hit", damage, civilian.global_position + Vector3.UP, civilian.global_position - center)
 	tree.call_group("enemies", "hear_noise", center, 35.0)
+	tree.call_group("civilians", "panic", center, 40.0)
 
 
 static func _blocked(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude: Array[RID]) -> bool:

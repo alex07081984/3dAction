@@ -16,7 +16,12 @@ const LEVELS := [
 	{"title": "Небоскрёб", "scene": "res://scenes/levels/level_3_skyscraper.tscn", "reward": 250},
 	{"title": "Особняк", "scene": "res://scenes/levels/level_4_mansion.tscn", "reward": 300},
 	{"title": "Город", "scene": "res://scenes/levels/level_5_town.tscn", "reward": 500},
+	# Эпизод 2: открывается после освобождения города, входы — на окраинах города.
+	{"title": "Порт", "scene": "res://scenes/levels/level_6_port.tscn", "reward": 400},
+	{"title": "Казино", "scene": "res://scenes/levels/level_7_casino.tscn", "reward": 450},
+	{"title": "Тюрьма", "scene": "res://scenes/levels/level_8_prison.tscn", "reward": 600},
 ]
+const EPISODE_2_START := 5
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
 const PROPERTIES := [
@@ -53,6 +58,7 @@ var settings := {
 	"auto_fire": false,
 	"shadows": true,
 	"noir": true,
+	"music": true,
 }
 var unlocked_levels := 1
 ## Рекорды: индекс уровня -> {"time": секунды, "kills": убийства, "headshots": хедшоты}.
@@ -106,6 +112,15 @@ func go_to_menu() -> void:
 func go_to_town() -> void:
 	save_data()
 	start_level(TOWN_INDEX)
+
+
+func episode_of(index: int) -> int:
+	return 2 if index >= EPISODE_2_START else 1
+
+
+## Последний уровень эпизода: после него — «Эпизод пройден!».
+func is_episode_finale(index: int) -> bool:
+	return index == TOWN_INDEX or index == LEVELS.size() - 1
 
 
 func has_next_level(index: int) -> bool:

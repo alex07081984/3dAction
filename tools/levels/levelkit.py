@@ -249,7 +249,7 @@ class Level:
 
     def pickup(self, kind, pos, weapon=None, heal=None):
         script = self.ext_res("Script", "res://scripts/pickup.gd")
-        kinds = {"health": 0, "ammo": 1, "weapon": 2}
+        kinds = {"health": 0, "ammo": 1, "weapon": 2, "grenade": 3}
         props = {"transform": xform(pos), "script": script, "kind": str(kinds[kind])}
         if heal:
             props["heal_amount"] = str(heal)

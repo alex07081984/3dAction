@@ -43,6 +43,7 @@ func _ready() -> void:
 	for light in find_children("*", "DirectionalLight3D"):
 		(light as DirectionalLight3D).shadow_enabled = shadows
 
+	Audio.play_music("music_explore")
 	var tier: int = Game.current_tier
 	hud.show_message(title, objective if tier == 0 else "Сложность %d · награда ×%.1f" % [tier + 1, Game.reward_multiplier()])
 	hud.set_objective(objective)
@@ -66,30 +67,47 @@ func complete() -> void:
 		return
 	_finished = true
 	var result := Game.complete_level(level_index, time, kills, headshots)
+	Audio.stop_music()
 	Audio.play("level_complete")
 	var next_text := ""
-	if Game.town_liberated:
-		next_text = "В город"
-	elif Game.has_next_level(level_index):
+	if _continues_episode():
 		next_text = "Следующий уровень"
-	var heading := "Эпизод 1 пройден!" if level_index == Game.TOWN_INDEX else "%s пройден!" % title
+	elif Game.town_liberated:
+		next_text = "В город"
+	var heading := "%s пройден!" % title
+	if Game.is_episode_finale(level_index):
+		heading = "Эпизод %d пройден!" % Game.episode_of(level_index)
 	hud.show_level_complete(heading, time, kills, headshots, result.reward, result.record, next_text)
 
 
 func _on_next_requested() -> void:
-	if Game.town_liberated:
-		Game.go_to_town()
-	else:
+	if _continues_episode():
 		Game.start_level(level_index + 1)
+	else:
+		Game.go_to_town()
+
+
+## Уровень ведёт к следующему уровню того же эпизода (а не обратно в город).
+func _continues_episode() -> bool:
+	if Game.is_episode_finale(level_index) or not Game.has_next_level(level_index):
+		return false
+	return Game.episode_of(level_index) == 2 or not Game.town_liberated
 
 
 func _on_player_died() -> void:
+	Audio.stop_music()
 	Game.save_data()
 	get_tree().create_timer(1.5, false).timeout.connect(hud.show_game_over)
 
 
 ## Босс побеждён: либо уровень пройден сразу, либо открывается выход.
+## Босс заметил игрока — играет музыка боя.
+func on_boss_fight(_boss: Boss) -> void:
+	Audio.play_music("music_combat")
+
+
 func on_boss_defeated(boss: Boss) -> void:
+	Audio.play_music("music_explore")
 	if boss.completes_level:
 		get_tree().create_timer(3.0, false).timeout.connect(complete)
 	else:
@@ -97,6 +115,7 @@ func on_boss_defeated(boss: Boss) -> void:
 
 
 func _on_zone_started(zone: WaveZone) -> void:
+	Audio.play_music("music_combat")
 	hud.show_message(zone.title, "Продержитесь!")
 
 
@@ -105,5 +124,6 @@ func _on_wave_started(_zone: WaveZone, wave: int, total: int) -> void:
 
 
 func _on_zone_cleared(_zone: WaveZone) -> void:
+	Audio.play_music("music_explore")
 	hud.show_message("Чисто!", "Проход открыт")
 	hud.set_objective(objective)

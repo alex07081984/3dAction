@@ -117,7 +117,8 @@ for cx in STREETS:
 for i in range(3):
     for j in range(3):
         L.begin_section(f"Ground{i}{j}")
-        L.box_ext("Geometry", "Asphalt", TILES[i], TILES[i + 1], GROUND - 0.5, GROUND, TILES[j], TILES[j + 1], "asphalt")
+        L.box_ext("Geometry", "Asphalt", TILES[i], TILES[i + 1], GROUND - 0.5, GROUND, TILES[j], TILES[j + 1],
+                  "asphalt_wet")
         for name, x0, x1, z0, z1 in marks:
             if tile_of((x0 + x1) / 2, (z0 + z1) / 2) == f"Ground{i}{j}":
                 L.box_ext("Props", name, x0, x1, GROUND, 0.01, z0, z1, "road_line", collide=False, shadow=False)
@@ -357,6 +358,16 @@ for c in STREETS:
                 continue
             L.node(f"Lamp{n:02d}", "Marker3D", lamps, transform=xform(pos, rot_y(yaw_to(pos, target))))
             n += 1
+
+# --- Эпизод 2: выезды из города (открываются по мере прохождения) --------------------------
+L.interactable("level_entrance", "PortBus", "Entrances", (58.5, 1.5, 0), (3, 3, 6), level_index="5")
+L.label("АВТОБУС В ПОРТ", (60.4, 3.6, 0), yaw=-90, size=64, color="Color(1, 0.85, 0.3, 1)")
+L.interactable("level_entrance", "CasinoCar", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="6")
+L.label("КАЗИНО «ФОРТУНА»", (-60.4, 3.6, 0), yaw=90, size=64, color="Color(1, 0.25, 0.2, 1)")
+L.interactable("level_entrance", "PrisonBus", "Entrances", (0, 1.5, -58.5), (6, 3, 3), level_index="7")
+L.label("АВТОБУС В ТЮРЬМУ", (0, 3.6, -60.4), size=64, color="Color(0.8, 0.85, 1, 1)")
+for name in ("Rain", "Civilians", "Traffic"):
+    L.node(name, "Node3D", ".", script=L.ext_res("Script", f"res://scripts/town/{name.lower()}.gd"))
 
 # --- Недвижимость --------------------------------------------------------------------------
 L.section = None

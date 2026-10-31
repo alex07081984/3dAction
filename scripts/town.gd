@@ -13,17 +13,31 @@ func _ready() -> void:
 	if hub_mode:
 		_enter_hub_mode()
 	for entrance in find_children("*", "LevelEntrance"):
-		(entrance as LevelEntrance).active = hub_mode
+		var level_entrance := entrance as LevelEntrance
+		level_entrance.active = hub_mode and Game.is_level_unlocked(level_entrance.level_index)
 	_districts_left = find_children("*", "WaveZone").size()
 	super._ready()
 	if hub_mode:
 		hud.set_kills_visible(false)
-		hud.show_message("Город", "Ваша база: задания и недвижимость")
+		hud.show_message("Город", _hub_hint())
+		Audio.play_music("music_menu")
 	else:
 		hud.set_objective("Освободите город: осталось районов — %d" % _districts_left)
 
 
+## Подсказка на базе: куда идти дальше по эпизоду 2.
+func _hub_hint() -> String:
+	var hints := {5: "Эпизод 2: автобус в порт — восточный конец главной улицы",
+			6: "Эпизод 2: казино «Фортуна» — западный конец главной улицы",
+			7: "Эпизод 2: автобус в тюрьму — северный конец улицы у мэрии"}
+	for index in [5, 6, 7]:
+		if Game.is_level_unlocked(index) and not Game.records.has(index):
+			return hints[index]
+	return "Ваша база: задания и недвижимость"
+
+
 func _on_zone_cleared(_zone: WaveZone) -> void:
+	Audio.play_music("music_explore")
 	_districts_left -= 1
 	if _districts_left > 0:
 		hud.show_message("Район освобождён!", "Осталось районов: %d" % _districts_left)

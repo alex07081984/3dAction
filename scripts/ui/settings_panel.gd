@@ -12,6 +12,7 @@ signal closed
 @onready var _auto_fire: CheckButton = %AutoFire
 @onready var _shadows: CheckButton = %Shadows
 @onready var _noir: CheckButton = %Noir
+@onready var _music: CheckButton = %Music
 
 
 func _ready() -> void:
@@ -22,6 +23,7 @@ func _ready() -> void:
 	_auto_fire.toggled.connect(func(on: bool) -> void: Game.set_setting("auto_fire", on))
 	_shadows.toggled.connect(_on_shadows)
 	_noir.toggled.connect(func(on: bool) -> void: Game.set_setting("noir", on))
+	_music.toggled.connect(func(on: bool) -> void: Audio.set_music_enabled(on))
 	%DoneButton.pressed.connect(_on_done)
 	visibility_changed.connect(_sync)
 
@@ -38,6 +40,7 @@ func _sync() -> void:
 	_auto_fire.set_pressed_no_signal(bool(Game.settings.auto_fire))
 	_shadows.set_pressed_no_signal(bool(Game.settings.shadows))
 	_noir.set_pressed_no_signal(bool(Game.settings.get("noir", true)))
+	_music.set_pressed_no_signal(bool(Game.settings.get("music", true)))
 	_update_labels()
 
 

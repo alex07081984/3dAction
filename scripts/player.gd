@@ -11,6 +11,7 @@ signal reload_started(duration: float)
 signal shot_fired(weapon: WeaponData)
 signal hit_confirmed(headshot: bool, killed: bool)
 signal picked_up(text: String)
+signal grenades_changed(count: int)
 signal died
 
 const WORLD_MASK := 1
@@ -35,6 +36,8 @@ const FALL_LIMIT := -25.0
 @export var start_weapons: Array[WeaponData] = []
 @export var aim_assist_deg := 4.0  ## Насколько далеко от прицела помощь «доводит» выстрел.
 @export var hurt_invincibility := 0.25
+@export var max_grenades := 5
+@export var start_grenades := 2
 
 var health := 0
 var weapons: Array[WeaponData] = []
@@ -57,6 +60,8 @@ var _spawn_position := Vector3.ZERO
 var _damage_bonus := 1.0
 var _aim_start := Vector3.ZERO
 var _aim_point := Vector3.ZERO
+var grenades := 0
+var _grenade_cooldown := 0.0
 
 @onready var model: BlockyCharacter = $Model
 @onready var camera_rig: CameraRig = $CameraRig
@@ -75,6 +80,7 @@ func _ready() -> void:
 	model.rotation.y = camera_rig.get_yaw()
 	for weapon in start_weapons:
 		give_weapon(weapon, false)
+	grenades = start_grenades
 
 
 func _physics_process(delta: float) -> void:
@@ -93,6 +99,8 @@ func _physics_process(delta: float) -> void:
 		start_reload()
 	if Input.is_action_just_pressed("switch_weapon"):
 		switch_weapon()
+	if Input.is_action_just_pressed("grenade"):
+		throw_grenade()
 	if Input.is_action_just_pressed("interact") and is_instance_valid(interactable) and interactable.active:
 		interactable.interact(self)
 
@@ -166,6 +174,29 @@ func take_damage(amount: int, from_position: Vector3) -> void:
 	Audio.play("hurt", -2.0)
 	if health == 0:
 		_die(from_position)
+
+
+## Бросить гранату туда, куда смотрит прицел (дальше 24 м не долетит).
+func throw_grenade() -> bool:
+	if _dead or grenades <= 0 or _grenade_cooldown > 0.0:
+		return false
+	grenades -= 1
+	_grenade_cooldown = 0.8
+	var from := global_position + Vector3.UP * 1.6 + camera_rig.get_yaw_basis() * Vector3(0.3, 0.0, -0.6)
+	var container := get_tree().current_scene if get_tree().current_scene else get_parent()
+	Grenade.throw_at(container, from, _aim_point, 24.0)
+	model.recoil(0.4)
+	grenades_changed.emit(grenades)
+	return true
+
+
+func add_grenades(amount: int) -> bool:
+	if grenades >= max_grenades:
+		return false
+	grenades = mini(grenades + amount, max_grenades)
+	grenades_changed.emit(grenades)
+	picked_up.emit("Гранаты: %d" % grenades)
+	return true
 
 
 func heal(amount: int) -> bool:
@@ -305,6 +336,7 @@ func _shoot(weapon: WeaponData) -> void:
 	shot_fired.emit(weapon)
 	# Выстрел слышат враги поблизости.
 	get_tree().call_group("enemies", "hear_noise", global_position, 22.0)
+	get_tree().call_group("civilians", "panic", global_position, 30.0)
 
 
 ## Где прицел: обычный луч из центра экрана, а если он мимо — помощь
@@ -409,6 +441,7 @@ func _finish_reload() -> void:
 
 func _tick_timers(delta: float) -> void:
 	_fire_cooldown -= delta
+	_grenade_cooldown -= delta
 	_dodge_left -= delta
 	_dodge_cooldown_left -= delta
 	_invincible -= delta

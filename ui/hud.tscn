@@ -228,6 +228,27 @@ text = "Войти"
 font_size = 24
 color = Color(0.3, 1, 0.45, 0.35)
 
+[node name="GrenadeButton" type="Control" parent="TouchControls"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -455.0
+offset_top = -400.0
+offset_right = -355.0
+offset_bottom = -300.0
+mouse_filter = 2
+script = ExtResource("3_touch_button")
+action = &"grenade"
+text = "Гран 2"
+font_size = 18
+color = Color(0.5, 1, 0.4, 0.28)
+
 [node name="InteractPrompt" type="Label" parent="TouchControls"]
 unique_name_in_owner = true
 visible = false

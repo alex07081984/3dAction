@@ -11,6 +11,7 @@ extends Node3D
 
 
 func _ready() -> void:
+	Audio.play_music("music_menu")
 	_hero.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -52,7 +53,7 @@ func _build_level_list() -> void:
 		child.queue_free()
 	for index in Game.LEVELS.size():
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(720, 70)
+		button.custom_minimum_size = Vector2(720, 56)
 		var title: String = Game.LEVELS[index].title
 		if Game.is_level_unlocked(index):
 			var record: Variant = Game.records.get(index)

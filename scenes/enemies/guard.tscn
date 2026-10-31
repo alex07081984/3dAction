@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.38
+height = 1.95
+
+[node name="Guard" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_enemy")
+kind = 0
+max_health = 70.0
+move_speed = 3.0
+damage = 7
+aim_time = 0.8
+burst = 1
+fire_pause = 1.6
+accuracy = 0.6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0)
+script = ExtResource("2_model")
+outfit = "shirt"
+hat = "cap"
+random_look = true
+shirt_color = Color(0.3, 0.36, 0.46, 1)
+pants_color = Color(0.12, 0.13, 0.17, 1)
+hat_color = Color(0.1, 0.12, 0.2, 1)
+weapon = "pistol"

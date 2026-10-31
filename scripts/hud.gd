@@ -96,6 +96,8 @@ func bind_player(player: Player) -> void:
 	player.shot_fired.connect(func(weapon: WeaponData) -> void: _crosshair.kick(weapon.crosshair_kick))
 	player.hit_confirmed.connect(_crosshair.show_hit)
 	player.picked_up.connect(show_toast)
+	player.grenades_changed.connect(_on_grenades_changed)
+	_on_grenades_changed(player.grenades)
 	set_health(player.health, player.max_health)
 	if player.current_weapon:
 		_on_weapon_changed(player.current_weapon)
@@ -357,6 +359,10 @@ func show_level_complete(heading: String, time: float, kills: int, headshots: in
 	_next_button.text = next_text
 	_complete.show()
 	get_tree().paused = true
+
+
+func _on_grenades_changed(count: int) -> void:
+	%GrenadeButton.text = "Гран %d" % count
 
 
 func _on_weapon_changed(weapon: WeaponData) -> void:

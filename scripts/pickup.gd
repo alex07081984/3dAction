@@ -3,7 +3,7 @@ extends Area3D
 ## Подбираемый предмет: аптечка, патроны или оружие.
 ## Моделька и зона подбора строятся кодом — достаточно поставить узел на уровень.
 
-enum Kind { HEALTH, AMMO, WEAPON }
+enum Kind { HEALTH, AMMO, WEAPON, GRENADE }
 
 @export var kind := Kind.HEALTH
 @export var heal_amount := 35
@@ -61,6 +61,8 @@ func _try_pick(body: Node) -> void:
 			used = player.add_ammo()
 		Kind.WEAPON:
 			used = player.give_weapon(weapon)
+		Kind.GRENADE:
+			used = player.add_grenades(2)
 	if used:
 		Audio.play("weapon_pickup" if kind == Kind.WEAPON else "pickup")
 		queue_free()
@@ -81,6 +83,10 @@ func _build_visual() -> Node3D:
 			BlockyCharacter.add_box(root, Vector3(0.52, 0.06, 0.34), Vector3(0, 0.05, 0), Color(0.9, 0.75, 0.2))
 			for i in 4:
 				BlockyCharacter.add_box(root, Vector3(0.05, 0.14, 0.05), Vector3(-0.15 + i * 0.1, 0.22, 0), Color(0.85, 0.65, 0.25))
+		Kind.GRENADE:
+			for x in [-0.12, 0.12]:
+				BlockyCharacter.add_box(root, Vector3(0.16, 0.22, 0.16), Vector3(x, 0, 0), Color(0.24, 0.28, 0.17))
+				BlockyCharacter.add_box(root, Vector3(0.06, 0.06, 0.06), Vector3(x, 0.14, 0), Color(0.55, 0.55, 0.52))
 		Kind.WEAPON:
 			if weapon:
 				var gun := BlockyCharacter.build_weapon_model(weapon.model)
@@ -105,7 +111,8 @@ func _build_visual() -> Node3D:
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var colors := {Kind.HEALTH: Color(1, 0.3, 0.3, 0.5), Kind.AMMO: Color(1, 0.85, 0.3, 0.5), Kind.WEAPON: Color(0.4, 0.9, 1, 0.6)}
+	var colors := {Kind.HEALTH: Color(1, 0.3, 0.3, 0.5), Kind.AMMO: Color(1, 0.85, 0.3, 0.5), Kind.WEAPON: Color(0.4, 0.9, 1, 0.6),
+			Kind.GRENADE: Color(0.5, 1, 0.4, 0.5)}
 	material.albedo_color = colors[kind]
 	disk.material = material
 	glow.mesh = disk

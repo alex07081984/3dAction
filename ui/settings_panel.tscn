@@ -127,6 +127,12 @@ custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"
 
+[node name="Music" type="CheckButton" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "Музыка"
+
 [node name="DoneButton" type="Button" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 76)

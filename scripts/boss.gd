@@ -18,6 +18,9 @@ signal cleared(boss: Boss)  ## Босс побеждён (на это смотр
 @export var henchman_points: NodePath  ## Узел с Marker3D, откуда приходят прислужники.
 @export var henchmen_per_phase := 4
 @export var completes_level := false  ## Уровень пройден сразу после победы над боссом.
+@export var final_burst := 0  ## Длина очереди в последней фазе (0 — одиночные выстрелы).
+@export var blackout := false  ## При смене фазы гаснет свет (Крупье).
+@export var grenade_interval := 0.0  ## Бросает гранату раз в столько секунд (0 — не бросает).
 @export var reward := 400  ## Премия за босса (умножается на сложность).
 @export var gunner_scene: PackedScene
 @export var rusher_scene: PackedScene
@@ -35,6 +38,7 @@ var _hint_timer := 0.0
 var _hidden_time := 0.0
 var _hide_name := ""
 var _charging := false
+var _grenade_timer := 3.0
 
 
 func _ready() -> void:
@@ -52,6 +56,8 @@ func _physics_process(delta: float) -> void:
 		_transition -= delta
 	if hidden:
 		_hide_logic(delta)
+	elif grenade_interval > 0.0 and _awake and _transition <= 0.0:
+		_grenade_logic(delta)
 	super._physics_process(delta)
 
 
@@ -109,6 +115,7 @@ func _wake(alert_neighbors := true) -> void:
 		_announced = true
 		_hud("show_message", boss_name, "Босс! Фаза 1 из %d" % phases)
 		Audio.play_at("laugh" if hides else "roar", _head(), 4.0)
+		get_tree().call_group("level", "on_boss_fight", self)
 	super._wake(alert_neighbors)
 	_update_bar()
 
@@ -132,6 +139,8 @@ func _next_phase() -> void:
 		accuracy = minf(accuracy + 0.05, 0.9)
 		hold_position = false
 	_spawn_henchmen()
+	if blackout:
+		_blackout()
 	if hides:
 		_vanish()
 	else:
@@ -143,7 +152,7 @@ func _next_phase() -> void:
 func _enter_final_phase() -> void:
 	model.set_weapon(final_weapon)
 	damage = roundi(final_damage * Game.enemy_damage_multiplier())
-	burst = 1
+	burst = maxi(final_burst, 1)
 	hold_position = false
 	if final_weapon == "shotgun":
 		_charging = true
@@ -152,6 +161,12 @@ func _enter_final_phase() -> void:
 		aim_time = 0.5
 		fire_pause = 1.1
 		sight_range = 45.0
+	elif final_weapon == "rifle":
+		shot_sound = "rifle"
+		burst_interval = 0.09
+		aim_time = 0.65
+		fire_pause = 1.3
+		move_speed *= 1.2
 	else:
 		shot_sound = "deagle"
 		aim_time = 0.6
@@ -172,6 +187,34 @@ func _die(mode: BlockyCharacter.Death, direction: Vector3, force: float) -> void
 	_hud("show_message", "%s повержен!" % boss_name, "Премия: $%d" % bonus)
 	cleared.emit(self)
 	get_tree().call_group("level", "on_boss_defeated", self)
+
+
+# --- Гранаты (Начальник тюрьмы) и затемнение (Крупье) ----------------------------
+
+func _grenade_logic(delta: float) -> void:
+	_grenade_timer -= delta
+	if _grenade_timer > 0.0 or not _sees_player or not _player_alive():
+		return
+	var distance := _distance_to_player()
+	if distance < 5.0 or distance > 24.0:
+		return
+	_grenade_timer = grenade_interval * randf_range(0.8, 1.2)
+	var from := global_position + Vector3.UP * 2.2 * model.scale.y
+	var target := _player.global_position + _player.velocity * 0.6
+	Grenade.throw_at(get_parent(), from, target, 24.0, 2.4, 30)
+	model.recoil(0.6)
+
+
+## Свет на уровне гаснет на пару секунд — в темноте приходит подмога.
+func _blackout() -> void:
+	var lights := get_tree().current_scene.find_children("*", "OmniLight3D", true, false)
+	for light in lights:
+		light.visible = false
+	Audio.play_at("door", _head(), 2.0, 0.6)
+	get_tree().create_timer(2.6, false).timeout.connect(func() -> void:
+		for light in lights:
+			if is_instance_valid(light):
+				light.visible = true)
 
 
 # --- Прятки (Худой) -------------------------------------------------------------
