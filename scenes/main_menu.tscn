@@ -157,9 +157,15 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "Уровни"
 
-[node name="LevelList" type="VBoxContainer" parent="UI/LevelsPanel"]
+[node name="Scroll" type="ScrollContainer" parent="UI/LevelsPanel"]
+custom_minimum_size = Vector2(760, 400)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="LevelList" type="VBoxContainer" parent="UI/LevelsPanel/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="BackButton" type="Button" parent="UI/LevelsPanel"]

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "magnum"
+display_name = "Магнум .44"
+short_name = "Магн"
+model = "magnum"
+sound = "magnum"
+damage = 70.0
+pellets = 1
+spread_deg = 0.5
+fire_interval = 0.45
+max_range = 80.0
+headshot_multiplier = 3.0
+impulse = 9.0
+gib_damage = 1000.0
+sever_damage = 60.0
+magazine = 6
+reload_time = 2.2
+infinite_ammo = false
+start_reserve = 18
+max_reserve = 54
+ammo_per_pickup = 12
+recoil_deg = 4.5
+shake = 0.3
+crosshair_kick = 22.0

@@ -172,4 +172,4 @@ L.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("En
 L.explosives([(-15, 0, -4), (15, 0, -11.5), (-11, 0, -21), (-19.5, 0, -42), (19.5, 0, -70), (-14.5, 0, -66),
               (-8.5, 0, -95), (-14.5, VIP, -150)], pattern="BCB")
 L.explosives([(14.4, VIP, -138), (14.4, VIP, -142)], pattern="C")
-L.write("scenes/levels/level_7_casino.tscn", env, ["pistol", "shotgun", "deagle", "rifle"])
+L.write("scenes/levels/level_7_casino.tscn", env, ["pistol", "shotgun", "magnum", "rifle"])

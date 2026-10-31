@@ -376,8 +376,10 @@ def main_menu():
            visible=False, theme_override_constants__separation=14)
     s.node("Header", "Label", "UI/LevelsPanel", layout="container", theme_override_font_sizes__font_size=40,
            text="Уровни")
-    s.node("LevelList", "VBoxContainer", "UI/LevelsPanel", layout="container", unique=True,
-           theme_override_constants__separation=8)
+    s.node("Scroll", "ScrollContainer", "UI/LevelsPanel", layout="container",
+           custom_minimum_size="Vector2(760, 400)", horizontal_scroll_mode=0)
+    s.node("LevelList", "VBoxContainer", "UI/LevelsPanel/Scroll", layout="container", unique=True,
+           size_flags_horizontal=3, theme_override_constants__separation=8)
     s.node("BackButton", "Button", "UI/LevelsPanel", layout="container", unique=True,
            custom_minimum_size="Vector2(300, 72)", text="Назад")
     s.node("SettingsPanel", None, "UI", instance=settings, unique=True, visible=False)

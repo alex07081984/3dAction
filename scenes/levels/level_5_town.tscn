@@ -49,34 +49,35 @@
 [ext_resource type="Material" path="res://materials/pipe.tres" id="47_pipe"]
 [ext_resource type="Material" path="res://materials/car_black.tres" id="48_car_black"]
 [ext_resource type="Script" path="res://scripts/street_lamps.gd" id="49_street_lamps"]
-[ext_resource type="Script" path="res://scripts/town/rain.gd" id="50_rain"]
-[ext_resource type="Script" path="res://scripts/town/civilians.gd" id="51_civilians"]
-[ext_resource type="Script" path="res://scripts/town/traffic.gd" id="52_traffic"]
-[ext_resource type="Script" path="res://scripts/property.gd" id="53_property"]
-[ext_resource type="Script" path="res://scripts/property_door.gd" id="54_property_door"]
-[ext_resource type="Material" path="res://materials/bed_sheet.tres" id="55_bed_sheet"]
-[ext_resource type="Material" path="res://materials/crate.tres" id="56_crate"]
-[ext_resource type="Material" path="res://materials/blanket.tres" id="57_blanket"]
-[ext_resource type="Material" path="res://materials/lamp.tres" id="58_lamp"]
-[ext_resource type="Material" path="res://materials/red_carpet.tres" id="59_red_carpet"]
-[ext_resource type="Material" path="res://materials/monitor.tres" id="60_monitor"]
-[ext_resource type="Material" path="res://materials/sofa.tres" id="61_sofa"]
-[ext_resource type="Material" path="res://materials/pool_water.tres" id="62_pool_water"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/gunner.tscn" id="63_gunner"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/rusher.tscn" id="64_rusher"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="65_heavy"]
-[ext_resource type="Script" path="res://scripts/pickup.gd" id="66_pickup"]
-[ext_resource type="Script" path="res://scripts/wave_zone.gd" id="67_wave_zone"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="68_player"]
-[ext_resource type="Shader" path="res://materials/night_sky.gdshader" id="69_night_sky"]
-[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="70_explosive_barrel"]
-[ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="71_gas_cylinder"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="72_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="73_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="74_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="75_shotgun"]
-[ext_resource type="Resource" path="res://weapons/deagle.tres" id="76_deagle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="77_hud"]
+[ext_resource type="Script" path="res://scripts/travel_point.gd" id="50_travel_point"]
+[ext_resource type="Script" path="res://scripts/town/rain.gd" id="51_rain"]
+[ext_resource type="Script" path="res://scripts/town/civilians.gd" id="52_civilians"]
+[ext_resource type="Script" path="res://scripts/town/traffic.gd" id="53_traffic"]
+[ext_resource type="Script" path="res://scripts/property.gd" id="54_property"]
+[ext_resource type="Script" path="res://scripts/property_door.gd" id="55_property_door"]
+[ext_resource type="Material" path="res://materials/bed_sheet.tres" id="56_bed_sheet"]
+[ext_resource type="Material" path="res://materials/crate.tres" id="57_crate"]
+[ext_resource type="Material" path="res://materials/blanket.tres" id="58_blanket"]
+[ext_resource type="Material" path="res://materials/lamp.tres" id="59_lamp"]
+[ext_resource type="Material" path="res://materials/red_carpet.tres" id="60_red_carpet"]
+[ext_resource type="Material" path="res://materials/monitor.tres" id="61_monitor"]
+[ext_resource type="Material" path="res://materials/sofa.tres" id="62_sofa"]
+[ext_resource type="Material" path="res://materials/pool_water.tres" id="63_pool_water"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/gunner.tscn" id="64_gunner"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/rusher.tscn" id="65_rusher"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="66_heavy"]
+[ext_resource type="Script" path="res://scripts/pickup.gd" id="67_pickup"]
+[ext_resource type="Script" path="res://scripts/wave_zone.gd" id="68_wave_zone"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="69_player"]
+[ext_resource type="Shader" path="res://materials/night_sky.gdshader" id="70_night_sky"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="71_explosive_barrel"]
+[ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="72_gas_cylinder"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="73_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="74_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="75_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="76_shotgun"]
+[ext_resource type="Resource" path="res://weapons/deagle.tres" id="77_deagle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="78_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(126, 6, 1)
@@ -106,31 +107,25 @@ size = Vector3(3, 3, 3)
 size = Vector3(3, 3, 6)
 
 [sub_resource type="BoxShape3D" id="Box_10"]
-size = Vector3(3, 3, 6)
-
-[sub_resource type="BoxShape3D" id="Box_11"]
-size = Vector3(6, 3, 3)
-
-[sub_resource type="BoxShape3D" id="Box_12"]
 size = Vector3(2.4, 3, 3)
 
-[sub_resource type="BoxShape3D" id="Box_13"]
+[sub_resource type="BoxShape3D" id="Box_11"]
 size = Vector3(2.6, 3, 3.6)
 
-[sub_resource type="BoxShape3D" id="Box_14"]
+[sub_resource type="BoxShape3D" id="Box_12"]
 size = Vector3(3.6, 3, 2.6)
 
-[sub_resource type="BoxShape3D" id="Box_15"]
+[sub_resource type="BoxShape3D" id="Box_13"]
 size = Vector3(20, 4, 20)
 
-[sub_resource type="BoxShape3D" id="Box_16"]
+[sub_resource type="BoxShape3D" id="Box_14"]
 size = Vector3(18, 4, 18)
 
-[sub_resource type="BoxShape3D" id="Box_17"]
+[sub_resource type="BoxShape3D" id="Box_15"]
 size = Vector3(18, 4, 18)
 
 [sub_resource type="ShaderMaterial" id="SkyMat_5"]
-shader = ExtResource("69_night_sky")
+shader = ExtResource("70_night_sky")
 shader_parameter/moon_direction = Vector3(0.394, 0.6157, -0.6824)
 
 [sub_resource type="Sky" id="Sky_5"]
@@ -149,11 +144,11 @@ fog_density = 0.011
 fog_sky_affect = 0.25
 
 [node name="Level5Town" type="Node3D"]
-script = ExtResource("72_town")
+script = ExtResource("73_town")
 level_index = 4
 title = "Город"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("73_weapon_data")]([ExtResource("74_pistol"), ExtResource("75_shotgun"), ExtResource("76_deagle")])
+start_weapons = Array[ExtResource("74_weapon_data")]([ExtResource("75_pistol"), ExtResource("76_shotgun"), ExtResource("77_deagle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -3357,65 +3352,33 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 41.6, -0.02, 56)
 [node name="Lamp43" type="Marker3D" parent="StreetLamps"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 56, -0.02, 30.4)
 
-[node name="PortBus" type="Area3D" parent="Entrances"]
+[node name="Airport" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, 0)
-script = ExtResource("9_level_entrance")
-level_index = 5
+script = ExtResource("50_travel_point")
+episode = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/PortBus"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/Airport"]
 shape = SubResource("Box_9")
 
 [node name="Label10" type="Label3D" parent="Props"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 60.4, 3.6, 0)
 pixel_size = 0.01
 modulate = Color(1, 0.85, 0.3, 1)
-text = "АВТОБУС В ПОРТ"
-font_size = 64
-outline_size = 12
-
-[node name="CasinoCar" type="Area3D" parent="Entrances"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, 1.5, 0)
-script = ExtResource("9_level_entrance")
-level_index = 6
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/CasinoCar"]
-shape = SubResource("Box_10")
-
-[node name="Label11" type="Label3D" parent="Props"]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, 0)
-pixel_size = 0.01
-modulate = Color(1, 0.25, 0.2, 1)
-text = "КАЗИНО «ФОРТУНА»"
-font_size = 64
-outline_size = 12
-
-[node name="PrisonBus" type="Area3D" parent="Entrances"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -58.5)
-script = ExtResource("9_level_entrance")
-level_index = 7
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/PrisonBus"]
-shape = SubResource("Box_11")
-
-[node name="Label12" type="Label3D" parent="Props"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6, -60.4)
-pixel_size = 0.01
-modulate = Color(0.8, 0.85, 1, 1)
-text = "АВТОБУС В ТЮРЬМУ"
-font_size = 64
+text = "АЭРОПОРТ → САН-ФРАНЦИСКО"
+font_size = 56
 outline_size = 12
 
 [node name="Rain" type="Node3D" parent="."]
-script = ExtResource("50_rain")
+script = ExtResource("51_rain")
 
 [node name="Civilians" type="Node3D" parent="."]
-script = ExtResource("51_civilians")
+script = ExtResource("52_civilians")
 
 [node name="Traffic" type="Node3D" parent="."]
-script = ExtResource("52_traffic")
+script = ExtResource("53_traffic")
 
 [node name="shack" type="Node3D" parent="Properties"]
-script = ExtResource("53_property")
+script = ExtResource("54_property")
 property_id = "shack"
 
 [node name="Door" type="CSGBox3D" parent="Properties/shack"]
@@ -3439,23 +3402,23 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -53, 0.05, 15)
 
 [node name="ShackDoor" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.3, 1.5, 15)
-script = ExtResource("54_property_door")
+script = ExtResource("55_property_door")
 property_id = "shack"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/ShackDoor"]
-shape = SubResource("Box_12")
+shape = SubResource("Box_10")
 
 [node name="Base" type="Node3D" parent="Properties/shack/Furniture"]
 
 [node name="Mattress" type="CSGBox3D" parent="Properties/shack/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -55, 0.12, 13.2)
 size = Vector3(1.8, 0.24, 1.2)
-material = ExtResource("55_bed_sheet")
+material = ExtResource("56_bed_sheet")
 
 [node name="Crate" type="CSGBox3D" parent="Properties/shack/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51, 0.35, 12.6)
 size = Vector3(0.8, 0.7, 0.8)
-material = ExtResource("56_crate")
+material = ExtResource("57_crate")
 
 [node name="bed" type="Node3D" parent="Properties/shack/Furniture"]
 
@@ -3467,7 +3430,7 @@ material = ExtResource("17_wood")
 [node name="Blanket" type="CSGBox3D" parent="Properties/shack/Furniture/bed"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -55, 0.64, 16.6)
 size = Vector3(1.9, 0.1, 1.3)
-material = ExtResource("57_blanket")
+material = ExtResource("58_blanket")
 
 [node name="stash" type="Node3D" parent="Properties/shack/Furniture"]
 
@@ -3496,7 +3459,7 @@ material = ExtResource("18_car_red")
 [node name="Bulb" type="CSGBox3D" parent="Properties/shack/Furniture/lamp"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 2.6, 15)
 size = Vector3(0.3, 0.3, 0.3)
-material = ExtResource("58_lamp")
+material = ExtResource("59_lamp")
 
 [node name="Light" type="OmniLight3D" parent="Properties/shack/Furniture/lamp"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 2.4, 15)
@@ -3505,7 +3468,7 @@ light_energy = 1.2
 omni_range = 6
 
 [node name="apartment" type="Node3D" parent="Properties"]
-script = ExtResource("53_property")
+script = ExtResource("54_property")
 property_id = "apartment"
 
 [node name="Door" type="CSGBox3D" parent="Properties/apartment"]
@@ -3529,23 +3492,23 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -11, 0.05, -18)
 
 [node name="ApartmentDoor" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 1.5, -18)
-script = ExtResource("54_property_door")
+script = ExtResource("55_property_door")
 property_id = "apartment"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/ApartmentDoor"]
-shape = SubResource("Box_13")
+shape = SubResource("Box_11")
 
 [node name="Base" type="Node3D" parent="Properties/apartment/Furniture"]
 
 [node name="Bed" type="CSGBox3D" parent="Properties/apartment/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 0.3, -25.5)
 size = Vector3(2, 0.6, 2.4)
-material = ExtResource("55_bed_sheet")
+material = ExtResource("56_bed_sheet")
 
 [node name="Rug" type="CSGBox3D" parent="Properties/apartment/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.02, -18)
 size = Vector3(5, 0.02, 4)
-material = ExtResource("59_red_carpet")
+material = ExtResource("60_red_carpet")
 
 [node name="Table" type="CSGBox3D" parent="Properties/apartment/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.4, -12)
@@ -3596,15 +3559,15 @@ material = ExtResource("8_black_metal")
 [node name="TV" type="CSGBox3D" parent="Properties/apartment/Furniture/tv"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 1.5, -10)
 size = Vector3(0.1, 1, 1.8)
-material = ExtResource("60_monitor")
+material = ExtResource("61_monitor")
 
 [node name="Sofa" type="CSGBox3D" parent="Properties/apartment/Furniture/tv"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.4, -10)
 size = Vector3(1, 0.8, 3)
-material = ExtResource("61_sofa")
+material = ExtResource("62_sofa")
 
 [node name="mansion" type="Node3D" parent="Properties"]
-script = ExtResource("53_property")
+script = ExtResource("54_property")
 property_id = "mansion"
 
 [node name="Door" type="CSGBox3D" parent="Properties/mansion"]
@@ -3628,23 +3591,23 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 49, 0.05, -52)
 
 [node name="MansionDoor" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 1.5, -46.8)
-script = ExtResource("54_property_door")
+script = ExtResource("55_property_door")
 property_id = "mansion"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/MansionDoor"]
-shape = SubResource("Box_14")
+shape = SubResource("Box_12")
 
 [node name="Base" type="Node3D" parent="Properties/mansion/Furniture"]
 
 [node name="Rug" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 0.02, -54)
 size = Vector3(7, 0.02, 5)
-material = ExtResource("59_red_carpet")
+material = ExtResource("60_red_carpet")
 
 [node name="Sofa" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0.45, -54)
 size = Vector3(1, 0.9, 4)
-material = ExtResource("61_sofa")
+material = ExtResource("62_sofa")
 
 [node name="Chandelier" type="CSGBox3D" parent="Properties/mansion/Furniture/Base"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 3.6, -53.5)
@@ -3705,7 +3668,7 @@ material = ExtResource("3_stone")
 [node name="PoolWater" type="CSGBox3D" parent="Properties/mansion/Furniture/pool"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.5, 0.2, -53.5)
 size = Vector3(3, 0.1, 6.4)
-material = ExtResource("62_pool_water")
+material = ExtResource("63_pool_water")
 
 [node name="Lounger" type="CSGBox3D" parent="Properties/mansion/Furniture/pool"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0.25, -45.5)
@@ -3715,151 +3678,151 @@ material = ExtResource("32_white_paint")
 [node name="HubStart" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 54)
 
-[node name="Gunner" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9924, 0, 0.1232, 0, 1, 0, -0.1232, 0, -0.9924, 3.6, 0, 27)
 
-[node name="Gunner2" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner2" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9962, 0, -0.0875, 0, 1, 0, 0.0875, 0, -0.9962, -3.6, 0, 15)
 
-[node name="Rusher" parent="Enemies" instance=ExtResource("64_rusher")]
+[node name="Rusher" parent="Enemies" instance=ExtResource("65_rusher")]
 transform = Transform3D(-0.995, 0, 0.0995, 0, 1, 0, -0.0995, 0, -0.995, 2, 0, 36)
 
-[node name="Gunner3" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner3" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9908, 0, -0.1351, 0, 1, 0, 0.1351, 0, -0.9908, -3, 0, -12)
 
-[node name="Gunner4" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner4" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9961, 0, 0.0879, 0, 1, 0, -0.0879, 0, -0.9961, 3, 0, -24)
 
-[node name="Gunner5" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner5" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.3511, 0, 0.9363, 0, 1, 0, -0.9363, 0, -0.3511, 16, 0, -6)
 
-[node name="Gunner6" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner6" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0.2425, 0, 0.9701, 0, 1, 0, -0.9701, 0, 0.2425, 24, 0, 6)
 
-[node name="Gunner7" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner7" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0.3511, 0, -0.9363, 0, 1, 0, 0.9363, 0, 0.3511, -16, 0, 6)
 
-[node name="Gunner8" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner8" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.2249, 0, -0.9744, 0, 1, 0, 0.9744, 0, -0.2249, -26, 0, -6)
 
-[node name="Rusher2" parent="Enemies" instance=ExtResource("64_rusher")]
+[node name="Rusher2" parent="Enemies" instance=ExtResource("65_rusher")]
 transform = Transform3D(0.0995, 0, 0.995, 0, 1, 0, -0.995, 0, 0.0995, 46, 0, 1)
 
-[node name="Gunner9" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner9" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.1104, 0, 0.9939, 0, 1, 0, -0.9939, 0, -0.1104, 54, 0, -2)
 
-[node name="Rusher3" parent="Enemies" instance=ExtResource("64_rusher")]
+[node name="Rusher3" parent="Enemies" instance=ExtResource("65_rusher")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 18)
 
-[node name="Gunner10" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner10" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9864, 0, -0.1644, 0, 1, 0, 0.1644, 0, -0.9864, 33, 0, -18)
 
-[node name="Gunner11" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner11" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9943, 0, 0.1065, 0, 1, 0, -0.1065, 0, -0.9943, 39, 0, -28)
 
-[node name="Gunner12" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner12" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 22)
 
-[node name="Gunner13" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner13" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9908, 0, 0.1351, 0, 1, 0, -0.1351, 0, -0.9908, -33, 0, -22)
 
-[node name="Gunner14" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner14" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0.0712, 0, -0.9975, 0, 1, 0, 0.9975, 0, 0.0712, -14, 0, -35)
 
-[node name="Gunner15" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner15" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.0712, 0, 0.9975, 0, 1, 0, -0.9975, 0, -0.0712, 14, 0, -37)
 
-[node name="Heavy" parent="Enemies" instance=ExtResource("65_heavy")]
+[node name="Heavy" parent="Enemies" instance=ExtResource("66_heavy")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 0, -36)
 
-[node name="Gunner16" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner16" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0.0995, 0, -0.995, 0, 1, 0, 0.995, 0, 0.0995, -20, 0, 38)
 
-[node name="Gunner17" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner17" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 20, 0, 36)
 
-[node name="Gunner18" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner18" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.8944, 0, 0.4472, 0, 1, 0, -0.4472, 0, -0.8944, -14, 0, -50)
 
-[node name="Gunner19" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner19" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.9487, 0, -0.3162, 0, 1, 0, 0.3162, 0, -0.9487, -22, 0, -54)
 
-[node name="Gunner20" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner20" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.4961, 0, 0.8682, 0, 1, 0, -0.8682, 0, -0.4961, 12, 0, -22)
 
-[node name="Rusher4" parent="Enemies" instance=ExtResource("64_rusher")]
+[node name="Rusher4" parent="Enemies" instance=ExtResource("65_rusher")]
 transform = Transform3D(0.206, 0, 0.9785, 0, 1, 0, -0.9785, 0, 0.206, 24, 0, -14)
 
-[node name="Gunner21" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner21" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(0.5547, 0, 0.8321, 0, 1, 0, -0.8321, 0, 0.5547, 50, 0, -12)
 
-[node name="Heavy2" parent="Enemies" instance=ExtResource("65_heavy")]
+[node name="Heavy2" parent="Enemies" instance=ExtResource("66_heavy")]
 transform = Transform3D(-0.1789, 0, 0.9839, 0, 1, 0, -0.9839, 0, -0.1789, 52, 0, -20)
 
-[node name="Gunner22" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner22" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.229, 0, -0.9734, 0, 1, 0, 0.9734, 0, -0.229, -22, 0, 12)
 
-[node name="Rusher5" parent="Enemies" instance=ExtResource("64_rusher")]
+[node name="Rusher5" parent="Enemies" instance=ExtResource("65_rusher")]
 transform = Transform3D(0.4061, 0, -0.9138, 0, 1, 0, 0.9138, 0, 0.4061, -14, 0, 20)
 
-[node name="Gunner23" parent="Enemies" instance=ExtResource("63_gunner")]
+[node name="Gunner23" parent="Enemies" instance=ExtResource("64_gunner")]
 transform = Transform3D(-0.1644, 0, -0.9864, 0, 1, 0, 0.9864, 0, -0.1644, -23, 0, 46)
 
 [node name="Health" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 40)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 0
 
 [node name="Ammo" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 8)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 1
 
 [node name="Health2" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 6)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 0
 
 [node name="Ammo2" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, -30)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 1
 
 [node name="Health3" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -40)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 0
 
 [node name="Ammo3" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, 2)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 1
 
 [node name="Health4" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 0
 
 [node name="Ammo4" type="Area3D" parent="Pickups"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 20)
-script = ExtResource("66_pickup")
+script = ExtResource("67_pickup")
 kind = 1
 
 [node name="ZoneSquare" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-script = ExtResource("67_wave_zone")
+script = ExtResource("68_wave_zone")
 title = "Центральная площадь!"
 waves = 2
 enemies_in_first_wave = 5
 extra_per_wave = 2
 rusher_share = 0.35
 heavy_in_last_wave = 0
-gunner_scene = ExtResource("63_gunner")
-rusher_scene = ExtResource("64_rusher")
-heavy_scene = ExtResource("65_heavy")
+gunner_scene = ExtResource("64_gunner")
+rusher_scene = ExtResource("65_rusher")
+heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneSquare"]
-shape = SubResource("Box_15")
+shape = SubResource("Box_13")
 
 [node name="Spawns" type="Node3D" parent="ZoneSquare"]
 
@@ -3879,19 +3842,19 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 22, -1.9, 0)
 
 [node name="ZoneEast" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 2, 0)
-script = ExtResource("67_wave_zone")
+script = ExtResource("68_wave_zone")
 title = "Восточный перекрёсток!"
 waves = 2
 enemies_in_first_wave = 5
 extra_per_wave = 2
 rusher_share = 0.3
 heavy_in_last_wave = 1
-gunner_scene = ExtResource("63_gunner")
-rusher_scene = ExtResource("64_rusher")
-heavy_scene = ExtResource("65_heavy")
+gunner_scene = ExtResource("64_gunner")
+rusher_scene = ExtResource("65_rusher")
+heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneEast"]
-shape = SubResource("Box_16")
+shape = SubResource("Box_14")
 
 [node name="Spawns" type="Node3D" parent="ZoneEast"]
 
@@ -3911,19 +3874,19 @@ transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -16, -1.9, 0)
 
 [node name="ZoneTownHall" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -36)
-script = ExtResource("67_wave_zone")
+script = ExtResource("68_wave_zone")
 title = "Площадь у мэрии!"
 waves = 2
 enemies_in_first_wave = 6
 extra_per_wave = 2
 rusher_share = 0.3
 heavy_in_last_wave = 1
-gunner_scene = ExtResource("63_gunner")
-rusher_scene = ExtResource("64_rusher")
-heavy_scene = ExtResource("65_heavy")
+gunner_scene = ExtResource("64_gunner")
+rusher_scene = ExtResource("65_rusher")
+heavy_scene = ExtResource("66_heavy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneTownHall"]
-shape = SubResource("Box_17")
+shape = SubResource("Box_15")
 
 [node name="Spawns" type="Node3D" parent="ZoneTownHall"]
 
@@ -3941,7 +3904,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, 16)
 
 [node name="Barriers" type="Node3D" parent="ZoneTownHall"]
 
-[node name="Player" parent="." instance=ExtResource("68_player")]
+[node name="Player" parent="." instance=ExtResource("69_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 56)
 
 [node name="OutskirtsDecor" type="CSGCombiner3D" parent="Props"]
@@ -4606,40 +4569,40 @@ directional_shadow_mode = 1
 
 [node name="Explosives" type="Node3D" parent="."]
 
-[node name="Barrel" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.99, -0.02, 27.57)
 
-[node name="Barrel2" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel2" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, -5.03, -0.02, -11.94)
 
-[node name="Cylinder" parent="Explosives" instance=ExtResource("71_gas_cylinder")]
+[node name="Cylinder" parent="Explosives" instance=ExtResource("72_gas_cylinder")]
 transform = Transform3D(0.2756, 0, 0.9613, 0, 1, 0, -0.9613, 0, 0.2756, 17.06, -0.02, -7.06)
 
-[node name="Barrel3" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel3" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(-0.3584, 0, 0.9336, 0, 1, 0, -0.9336, 0, -0.3584, -17.06, -0.02, 7.06)
 
-[node name="Barrel4" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel4" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(-0.848, 0, 0.5299, 0, 1, 0, -0.5299, 0, -0.848, 47.06, -0.02, 2.06)
 
-[node name="Cylinder2" parent="Explosives" instance=ExtResource("71_gas_cylinder")]
+[node name="Cylinder2" parent="Explosives" instance=ExtResource("72_gas_cylinder")]
 transform = Transform3D(-0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, -0.9962, 40.42, -0.02, -27.17)
 
-[node name="Barrel5" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel5" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(-0.7431, 0, -0.6691, 0, 1, 0, 0.6691, 0, -0.7431, -15.06, -0.02, -33.94)
 
-[node name="Barrel6" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel6" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(-0.1908, 0, -0.9816, 0, 1, 0, 0.9816, 0, -0.1908, 20, -0.02, 38)
 
-[node name="Cylinder3" parent="Explosives" instance=ExtResource("71_gas_cylinder")]
+[node name="Cylinder3" parent="Explosives" instance=ExtResource("72_gas_cylinder")]
 transform = Transform3D(0.4384, 0, -0.8988, 0, 1, 0, 0.8988, 0, 0.4384, -20.94, 0, -52.94)
 
-[node name="Barrel7" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel7" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(0.891, 0, -0.454, 0, 1, 0, 0.454, 0, 0.891, 22.94, 0, -12.94)
 
-[node name="Barrel8" parent="Explosives" instance=ExtResource("70_explosive_barrel")]
+[node name="Barrel8" parent="Explosives" instance=ExtResource("71_explosive_barrel")]
 transform = Transform3D(0.9848, 0, 0.1736, 0, 1, 0, -0.1736, 0, 0.9848, 50.16, 0, -21.84)
 
-[node name="Cylinder4" parent="Explosives" instance=ExtResource("71_gas_cylinder")]
+[node name="Cylinder4" parent="Explosives" instance=ExtResource("72_gas_cylinder")]
 transform = Transform3D(0.682, 0, 0.7314, 0, 1, 0, -0.7314, 0, 0.682, -14.77, 0, 21.85)
 
 [node name="Route" type="Node3D" parent="."]
@@ -4692,4 +4655,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46, 0, 15)
 [node name="P15" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.5, 0, 15)
 
-[node name="HUD" parent="." instance=ExtResource("77_hud")]
+[node name="HUD" parent="." instance=ExtResource("78_hud")]

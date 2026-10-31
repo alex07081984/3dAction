@@ -10,7 +10,7 @@ extends Node3D
 
 
 func _ready() -> void:
-	if not Game.town_liberated:
+	if not Game.is_liberated(Game.current_level):
 		return
 	await get_tree().physics_frame
 	var segments := []

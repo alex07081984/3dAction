@@ -19,9 +19,16 @@ const LEVELS := [
 	# Эпизод 2: открывается после освобождения города, входы — на окраинах города.
 	{"title": "Порт", "scene": "res://scenes/levels/level_6_port.tscn", "reward": 400},
 	{"title": "Казино", "scene": "res://scenes/levels/level_7_casino.tscn", "reward": 450},
-	{"title": "Тюрьма", "scene": "res://scenes/levels/level_8_prison.tscn", "reward": 600},
+	{"title": "Алькатрас", "scene": "res://scenes/levels/level_8_prison.tscn", "reward": 600},
+	{"title": "Мост Золотые Ворота", "scene": "res://scenes/levels/level_9_bridge.tscn", "reward": 700},
+	{"title": "Сан-Франциско", "scene": "res://scenes/levels/level_10_san_francisco.tscn", "reward": 900},
 ]
-const EPISODE_2_START := 5
+## Эпизоды: уровни идут по порядку с first до city, а город в конце нужно освободить —
+## после этого он становится базой с входами на уровни эпизода. Между базами летают самолёты.
+const EPISODES := [
+	{"title": "Эпизод 1", "first": 0, "city": 4},
+	{"title": "Эпизод 2 · Сан-Франциско", "first": 5, "city": 9},
+]
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
 const PROPERTIES := [
@@ -49,6 +56,14 @@ const PROPERTIES := [
 		{"id": "pool", "title": "Бассейн", "price": 6000, "perk": "max_health", "value": 20.0,
 				"text": "+20 к здоровью"},
 	]},
+	{"id": "flat", "city": 9, "title": "Квартира в викторианском доме", "price": 8000, "upgrades": [
+		{"id": "espresso", "title": "Кофемашина", "price": 2000, "perk": "money", "value": 0.1,
+				"text": "+10% денег за задания"},
+		{"id": "magnum_safe", "title": "Сейф с патронами .44", "price": 2500, "perk": "ammo", "value": 0.25,
+				"text": "+25% патронов в запасе"},
+		{"id": "punching_bag", "title": "Боксёрская груша", "price": 3000, "perk": "max_health", "value": 15.0,
+				"text": "+15 к здоровью"},
+	]},
 ]
 
 var settings := {
@@ -68,6 +83,8 @@ var money := 0
 var completions := {}
 ## Город освобождён — эпизод пройден, город стал базой.
 var town_liberated := false
+## Освобождённые города следующих эпизодов (номера уровней-городов).
+var liberated_cities: Array = []
 var owned_properties: Array = []
 var owned_upgrades: Array = []  # строки вида "shack/bed"
 var current_level := -1
@@ -90,7 +107,7 @@ func start_level(index: int) -> void:
 		go_to_menu()
 		return
 	current_level = index
-	current_tier = 0 if index == TOWN_INDEX else tier_of(index)
+	current_tier = 0 if is_city(index) else tier_of(index)
 	_reset_runtime_state()
 	get_tree().change_scene_to_file(LEVELS[index].scene)
 
@@ -109,18 +126,70 @@ func go_to_menu() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE)
 
 
-func go_to_town() -> void:
+## В город-базу: в указанный, иначе в город текущего эпизода, иначе в последний освобождённый.
+func go_to_town(city := -1) -> void:
 	save_data()
-	start_level(TOWN_INDEX)
+	if city < 0 or not is_liberated(city):
+		city = city_of(current_level) if current_level >= 0 and is_liberated(city_of(current_level)) else latest_city()
+	start_level(maxi(city, TOWN_INDEX))
 
 
+## Номер эпизода (с 1).
 func episode_of(index: int) -> int:
-	return 2 if index >= EPISODE_2_START else 1
+	for i in EPISODES.size():
+		if index <= int(EPISODES[i].city):
+			return i + 1
+	return EPISODES.size()
 
 
-## Последний уровень эпизода: после него — «Эпизод пройден!».
+func city_of(index: int) -> int:
+	return int(EPISODES[episode_of(index) - 1].city)
+
+
+func is_city(index: int) -> bool:
+	for episode in EPISODES:
+		if int(episode.city) == index:
+			return true
+	return false
+
+
+func is_liberated(city: int) -> bool:
+	return town_liberated if city == TOWN_INDEX else city in liberated_cities
+
+
+## Последний освобождённый город (-1 — ещё ни одного).
+func latest_city() -> int:
+	var best := -1
+	for episode in EPISODES:
+		if is_liberated(int(episode.city)):
+			best = int(episode.city)
+	return best
+
+
+## Финал эпизода — освобождение города: после него «Эпизод пройден!».
 func is_episode_finale(index: int) -> bool:
-	return index == TOWN_INDEX or index == LEVELS.size() - 1
+	return is_city(index)
+
+
+## Куда ведёт перелёт в эпизод: в освобождённый город или на первый непройденный уровень.
+func travel_target(episode: int) -> int:
+	var data: Dictionary = EPISODES[episode - 1]
+	if is_liberated(int(data.city)):
+		return int(data.city)
+	return clampi(unlocked_levels - 1, int(data.first), int(data.city))
+
+
+func is_episode_open(episode: int) -> bool:
+	return episode >= 1 and episode <= EPISODES.size() and is_level_unlocked(int(EPISODES[episode - 1].first))
+
+
+func travel(episode: int) -> void:
+	var target := travel_target(episode)
+	if is_city(target) and is_liberated(target):
+		go_to_town(target)
+	else:
+		save_data()
+		start_level(target)
 
 
 func has_next_level(index: int) -> bool:
@@ -171,6 +240,8 @@ func complete_level(index: int, time: float, kills: int, headshots: int) -> Dict
 	completions[index] = int(completions.get(index, 0)) + 1
 	if index == TOWN_INDEX:
 		town_liberated = true
+	elif is_city(index) and not index in liberated_cities:
+		liberated_cities.append(index)
 	unlocked_levels = clampi(maxi(unlocked_levels, index + 2), 1, LEVELS.size())
 	var best: Variant = records.get(index)
 	var is_record: bool = best == null or time < float(best.time)
@@ -207,12 +278,21 @@ func owns_property(id: String) -> bool:
 	return id in owned_properties
 
 
-## Купить можно только по порядку: сначала хибару, потом квартиру, потом особняк.
+## В первом городе жильё покупается по порядку: хибара, квартира, особняк.
+## В других городах — как только город освобождён.
 func is_property_available(id: String) -> bool:
 	for i in PROPERTIES.size():
-		if PROPERTIES[i].id == id:
-			return i == 0 or owns_property(PROPERTIES[i - 1].id)
+		if PROPERTIES[i].id != id:
+			continue
+		var city := property_city(id)
+		if city != TOWN_INDEX:
+			return is_liberated(city)
+		return i == 0 or owns_property(PROPERTIES[i - 1].id)
 	return false
+
+
+func property_city(id: String) -> int:
+	return int(property(id).get("city", TOWN_INDEX))
 
 
 func buy_property(id: String) -> bool:
@@ -255,11 +335,11 @@ func perk(name: String) -> float:
 	return total
 
 
-## Самое дорогое жильё игрока — там он появляется в городе.
-func home_property() -> String:
+## Самое дорогое жильё игрока в этом городе — там он появляется.
+func home_property(city := TOWN_INDEX) -> String:
 	var home := ""
 	for item in PROPERTIES:
-		if owns_property(item.id):
+		if owns_property(item.id) and int(item.get("city", TOWN_INDEX)) == city:
 			home = item.id
 	return home
 
@@ -287,6 +367,7 @@ func save_data() -> void:
 	for key in settings:
 		config.set_value("settings", key, settings[key])
 	config.set_value("progress", "unlocked_levels", unlocked_levels)
+	config.set_value("progress", "liberated_cities", liberated_cities)
 	config.set_value("progress", "money", money)
 	config.set_value("progress", "town_liberated", town_liberated)
 	config.set_value("progress", "properties", owned_properties)
@@ -307,6 +388,7 @@ func load_data() -> void:
 	unlocked_levels = clampi(int(config.get_value("progress", "unlocked_levels", 1)), 1, LEVELS.size())
 	money = int(config.get_value("progress", "money", 0))
 	town_liberated = bool(config.get_value("progress", "town_liberated", false))
+	liberated_cities = Array(config.get_value("progress", "liberated_cities", []))
 	owned_properties = Array(config.get_value("progress", "properties", []))
 	owned_upgrades = Array(config.get_value("progress", "upgrades", []))
 	for index in LEVELS.size():
@@ -323,6 +405,7 @@ func reset_progress() -> void:
 	money = 0
 	completions = {}
 	town_liberated = false
+	liberated_cities = []
 	owned_properties = []
 	owned_upgrades = []
 	economy_changed.emit()

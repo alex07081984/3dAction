@@ -420,6 +420,32 @@ static func build_weapon_model(kind: String) -> Node3D:
 					[Vector3(0.05, 0.1, 0.26), Vector3(0, 0.04, 0.22), wood, 0.015]]
 			muzzle_at = Vector3(0, 0.08, -0.74)
 			support_at = Vector3(0, 0.0, -0.38)
+		"magnum":
+			var steel := Color(0.55, 0.56, 0.6)
+			boxes = [[Vector3(0.05, 0.05, 0.3), Vector3(0, 0.085, -0.21), steel, 0.008],
+					[Vector3(0.07, 0.08, 0.09), Vector3(0, 0.07, -0.03), steel.darkened(0.2), 0.02],
+					[Vector3(0.05, 0.05, 0.12), Vector3(0, 0.05, 0.03), steel.darkened(0.35)],
+					[Vector3(0.048, 0.14, 0.07), Vector3(0, -0.02, 0.06), wood, 0.012],
+					[Vector3(0.012, 0.04, 0.06), Vector3(0, 0.0, -0.04), black]]
+			muzzle_at = Vector3(0, 0.085, -0.37)
+		"sniper":
+			var walnut := Color(0.36, 0.2, 0.1)
+			boxes = [[Vector3(0.055, 0.08, 0.36), Vector3(0, 0.06, -0.12), dark, 0.01],
+					[Vector3(0.06, 0.07, 0.4), Vector3(0, 0.045, -0.42), walnut, 0.012],
+					[Vector3(0.026, 0.026, 0.5), Vector3(0, 0.085, -0.78), black],
+					[Vector3(0.036, 0.036, 0.07), Vector3(0, 0.085, -1.04), black, 0.006],
+					[Vector3(0.05, 0.05, 0.3), Vector3(0, 0.155, -0.14), black, 0.02],
+					[Vector3(0.062, 0.062, 0.05), Vector3(0, 0.155, -0.3), black, 0.01],
+					[Vector3(0.06, 0.06, 0.04), Vector3(0, 0.155, 0.02), black, 0.01],
+					[Vector3(0.05, 0.012, 0.012), Vector3(0.04, 0.095, 0.0), dark],
+					[Vector3(0.045, 0.11, 0.05), Vector3(0, -0.02, 0.03), walnut],
+					[Vector3(0.05, 0.12, 0.3), Vector3(0, 0.02, 0.24), walnut, 0.015]]
+			muzzle_at = Vector3(0, 0.085, -1.08)
+			support_at = Vector3(0, -0.005, -0.42)
+		"knife":
+			boxes = [[Vector3(0.012, 0.045, 0.24), Vector3(0, 0.0, -0.17), Color(0.75, 0.76, 0.8)],
+					[Vector3(0.035, 0.045, 0.11), Vector3(0, 0.0, -0.01), black, 0.01]]
+			muzzle_at = Vector3(0, 0, -0.3)
 		"bat":
 			boxes = [[Vector3(0.05, 0.05, 0.42), Vector3(0, 0.0, -0.17), wood, 0.01],
 					[Vector3(0.085, 0.085, 0.42), Vector3(0, 0.0, -0.58), wood.lightened(0.15), 0.02],

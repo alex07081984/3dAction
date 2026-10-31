@@ -459,6 +459,7 @@ def extra_sounds():
     save("music_menu", finish(jazz_track(), gain=0.8, drive=1.0))
     save("music_explore", finish(explore_track(), gain=0.75, drive=1.0))
     save("music_combat", finish(combat_track(), gain=0.8, drive=1.2))
+    save("magnum", finish(gunshot(0.9, 130, 40, 0.1, 0.022, 1500, 0.12, 420, 0.5, 0.65), drive=2.4))
 
 
 if __name__ == "__main__":

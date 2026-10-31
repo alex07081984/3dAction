@@ -1,20 +1,23 @@
 extends Level
-## Город — финал первого эпизода. В первый раз его нужно освободить от банды:
-## зачистить три района (места с волнами), после чего эпизод пройден.
-## Потом город становится базой: враги исчезают, открываются входы на уровни
-## (повторные прохождения сложнее и дороже) и продаётся недвижимость.
+## Город — финал эпизода (первый город, Сан-Франциско, Аляска). В первый раз его нужно
+## освободить от банды: зачистить три района (места с волнами), после чего эпизод пройден.
+## Потом город становится базой: враги исчезают, открываются входы на уровни эпизода
+## (повторные прохождения сложнее и дороже), продаётся недвижимость, летают самолёты.
 
 var hub_mode := false
 var _districts_left := 0
 
 
 func _ready() -> void:
-	hub_mode = Game.town_liberated
+	hub_mode = Game.is_liberated(level_index)
 	if hub_mode:
 		_enter_hub_mode()
 	for entrance in find_children("*", "LevelEntrance"):
 		var level_entrance := entrance as LevelEntrance
 		level_entrance.active = hub_mode and Game.is_level_unlocked(level_entrance.level_index)
+	for point in find_children("*", "TravelPoint"):
+		var travel := point as TravelPoint
+		travel.active = hub_mode and Game.is_episode_open(travel.episode)
 	_districts_left = find_children("*", "WaveZone").size()
 	super._ready()
 	if hub_mode:
@@ -25,14 +28,12 @@ func _ready() -> void:
 		hud.set_objective("Освободите город: осталось районов — %d" % _districts_left)
 
 
-## Подсказка на базе: куда идти дальше по эпизоду 2.
+## Подсказка на базе: если открыт следующий эпизод, а его город ещё не освобождён — лететь туда.
 func _hub_hint() -> String:
-	var hints := {5: "Эпизод 2: автобус в порт — восточный конец главной улицы",
-			6: "Эпизод 2: казино «Фортуна» — западный конец главной улицы",
-			7: "Эпизод 2: автобус в тюрьму — северный конец улицы у мэрии"}
-	for index in [5, 6, 7]:
-		if Game.is_level_unlocked(index) and not Game.records.has(index):
-			return hints[index]
+	for i in Game.EPISODES.size():
+		var episode: Dictionary = Game.EPISODES[i]
+		if int(episode.city) != level_index and Game.is_episode_open(i + 1) and not Game.is_liberated(int(episode.city)):
+			return "%s: летите из аэропорта" % episode.title
 	return "Ваша база: задания и недвижимость"
 
 
@@ -48,7 +49,7 @@ func _on_zone_cleared(_zone: WaveZone) -> void:
 
 
 func _enter_hub_mode() -> void:
-	title = "Город"
+	title = String(Game.LEVELS[level_index].title)
 	objective = "База: задания и жильё"
 	for path in ["Enemies", "Pickups"]:
 		var node := get_node_or_null(path)
@@ -59,7 +60,7 @@ func _enter_hub_mode() -> void:
 		zone.get_parent().remove_child(zone)
 		zone.queue_free()
 	var start := get_node_or_null("HubStart") as Node3D
-	var home := Game.home_property()
+	var home := Game.home_property(level_index)
 	if home != "":
 		var property := get_node_or_null("Properties/" + home) as Property
 		if property and property.get_spawn():

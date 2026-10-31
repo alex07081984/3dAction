@@ -360,12 +360,8 @@ for c in STREETS:
             n += 1
 
 # --- Эпизод 2: выезды из города (открываются по мере прохождения) --------------------------
-L.interactable("level_entrance", "PortBus", "Entrances", (58.5, 1.5, 0), (3, 3, 6), level_index="5")
-L.label("АВТОБУС В ПОРТ", (60.4, 3.6, 0), yaw=-90, size=64, color="Color(1, 0.85, 0.3, 1)")
-L.interactable("level_entrance", "CasinoCar", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="6")
-L.label("КАЗИНО «ФОРТУНА»", (-60.4, 3.6, 0), yaw=90, size=64, color="Color(1, 0.25, 0.2, 1)")
-L.interactable("level_entrance", "PrisonBus", "Entrances", (0, 1.5, -58.5), (6, 3, 3), level_index="7")
-L.label("АВТОБУС В ТЮРЬМУ", (0, 3.6, -60.4), size=64, color="Color(0.8, 0.85, 1, 1)")
+L.interactable("travel_point", "Airport", "Entrances", (58.5, 1.5, 0), (3, 3, 6), episode="2")
+L.label("АЭРОПОРТ → САН-ФРАНЦИСКО", (60.4, 3.6, 0), yaw=-90, size=56, color="Color(1, 0.85, 0.3, 1)")
 for name in ("Rain", "Civilians", "Traffic"):
     L.node(name, "Node3D", ".", script=L.ext_res("Script", f"res://scripts/town/{name.lower()}.gd"))
 

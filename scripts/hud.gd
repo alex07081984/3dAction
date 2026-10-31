@@ -201,7 +201,7 @@ func _apply_noir() -> void:
 func set_town_available(value: bool) -> void:
 	%TownButton.visible = value
 	%GameOverTownButton.visible = value
-	%RestartButton.visible = not (Game.town_liberated and Game.current_level == Game.TOWN_INDEX)
+	%RestartButton.visible = not (Game.is_city(Game.current_level) and Game.is_liberated(Game.current_level))
 
 
 func show_money_popup(amount: int) -> void:

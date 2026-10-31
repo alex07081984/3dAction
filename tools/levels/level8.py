@@ -1,5 +1,5 @@
-"""Уровень 8 «Тюрьма» (финал эпизода 2): проходная, двор с вышками, тюремный блок
-с галереями и кабинет начальника тюрьмы — финального босса."""
+"""Уровень 8 «Алькатрас» (эпизод 2): остров-тюрьма в заливе. Паромный причал, двор с вышками,
+тюремный блок с галереями и кабинет начальника тюрьмы — босса."""
 from levelkit import Level, xform, rot_x, rot_y, f, yaw_to
 import math
 import random
@@ -7,7 +7,7 @@ import random
 random.seed(8)
 L = Level("Level8Prison", {
     "level_index": "7",
-    "title": '"Тюрьма"',
+    "title": '"Алькатрас"',
     "objective": '"Найдите начальника тюрьмы"',
 })
 for g in ("Geometry", "Lights", "Props", "Enemies", "Pickups"):
@@ -33,12 +33,18 @@ def tower(x, z):
     L.enemy("guard", (x, 4.8, z), look_at=(0, 0, -16))
 
 
-# Проходная
-L.room("TGate", -10, 10, -16, 0, 0, 5, "asphalt", "concrete", None, openings={"N": [(-4, 4)]})
+# Паромный причал
+L.room("TGate", -10, 10, -16, 0, 0, 1.1, "plank", "wood", None, openings={"N": [(-4, 4)]})
+for x0, x1, z0, z1 in ((-10.6, -10, -16, 0), (10, 10.6, -16, 0), (-10.6, 10.6, 0, 0.6)):
+    L.invisible_wall("Geometry", "Guard", ((x0 + x1) / 2, 2.5, (z0 + z1) / 2), (x1 - x0, 5, z1 - z0))
+L.box_ext("Props", "Ferry", -7, 7, -1.8, 1.6, 2, 18, "car_white", collide=False)
+L.box_ext("Props", "FerryCabin", -4, 4, 1.6, 4.2, 6, 14, "white_paint", collide=False)
+L.box_ext("Props", "FerryStripe", -7.05, 7.05, 0.6, 1.0, 2, 18, "car_red", collide=False, shadow=False)
 L.box("Props", "Booth", (6.5, 1.5, -8), (3, 3, 3), "white_paint")
 L.box_ext("Props", "BoothWindow", 4.95, 5.05, 1.4, 2.4, -9, -7, "lamp", collide=False, shadow=False)
 L.box("Props", "GateArm", (-0.5, 1.0, -12), (7, 0.15, 0.15), "hazard", collide=False)
-L.label("ТЮРЬМА № 13", (0, 6.2, -15.4), size=110, color="Color(0.85, 0.9, 1, 1)")
+L.box_ext("Props", "GateLintel", -4, 4, 5, 7, -16.6, -16.0, "concrete")
+L.label("АЛЬКАТРАС", (0, 6.2, -15.4), size=110, color="Color(0.85, 0.9, 1, 1)")
 for x in (-7, 7):
     L.cylinder("Props", "Post", (x, 2.5, -2), 0.1, 5, "black_metal")
     L.box("Props", "PostLamp", (x, 5.1, -2), (0.5, 0.25, 0.4), "lamp_cold", collide=False)
@@ -155,7 +161,12 @@ L.markers("BossSpawns", [(f"Spawn{i}", p, 0) for i, p in enumerate((
     (-16, 0, -162), (16, 0, -162.5), (-16, 0, -194), (16, 0, -193), (0, 0, -150)))])
 
 L.section = "Outdoor"
-L.box_ext("Props", "Ground", -200, 200, -2, -0.6, -300, 100, "gravel", collide=False, shadow=False)
+L.box_ext("Props", "Water", -400, 400, -3, -1.2, -500, 300, "water", collide=False, shadow=False)
+L.box_ext("Props", "Island", -45, 45, -12, -0.5, -205, -14, "stone", collide=False, shadow=False)
+# Мост Золотые Ворота вдали, в тумане.
+L.box_ext("Props", "BridgeDeck", -420, 120, 18, 21, -520, -505, "bridge_red", collide=False, shadow=False)
+for x in (-260, -40):
+    L.box_ext("Props", "BridgeTower", x - 4, x + 4, -10, 95, -516, -509, "bridge_red", collide=False, shadow=False)
 L.cylinder("Props", "Moon", (-90, 100, -320), 8, 1, "lamp_cold", collide=False, rows=rot_x(math.pi / 2), sides=24)
 
 L.player((0, 0, -3), 0)
@@ -182,4 +193,4 @@ L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 40, 0), mul(r
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(-8.5, 0, -14), (8.6, 0, -14), (-28, 0, -44), (28, 0, -30), (10, 0, -73), (-8.5, 0, -112),
               (8.5, 0, -96), (-16.5, 0, -178), (16.4, 0, -172)], pattern="BBC")
-L.write("scenes/levels/level_8_prison.tscn", env, ["pistol", "shotgun", "deagle", "rifle"])
+L.write("scenes/levels/level_8_prison.tscn", env, ["pistol", "shotgun", "magnum", "rifle"])

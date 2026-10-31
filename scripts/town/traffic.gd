@@ -17,7 +17,7 @@ static var _light_materials := {}
 
 
 func _ready() -> void:
-	if not Game.town_liberated:
+	if not Game.is_liberated(Game.current_level):
 		return
 	for i in corners.size():
 		_length += corners[i].distance_to(corners[(i + 1) % corners.size()])

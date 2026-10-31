@@ -31,7 +31,7 @@ func _ready() -> void:
 	hud.menu_requested.connect(Game.go_to_menu)
 	hud.town_requested.connect(Game.go_to_town)
 	hud.next_requested.connect(_on_next_requested)
-	hud.set_town_available(Game.town_liberated and level_index != Game.TOWN_INDEX)
+	hud.set_town_available(Game.latest_city() >= 0 and not Game.is_city(level_index))
 	player.died.connect(_on_player_died)
 
 	for zone in find_children("*", "WaveZone"):
@@ -72,7 +72,7 @@ func complete() -> void:
 	var next_text := ""
 	if _continues_episode():
 		next_text = "Следующий уровень"
-	elif Game.town_liberated:
+	elif Game.latest_city() >= 0:
 		next_text = "В город"
 	var heading := "%s пройден!" % title
 	if Game.is_episode_finale(level_index):
@@ -84,14 +84,14 @@ func _on_next_requested() -> void:
 	if _continues_episode():
 		Game.start_level(level_index + 1)
 	else:
-		Game.go_to_town()
+		Game.go_to_town(Game.city_of(level_index))
 
 
 ## Уровень ведёт к следующему уровню того же эпизода (а не обратно в город).
 func _continues_episode() -> bool:
 	if Game.is_episode_finale(level_index) or not Game.has_next_level(level_index):
 		return false
-	return Game.episode_of(level_index) == 2 or not Game.town_liberated
+	return not Game.is_liberated(Game.city_of(level_index))
 
 
 func _on_player_died() -> void:

@@ -59,8 +59,11 @@ func _test_menu() -> void:
 	await _frames(6)
 	_check(get_tree().current_scene != null and get_tree().current_scene.name == "MainMenu", "главное меню загружается")
 	var list := get_tree().current_scene.get_node("%LevelList")
-	_check(list.get_child_count() == _game.LEVELS.size(), "в меню %d уровней" % _game.LEVELS.size())
-	_check(not (list.get_child(0) as Button).disabled and (list.get_child(1) as Button).disabled,
+	var buttons := list.get_children().filter(func(node: Node) -> bool: return node is Button)
+	var headers := list.get_children().filter(func(node: Node) -> bool: return node is Label)
+	_check(buttons.size() == _game.LEVELS.size(), "в меню %d уровней" % _game.LEVELS.size())
+	_check(headers.size() == _game.EPISODES.size(), "в меню %d эпизода" % _game.EPISODES.size())
+	_check(buttons.size() > 1 and not (buttons[0] as Button).disabled and (buttons[1] as Button).disabled,
 			"открыт только первый уровень")
 
 
@@ -76,16 +79,16 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden"}
+	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac"}
 	if bosses.has(index):
 		_check(level.get_node_or_null("Enemies/" + bosses[index]) is Boss, "%s: босс %s" % [title, bosses[index]])
 	var boss_ends_level: bool = bosses.has(index) and (level.get_node("Enemies/" + bosses[index]) as Boss).completes_level
-	if index != _game.TOWN_INDEX and not boss_ends_level:
+	if not _game.is_city(index) and not boss_ends_level:
 		_check(level.has_node("Exit"), "%s: есть выход" % title)
 	var explosives := level.get_node_or_null("Explosives")
 	_check(explosives != null and explosives.get_child_count() >= 8,
 			"%s: бочки и баллоны (%d)" % [title, explosives.get_child_count() if explosives else 0])
-	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4][index]
+	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 4][index]
 	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
 	_check(problems.is_empty(), "%s: маршрут от старта до выхода проходим %s" % [title, problems])
@@ -480,25 +483,38 @@ func _test_episode_two() -> void:
 	_game.unlocked_levels = 6
 	_game.town_liberated = true
 	_game.completions[4] = 1
-	_check(_game.is_level_unlocked(5) and not _game.is_level_unlocked(6), "после города открыт только порт")
+	_check(_game.is_level_unlocked(5) and not _game.is_level_unlocked(6), "после первого города открыт эпизод 2")
 	var town := await _fresh_level(_game.TOWN_INDEX)
-	var entrances := town.find_children("*", "LevelEntrance")
-	_check(entrances.size() == 7, "в городе 7 входов (%d)" % entrances.size())
-	var states := {}
-	for entrance in entrances:
-		states[entrance.level_index] = entrance.active
-	_check(states.get(5, false) and not states.get(6, true) and not states.get(7, true),
-			"вход в порт открыт, в казино и тюрьму — пока нет")
+	var airport := town.find_children("*", "TravelPoint")
+	_check(airport.size() == 1 and airport[0].active, "в первом городе открыт аэропорт в Сан-Франциско")
+	_check(_game.travel_target(2) == 5, "перелёт ведёт на первый уровень эпизода 2 — порт")
 	var port := await _fresh_level(5)
 	_check(Audio.current_music() == "music_explore", "на уровне играет музыка (%s)" % Audio.current_music())
 	port.complete()
 	await _frames(3)
 	_check(port.hud.get_node("%NextButton").text == "Следующий уровень", "из порта — сразу в казино")
 	_check(_game.is_level_unlocked(6), "казино открылось")
-	var prison := await _fresh_level(7)
-	prison.complete()
+	_game.unlocked_levels = 9
+	var bridge := await _fresh_level(8)
+	bridge.complete()
 	await _frames(3)
-	_check(prison.hud.get_node("%CompleteTitle").text == "Эпизод 2 пройден!", "тюрьма завершает эпизод 2")
+	_check(bridge.hud.get_node("%NextButton").text == "Следующий уровень" and _game.is_level_unlocked(9),
+			"после моста — освобождать Сан-Франциско")
+	var city := await _fresh_level(9, false)
+	_check(not city.get("hub_mode") and city.find_children("*", "WaveZone").size() == 3,
+			"Сан-Франциско сначала надо освободить: три района")
+	city.complete()
+	await _frames(3)
+	_check(city.hud.get_node("%CompleteTitle").text == "Эпизод 2 пройден!", "освобождение города завершает эпизод 2")
+	_check(_game.is_liberated(9) and _game.travel_target(2) == 9, "Сан-Франциско стал базой")
+	var hub := await _fresh_level(9)
+	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
+	_check(hub.get("hub_mode") and doors.size() == 4, "на базе в Сан-Франциско 4 входа на уровни (%d)" % doors.size())
+	_check(_game.is_property_available("flat"), "в Сан-Франциско продаётся квартира")
+	var tram := hub.get_node("CableCar") as Node3D
+	var tram_start := tram.global_position
+	await _seconds(1.5)
+	_check(tram.global_position.distance_to(tram_start) > 1.0, "канатный трамвай едет")
 	_game.set_setting("music", false)
 	Audio.set_music_enabled(false)
 	await _frames(2)
@@ -571,6 +587,18 @@ func _test_new_bosses() -> void:
 			thrown = true
 			break
 	_check(thrown, "начальник тюрьмы бросает гранаты")
+
+	var bridge := await _fresh_level(8, false)
+	bridge.player.max_health = 100000
+	bridge.player.health = 100000
+	var maniac := bridge.get_node("Enemies/Maniac") as Boss
+	_teleport(bridge.player, Vector3(0, 32, -266))
+	await _seconds(1.0)
+	for i in 2:
+		maniac.apply_shot(maniac.health + 1.0, false, maniac.global_position + Vector3.UP, Vector3.FORWARD, load("res://weapons/deagle.tres"))
+		await _seconds(1.8)
+	_check(maniac.phase == 3 and maniac.kind == Enemy.Kind.RUSHER and maniac.model.weapon == "knife",
+			"в 3-й фазе Маньяк бросается с ножом")
 
 
 func _test_living_town() -> void:
@@ -722,7 +750,7 @@ func _test_hub_and_entrances() -> void:
 	_check(level.get("hub_mode"), "город открывается как база")
 	_check(get_tree().get_nodes_in_group("enemies").is_empty(), "на базе нет врагов")
 	var entrances := level.find_children("*", "LevelEntrance")
-	_check(entrances.size() == 7, "в городе 7 входов на уровни")
+	_check(entrances.size() == 4, "в городе 4 входа на уровни")
 	var metro: LevelEntrance = null
 	for entrance in entrances:
 		if entrance.level_index == 1:

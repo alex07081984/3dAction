@@ -161,6 +161,13 @@ func _enter_final_phase() -> void:
 		aim_time = 0.5
 		fire_pause = 1.1
 		sight_range = 45.0
+	elif final_weapon in ["knife", "bat"]:
+		# Последняя фаза — рукопашная: бежит прямо на игрока с ножом.
+		kind = Kind.RUSHER
+		melee_damage = roundi(final_damage * Game.enemy_damage_multiplier())
+		melee_windup = 0.35
+		move_speed *= 1.9
+		_show_laser(false)
 	elif final_weapon == "rifle":
 		shot_sound = "rifle"
 		burst_interval = 0.09

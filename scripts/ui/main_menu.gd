@@ -22,7 +22,7 @@ func _ready() -> void:
 	%BackButton.pressed.connect(_show_main)
 	_settings.closed.connect(_show_main)
 	var next := mini(Game.unlocked_levels, Game.LEVELS.size()) - 1
-	if Game.town_liberated:
+	if Game.latest_city() >= 0:
 		_play_button.text = "В город"
 	elif next == 0 and Game.records.is_empty():
 		_play_button.text = "Играть"
@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 
 func _on_play() -> void:
 	Audio.play("ui_click")
-	if Game.town_liberated:
+	if Game.latest_city() >= 0:
 		Game.go_to_town()
 	else:
 		# Продолжаем с последнего открытого уровня.
@@ -52,17 +52,24 @@ func _build_level_list() -> void:
 	for child in _level_list.get_children():
 		child.queue_free()
 	for index in Game.LEVELS.size():
+		for episode in Game.EPISODES:
+			if int(episode.first) == index:
+				var header := Label.new()
+				header.text = episode.title
+				header.add_theme_font_size_override("font_size", 26)
+				header.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
+				_level_list.add_child(header)
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(720, 56)
 		var title: String = Game.LEVELS[index].title
 		if Game.is_level_unlocked(index):
 			var record: Variant = Game.records.get(index)
 			button.text = "%d. %s" % [index + 1, title]
-			if index != Game.TOWN_INDEX and Game.tier_of(index) > 0:
+			if not Game.is_city(index) and Game.tier_of(index) > 0:
 				button.text += "   · сложность %d" % (Game.tier_of(index) + 1)
 			if record is Dictionary:
 				button.text += "   · рекорд %s" % Game.format_time(record.time)
-			if index == Game.TOWN_INDEX and Game.town_liberated:
+			if Game.is_city(index) and Game.is_liberated(index):
 				button.text = "%d. %s   · ваша база" % [index + 1, title]
 			button.pressed.connect(Game.start_level.bind(index))
 		else:
