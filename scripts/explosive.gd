@@ -156,7 +156,12 @@ static func blast(source: Node3D, center: Vector3, radius: float, damage: float,
 		var gap := center.distance_to(vehicle.global_position)
 		if gap < radius + 2.0:
 			var near := clampf(1.0 - gap / (radius + 2.0), 0.2, 1.0)
-			vehicle.take_hit(damage * near, center, (vehicle.global_position - center).normalized())
+			var push := (vehicle.global_position - center).normalized()
+			# Танку взрыв — в полную силу (броню пробивают РПГ, гранаты и бочки).
+			if vehicle.has_method("take_blast"):
+				vehicle.take_blast(damage * near, center, push)
+			else:
+				vehicle.take_hit(damage * near, center, push)
 
 	var player := tree.get_first_node_in_group("player") as Player
 	if player and player.is_alive():

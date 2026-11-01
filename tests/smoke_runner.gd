@@ -58,6 +58,7 @@ func _run() -> void:
 	await _test_save_migration()
 	await _test_train()
 	await _test_chase()
+	await _test_tank()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -90,16 +91,17 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac", 12: "Sniper"}
+	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac", 12: "Sniper", 13: "Tank"}
+	var boss_node: Node = level.get_node_or_null("Enemies/" + bosses[index]) if bosses.has(index) else null
 	if bosses.has(index):
-		_check(level.get_node_or_null("Enemies/" + bosses[index]) is Boss, "%s: босс %s" % [title, bosses[index]])
-	var boss_ends_level: bool = bosses.has(index) and (level.get_node("Enemies/" + bosses[index]) as Boss).completes_level
+		_check(boss_node is Boss or boss_node is TankBoss, "%s: босс %s" % [title, bosses[index]])
+	var boss_ends_level: bool = boss_node != null and bool(boss_node.get("completes_level"))
 	if not _game.is_city(index) and not boss_ends_level and not level is HeliLevel:
 		_check(level.has_node("Exit"), "%s: есть выход" % title)
 	var explosives := level.get_node_or_null("Explosives")
 	_check(explosives != null and explosives.get_child_count() >= 8,
 			"%s: бочки и баллоны (%d)" % [title, explosives.get_child_count() if explosives else 0])
-	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 2, 4, 4, 4, 5][index]
+	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 2, 4, 4, 4, 5, 5][index]
 	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
 	_check(problems.is_empty(), "%s: маршрут от старта до выхода проходим %s" % [title, problems])
@@ -728,24 +730,24 @@ func _test_episode_three() -> void:
 	_check((not is_instance_valid(boss) or boss.defeated) and _game.is_level_unlocked(13), "победа над Снайпером завершает уровень")
 
 	# Аляска: освобождение и база.
-	var alaska := await _fresh_level(13, false)
+	var alaska := await _fresh_level(14, false)
 	_check(not alaska.get("hub_mode") and alaska.find_children("*", "WaveZone").size() == 3,
 			"Аляску сначала надо освободить: три района")
 	alaska.complete()
 	await _frames(3)
 	_check(alaska.hud.get_node("%CompleteTitle").text == "Эпизод 3 пройден!", "освобождение Аляски завершает эпизод 3")
-	_check(_game.is_liberated(13) and _game.travel_target(3) == 13, "Аляска стала базой")
+	_check(_game.is_liberated(14) and _game.travel_target(3) == 14, "Аляска стала базой")
 	_game.traveled_routes = ["1-3", "2-3"]
-	var hub := await _fresh_level(13)
+	var hub := await _fresh_level(14)
 	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
-	_check(hub.get("hub_mode") and doors.size() == 2, "на базе Аляски входы на прииск и в городок (%d)" % doors.size())
+	_check(hub.get("hub_mode") and doors.size() == 3, "на базе Аляски входы на прииск, в городок и на радарную станцию (%d)" % doors.size())
 	var flights := hub.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.active)
 	_check(flights.size() == 2, "с аэродрома летают в первый город и Сан-Франциско (%d)" % flights.size())
 	_check(hub.get_node("Snow") is Rain, "на базе идёт снег")
 	_game.money = 20000
 	_check(_game.is_property_available("cabin") and _game.buy_property("cabin") and _game.buy_upgrade("cabin", "stove"),
 			"бревенчатый дом у озера и печь покупаются")
-	var cabin := await _fresh_level(13)
+	var cabin := await _fresh_level(14)
 	_check(cabin.player.global_position.distance_to(Vector3(-51, 0, 48)) < 2.0, "на базе Аляски появляемся дома")
 	_check(cabin.get_node("Properties/cabin/Furniture/stove").visible, "печь стоит в доме")
 
@@ -1148,17 +1150,67 @@ func _test_chase() -> void:
 	_game.reset_progress()
 
 
+func _test_tank() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 14
+	var level := await _fresh_level(13)
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	var tank := level.get_node("Enemies/Tank") as TankBoss
+	_check(tank != null and not tank.active, "в ангаре радарной станции стоит танк")
+	if tank == null:
+		return
+	_teleport(player, Vector3(0, 0, -232))
+	var started := Time.get_ticks_msec()
+	while not tank.active and Time.get_ticks_msec() - started < 4000:
+		await get_tree().physics_frame
+	_check(tank.active and level.hud.get_node("%BossBar").visible, "танк замечает героя — бой, полоса босса")
+	var health := tank.health
+	tank.take_hit(100.0, tank.global_transform * Vector3(0, 1, -3.2), Vector3.BACK)
+	var front := health - tank.health
+	health = tank.health
+	tank.take_hit(100.0, tank.global_transform * Vector3(0, 1, 3.2), Vector3.FORWARD)
+	var rear := health - tank.health
+	_check(front < 40.0 and rear > 140.0, "лоб танка держит пули (%.0f), корма — нет (%.0f)" % [front, rear])
+	health = tank.health
+	Explosive.blast(level, tank.global_position + Vector3(0, 1, 2), 5.0, 200.0, 0)
+	_check(health - tank.health > 100.0, "взрыв бьёт танк в полную силу (%.0f)" % (health - tank.health))
+	var shell := false
+	started = Time.get_ticks_msec()
+	while not shell and Time.get_ticks_msec() - started < 12000:
+		await get_tree().physics_frame
+		shell = not get_tree().get_nodes_in_group("hostile_rockets").is_empty()
+	_check(shell, "танк стреляет из пушки (перед выстрелом — лазер)")
+	var crowd := get_tree().get_nodes_in_group("enemies").size()
+	tank.take_blast(tank.health + 1.0, tank.global_position, Vector3.UP)
+	await _frames(3)
+	_check(tank.phase == 2 and get_tree().get_nodes_in_group("enemies").size() > crowd, "танк подбит — фаза 2, подмога")
+	await _seconds(1.6)
+	tank.take_blast(tank.health + 1.0, tank.global_position, Vector3.UP)
+	await _seconds(1.6)
+	tank.take_blast(tank.health + 1.0, tank.global_position, Vector3.UP)
+	_check(tank.defeated, "танк уничтожен — башню срывает")
+	started = Time.get_ticks_msec()
+	while not _game.is_level_unlocked(14) and Time.get_ticks_msec() - started < 8000:
+		await get_tree().process_frame
+	_check(_game.is_level_unlocked(14), "после танка — освобождать Аляску")
+	_game.reset_progress()
+
+
 func _test_save_migration() -> void:
 	# Старое сохранение (до уровня на вертолёте): номера уровней после моста сдвигаются.
 	_game.reset_progress()
 	_game.unlocked_levels = 11
 	_game.records = {9: {"time": 100.0, "kills": 5, "headshots": 1}, 3: {"time": 50.0, "kills": 1, "headshots": 0}}
 	_game.completions = {9: 2, 10: 1}
-	_game.liberated_cities = [9]
+	_game.liberated_cities = [9, 12]
 	_game._insert_level(9)
 	_check(_game.records.has(10) and _game.records.has(3) and not _game.records.has(9), "рекорды старых уровней переехали")
 	_check(int(_game.completions.get(10, 0)) == 2 and int(_game.completions.get(11, 0)) == 1, "прохождения переехали")
-	_check(_game.liberated_cities == [10] and _game.unlocked_levels == 12, "Сан-Франциско остался освобождённым")
+	_check(_game.liberated_cities == [10, 13] and _game.unlocked_levels == 12, "Сан-Франциско остался освобождённым")
+	_game._insert_level(13)
+	_check(_game.liberated_cities == [10, 14], "после радарной станции Аляска осталась освобождённой")
 	_game.reset_progress()
 
 

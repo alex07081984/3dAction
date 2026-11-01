@@ -1,0 +1,2277 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://materials/snow.tres" id="1_snow"]
+[ext_resource type="Material" path="res://materials/rock.tres" id="2_rock"]
+[ext_resource type="Material" path="res://materials/gravel.tres" id="3_gravel"]
+[ext_resource type="Material" path="res://materials/concrete.tres" id="4_concrete"]
+[ext_resource type="Material" path="res://materials/lamp.tres" id="5_lamp"]
+[ext_resource type="Material" path="res://materials/hazard.tres" id="6_hazard"]
+[ext_resource type="Material" path="res://materials/black_metal.tres" id="7_black_metal"]
+[ext_resource type="Material" path="res://materials/tree_trunk.tres" id="8_tree_trunk"]
+[ext_resource type="Material" path="res://materials/tree_leaves.tres" id="9_tree_leaves"]
+[ext_resource type="Material" path="res://materials/metal.tres" id="10_metal"]
+[ext_resource type="Material" path="res://materials/lamp_cold.tres" id="11_lamp_cold"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/bandit.tscn" id="12_bandit"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/marksman.tscn" id="13_marksman"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/trapper.tscn" id="14_trapper"]
+[ext_resource type="Script" path="res://scripts/pickup.gd" id="15_pickup"]
+[ext_resource type="Material" path="res://materials/plaster_green.tres" id="16_plaster_green"]
+[ext_resource type="Material" path="res://materials/car_red.tres" id="17_car_red"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/heavy.tscn" id="18_heavy"]
+[ext_resource type="Script" path="res://scripts/wave_zone.gd" id="19_wave_zone"]
+[ext_resource type="Material" path="res://materials/barrier.tres" id="20_barrier"]
+[ext_resource type="Material" path="res://materials/white_paint.tres" id="21_white_paint"]
+[ext_resource type="Material" path="res://materials/rust.tres" id="22_rust"]
+[ext_resource type="Resource" path="res://weapons/rpg.tres" id="23_rpg"]
+[ext_resource type="Script" path="res://scripts/tank_boss.gd" id="24_tank_boss"]
+[ext_resource type="PackedScene" path="res://scenes/props/fuel_tank.tscn" id="25_fuel_tank"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_car.tscn" id="26_explosive_car"]
+[ext_resource type="PackedScene" path="res://scenes/props/tnt_crate.tscn" id="27_tnt_crate"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="28_explosive_barrel"]
+[ext_resource type="Script" path="res://scripts/town/rain.gd" id="29_rain"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="30_player"]
+[ext_resource type="Shader" path="res://materials/aurora_sky.gdshader" id="31_aurora_sky"]
+[ext_resource type="Script" path="res://scripts/level.gd" id="32_level"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="33_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="34_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="35_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="36_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="37_rifle"]
+[ext_resource type="Resource" path="res://weapons/sniper.tres" id="38_sniper"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="39_hud"]
+
+[sub_resource type="BoxShape3D" id="Box_1"]
+size = Vector3(60, 4, 64)
+
+[sub_resource type="BoxShape3D" id="Box_2"]
+size = Vector3(60, 4, 50)
+
+[sub_resource type="ShaderMaterial" id="SkyMat_R"]
+shader = ExtResource("31_aurora_sky")
+
+[sub_resource type="Sky" id="Sky_R"]
+sky_material = SubResource("SkyMat_R")
+
+[sub_resource type="Environment" id="Env_R"]
+background_mode = 2
+sky = SubResource("Sky_R")
+ambient_light_source = 2
+ambient_light_color = Color(0.42, 0.47, 0.58, 1)
+ambient_light_energy = 0.65
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.24, 0.26, 0.31, 1)
+fog_density = 0.005
+fog_sky_affect = 0.4
+
+[node name="LevelRadar" type="Node3D"]
+script = ExtResource("32_level")
+level_index = 13
+title = "Радарная станция"
+objective = "Прорвитесь на базу и уничтожьте танк банды"
+start_weapons = Array[ExtResource("33_weapon_data")]([ExtResource("34_pistol"), ExtResource("35_shotgun"), ExtResource("36_magnum"), ExtResource("37_rifle"), ExtResource("38_sniper")])
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="RGate" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -25)
+size = Vector3(40, 0.5, 50)
+material = ExtResource("1_snow")
+
+[node name="WallN" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.25, 4.75, -50.25)
+size = Vector3(14.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN2" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -50.25)
+size = Vector3(12, 2, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN3" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.25, 4.75, -50.25)
+size = Vector3(14.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.75, 0.25)
+size = Vector3(41, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallW" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.25, 4.75, -25)
+size = Vector3(0.5, 10.5, 50)
+material = ExtResource("2_rock")
+
+[node name="WallE" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.25, 4.75, -25)
+size = Vector3(0.5, 10.5, 50)
+material = ExtResource("2_rock")
+
+[node name="RGateDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Road" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -25)
+size = Vector3(8, 0.02, 50)
+material = ExtResource("3_gravel")
+
+[node name="Booth" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.5, -12.5)
+size = Vector3(3, 3, 3)
+material = ExtResource("4_concrete")
+
+[node name="BoothRoof" type="CSGBox3D" parent="Geometry/RGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 3.15, -12.5)
+size = Vector3(3.6, 0.3, 3.6)
+material = ExtResource("1_snow")
+
+[node name="BoothWindow" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.985, 1.7, -12.5)
+size = Vector3(0.03, 1, 2)
+material = ExtResource("5_lamp")
+
+[node name="BarrierArm" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(0.8776, -0.4794, 0, 0.4794, 0.8776, 0, 0, 0, 1, -1.2, 1, -13.5)
+size = Vector3(5, 0.15, 0.15)
+material = ExtResource("6_hazard")
+
+[node name="RGateSolid" type="CSGCombiner3D" parent="Props"]
+use_collision = true
+
+[node name="BarrierPost" type="CSGBox3D" parent="Props/RGateSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.6, -13.5)
+size = Vector3(0.3, 1.2, 0.3)
+material = ExtResource("7_black_metal")
+
+[node name="Label" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.2, -10.6)
+pixel_size = 0.01
+modulate = Color(1, 0.85, 0.45, 1)
+text = "РАДАРНАЯ СТАНЦИЯ «СЕВЕРНЫЙ ЩИТ»"
+font_size = 40
+outline_size = 12
+
+[node name="Label2" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, -49.4)
+pixel_size = 0.01
+modulate = Color(1, 0.3, 0.25, 1)
+text = "ПОСТОРОННИМ ВХОД ЗАПРЕЩЁН"
+font_size = 56
+outline_size = 12
+
+[node name="PineTrunk" type="CSGCylinder3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.8568, -6)
+radius = 0.3
+height = 3.7137
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.5996, -6)
+size = Vector3(3.2, 1.7826, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3.4908, -6)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown2" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 4.2336, -6)
+size = Vector3(2.4, 1.7826, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow2" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 5.1248, -6)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown3" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 5.8676, -6)
+size = Vector3(1.5, 1.7826, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow3" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 6.7589, -6)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk2" type="CSGCylinder3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2.4526, -4)
+radius = 0.3
+height = 4.9052
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown4" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3.4336, -4)
+size = Vector3(3.2, 2.3545, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow4" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.6109, -4)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown5" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 5.5919, -4)
+size = Vector3(2.4, 2.3545, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow5" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 6.7691, -4)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown6" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 7.7502, -4)
+size = Vector3(1.5, 2.3545, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow6" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 8.9274, -4)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk3" type="CSGCylinder3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.402, -44)
+radius = 0.3
+height = 4.8041
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown7" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3.3629, -44)
+size = Vector3(3.2, 2.306, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow7" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 4.5158, -44)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown8" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5.4767, -44)
+size = Vector3(2.4, 2.306, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow8" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 6.6296, -44)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown9" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 7.5905, -44)
+size = Vector3(1.5, 2.306, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow9" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 8.7434, -44)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk4" type="CSGCylinder3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.6904, -46)
+radius = 0.3
+height = 5.3807
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown10" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3.7665, -46)
+size = Vector3(3.2, 2.5827, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow10" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 5.0579, -46)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown11" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 6.134, -46)
+size = Vector3(2.4, 2.5827, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow11" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 7.4254, -46)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown12" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 8.5015, -46)
+size = Vector3(1.5, 2.5827, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow12" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 9.7929, -46)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="LightPole" type="CSGCylinder3D" parent="Props/RGateSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, -30)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood" type="CSGBox3D" parent="Props/RGateDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 8.2, -30)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 7.5, -30)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="Bandit" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9487, 0, -0.3162, 0, 1, 0, 0.3162, 0, -0.9487, -8, 0, -24)
+
+[node name="Bandit2" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9578, 0, 0.2873, 0, 1, 0, -0.2873, 0, -0.9578, 9, 0, -30)
+
+[node name="Marksman" parent="Enemies" instance=ExtResource("13_marksman")]
+transform = Transform3D(-0.8872, 0, 0.4614, 0, 1, 0, -0.4614, 0, -0.8872, 6.5, 3.3, -12.5)
+
+[node name="Trapper" parent="Enemies" instance=ExtResource("14_trapper")]
+transform = Transform3D(-0.993, 0, -0.1182, 0, 1, 0, 0.1182, 0, -0.993, -5, 0, -42)
+
+[node name="Ammo" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -5)
+script = ExtResource("15_pickup")
+kind = 1
+
+[node name="Health" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -40)
+script = ExtResource("15_pickup")
+kind = 0
+
+[node name="RYard" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -90)
+size = Vector3(80, 0.5, 80)
+material = ExtResource("1_snow")
+
+[node name="WallN" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.25, 4.75, -130.25)
+size = Vector3(34.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN2" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -130.25)
+size = Vector3(12, 2, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN3" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.25, 4.75, -130.25)
+size = Vector3(34.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.25, 4.75, -49.75)
+size = Vector3(34.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS2" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -49.75)
+size = Vector3(12, 2, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS3" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.25, 4.75, -49.75)
+size = Vector3(34.5, 10.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallW" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.25, 4.75, -90)
+size = Vector3(0.5, 10.5, 80)
+material = ExtResource("2_rock")
+
+[node name="WallE" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.25, 4.75, -90)
+size = Vector3(0.5, 10.5, 80)
+material = ExtResource("2_rock")
+
+[node name="Building" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 2.25, -111)
+size = Vector3(16, 4.5, 14)
+material = ExtResource("16_plaster_green")
+
+[node name="RoofSlab" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 4.65, -111)
+size = Vector3(16.4, 0.3, 14.4)
+material = ExtResource("1_snow")
+
+[node name="RYardDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Windows" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 1.9, -103.975)
+size = Vector3(6, 1, 0.05)
+material = ExtResource("5_lamp")
+
+[node name="Building2" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 2.25, -89)
+size = Vector3(16, 4.5, 14)
+material = ExtResource("16_plaster_green")
+
+[node name="RoofSlab2" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 4.65, -89)
+size = Vector3(16.4, 0.3, 14.4)
+material = ExtResource("1_snow")
+
+[node name="Windows2" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 1.9, -81.975)
+size = Vector3(6, 1, 0.05)
+material = ExtResource("5_lamp")
+
+[node name="Building3" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 2.25, -100)
+size = Vector3(16, 4.5, 20)
+material = ExtResource("16_plaster_green")
+
+[node name="RoofSlab3" type="CSGBox3D" parent="Geometry/RYard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 4.65, -100)
+size = Vector3(16.4, 0.3, 20.4)
+material = ExtResource("1_snow")
+
+[node name="Windows3" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1.9, -89.975)
+size = Vector3(6, 1, 0.05)
+material = ExtResource("5_lamp")
+
+[node name="Label3" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 3.6, -81.9)
+pixel_size = 0.01
+modulate = Color(1, 0.85, 0.45, 1)
+text = "КАЗАРМА"
+font_size = 56
+outline_size = 12
+
+[node name="RYardSolid" type="CSGCombiner3D" parent="Props"]
+use_collision = true
+
+[node name="Flagpole" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 5, -88)
+size = Vector3(0.15, 10, 0.15)
+material = ExtResource("10_metal")
+
+[node name="Flag" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 9.2, -88)
+size = Vector3(1.6, 1, 0.05)
+material = ExtResource("17_car_red")
+
+[node name="Sandbags" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5, -66)
+size = Vector3(3, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="Sandbags2" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.5, -72)
+size = Vector3(3, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="Sandbags3" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -12, 0.5, -100)
+size = Vector3(3, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="Sandbags4" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 12, 0.5, -116)
+size = Vector3(3, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="Sandbags5" type="CSGBox3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, -108)
+size = Vector3(4, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="LightPole" type="CSGCylinder3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4, -60)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 8.2, -60)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 7.5, -60)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="LightPole2" type="CSGCylinder3D" parent="Props/RYardSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4, -122)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood2" type="CSGBox3D" parent="Props/RYardDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 8.2, -122)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light3" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 7.5, -122)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="Bandit3" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.8575, 0, -0.5145, 0, 1, 0, 0.5145, 0, -0.8575, -12, 0, -70)
+
+[node name="Bandit4" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9062, 0, 0.4229, 0, 1, 0, -0.4229, 0, -0.9062, 14, 0, -80)
+
+[node name="Heavy" parent="Enemies" instance=ExtResource("18_heavy")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -118)
+
+[node name="Trapper2" parent="Enemies" instance=ExtResource("14_trapper")]
+transform = Transform3D(-0.9409, 0, -0.3387, 0, 1, 0, 0.3387, 0, -0.9409, -18, 0, -100)
+
+[node name="Marksman2" parent="Enemies" instance=ExtResource("13_marksman")]
+transform = Transform3D(-0.8766, 0, -0.4813, 0, 1, 0, 0.4813, 0, -0.8766, -28, 4.5, -111)
+
+[node name="Health2" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, -55)
+script = ExtResource("15_pickup")
+kind = 0
+
+[node name="Ammo2" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, -126)
+script = ExtResource("15_pickup")
+kind = 1
+
+[node name="Grenade" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -120)
+script = ExtResource("15_pickup")
+kind = 3
+
+[node name="ZoneYard" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -92)
+script = ExtResource("19_wave_zone")
+title = "Тревога в казармах!"
+waves = 2
+enemies_in_first_wave = 5
+extra_per_wave = 2
+rusher_share = 0.3
+heavy_in_last_wave = 1
+gunner_scene = ExtResource("12_bandit")
+rusher_scene = ExtResource("14_trapper")
+heavy_scene = ExtResource("18_heavy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneYard"]
+shape = SubResource("Box_1")
+
+[node name="Spawns" type="Node3D" parent="ZoneYard"]
+
+[node name="Spawn" type="Marker3D" parent="ZoneYard/Spawns"]
+transform = Transform3D(-0.726, 0, -0.6877, 0, 1, 0, 0.6877, 0, -0.726, -18, -1.9, -19)
+
+[node name="Spawn2" type="Marker3D" parent="ZoneYard/Spawns"]
+transform = Transform3D(0.1644, 0, -0.9864, 0, 1, 0, 0.9864, 0, 0.1644, -18, -1.9, 3)
+
+[node name="Spawn3" type="Marker3D" parent="ZoneYard/Spawns"]
+transform = Transform3D(-0.4061, 0, 0.9138, 0, 1, 0, -0.9138, 0, -0.4061, 18, -1.9, -8)
+
+[node name="Spawn4" type="Marker3D" parent="ZoneYard/Spawns"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, -1.9, -34)
+
+[node name="Barriers" type="Node3D" parent="ZoneYard"]
+
+[node name="Barrier" type="CSGBox3D" parent="ZoneYard/Barriers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -38.15)
+use_collision = true
+size = Vector3(12.4, 4, 0.3)
+material = ExtResource("20_barrier")
+
+[node name="RRadar" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -165)
+size = Vector3(80, 0.5, 70)
+material = ExtResource("1_snow")
+
+[node name="WallN" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.25, 5.75, -200.25)
+size = Vector3(34.5, 12.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN2" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -200.25)
+size = Vector3(12, 4, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallN3" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.25, 5.75, -200.25)
+size = Vector3(34.5, 12.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.25, 5.75, -129.75)
+size = Vector3(34.5, 12.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS2" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -129.75)
+size = Vector3(12, 4, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS3" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.25, 5.75, -129.75)
+size = Vector3(34.5, 12.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallW" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.25, 5.75, -165)
+size = Vector3(0.5, 12.5, 70)
+material = ExtResource("2_rock")
+
+[node name="WallE" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.25, 5.75, -165)
+size = Vector3(0.5, 12.5, 70)
+material = ExtResource("2_rock")
+
+[node name="Radome" type="CSGCylinder3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 3, -168)
+radius = 8
+height = 6
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RRadarSolid" type="CSGCombiner3D" parent="Props"]
+use_collision = true
+
+[node name="RadomeCap" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 7, -168)
+radius = 7.04
+height = 2
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap2" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 8.8, -168)
+radius = 5.44
+height = 1.6
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap3" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 10.2, -168)
+radius = 3.36
+height = 1.2
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap4" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 11.2, -168)
+radius = 1.44
+height = 0.8
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="Radome2" type="CSGCylinder3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 3, -178)
+radius = 6.5
+height = 6
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap5" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 7, -178)
+radius = 5.72
+height = 2
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap6" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 8.8, -178)
+radius = 4.42
+height = 1.6
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap7" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 10.2, -178)
+radius = 2.73
+height = 1.2
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="RadomeCap8" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 11.2, -178)
+radius = 1.17
+height = 0.8
+sides = 20
+material = ExtResource("21_white_paint")
+
+[node name="Label4" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.5, -159.9)
+pixel_size = 0.01
+modulate = Color(1, 0.85, 0.45, 1)
+text = "ОБЪЕКТ «ЩИТ-1»"
+font_size = 56
+outline_size = 12
+
+[node name="AntennaTower" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, -190)
+size = Vector3(3, 12, 3)
+material = ExtResource("10_metal")
+
+[node name="AntennaDeck" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 12.2, -190)
+size = Vector3(6, 0.4, 6)
+material = ExtResource("7_black_metal")
+
+[node name="RRadarDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Dish" type="CSGBox3D" parent="Props/RRadarDecor"]
+transform = Transform3D(0.9063, -0.2026, 0.3709, 0, 0.8776, 0.4794, -0.4226, -0.4345, 0.7954, 8, 16, -190)
+size = Vector3(7, 5, 0.4)
+material = ExtResource("21_white_paint")
+
+[node name="DishFeed" type="CSGBox3D" parent="Props/RRadarDecor"]
+transform = Transform3D(1, 0, 0, 0, 0.8776, 0.4794, 0, -0.4794, 0.8776, 8, 16.6, -188.6)
+size = Vector3(0.3, 0.3, 2.4)
+material = ExtResource("10_metal")
+
+[node name="Building" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.5, -145)
+size = Vector3(10, 5, 10)
+material = ExtResource("4_concrete")
+
+[node name="RoofSlab" type="CSGBox3D" parent="Geometry/RRadar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 5.15, -145)
+size = Vector3(10.4, 0.3, 10.4)
+material = ExtResource("1_snow")
+
+[node name="Windows" type="CSGBox3D" parent="Props/RRadarDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.9, -139.975)
+size = Vector3(6, 1, 0.05)
+material = ExtResource("5_lamp")
+
+[node name="Label5" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.2, -139.9)
+pixel_size = 0.01
+modulate = Color(1, 0.85, 0.45, 1)
+text = "ПУЛЬТ УПРАВЛЕНИЯ"
+font_size = 40
+outline_size = 12
+
+[node name="ConcreteBlock" type="CSGBox3D" parent="Props/RRadarSolid"]
+transform = Transform3D(0.9714, 0, -0.2374, 0, 1, 0, 0.2374, 0, 0.9714, -6, 0.6, -175)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock2" type="CSGBox3D" parent="Props/RRadarSolid"]
+transform = Transform3D(0.9675, 0, -0.253, 0, 1, 0, 0.253, 0, 0.9675, 14, 0.6, -150)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock3" type="CSGBox3D" parent="Props/RRadarSolid"]
+transform = Transform3D(0.9701, 0, 0.2427, 0, 1, 0, -0.2427, 0, 0.9701, -30, 0.6, -190)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="LightPole" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 4, -136)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood" type="CSGBox3D" parent="Props/RRadarDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 8.2, -136)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light4" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 7.5, -136)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="LightPole2" type="CSGCylinder3D" parent="Props/RRadarSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 4, -196)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood2" type="CSGBox3D" parent="Props/RRadarDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 8.2, -196)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light5" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 7.5, -196)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="Bandit5" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9439, 0, -0.3304, 0, 1, 0, 0.3304, 0, -0.9439, -14, 0, -170)
+
+[node name="Bandit6" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.8824, 0, 0.4706, 0, 1, 0, -0.4706, 0, -0.8824, 16, 0, -160)
+
+[node name="Marksman3" parent="Enemies" instance=ExtResource("13_marksman")]
+transform = Transform3D(-0.9912, 0, 0.1322, 0, 1, 0, -0.1322, 0, -0.9912, 8, 12.4, -190)
+
+[node name="Marksman4" parent="Enemies" instance=ExtResource("13_marksman")]
+transform = Transform3D(-0.8575, 0, -0.5145, 0, 1, 0, 0.5145, 0, -0.8575, -9, 5.3, -145)
+
+[node name="Heavy2" parent="Enemies" instance=ExtResource("18_heavy")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -194)
+
+[node name="Health3" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, -134)
+script = ExtResource("15_pickup")
+kind = 0
+
+[node name="Ammo3" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, -134)
+script = ExtResource("15_pickup")
+kind = 1
+
+[node name="ZoneRadar" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -168)
+script = ExtResource("19_wave_zone")
+title = "Засада у радаров!"
+waves = 2
+enemies_in_first_wave = 5
+extra_per_wave = 2
+rusher_share = 0.3
+heavy_in_last_wave = 1
+gunner_scene = ExtResource("12_bandit")
+rusher_scene = ExtResource("14_trapper")
+heavy_scene = ExtResource("18_heavy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneRadar"]
+shape = SubResource("Box_2")
+
+[node name="Spawns" type="Node3D" parent="ZoneRadar"]
+
+[node name="Spawn" type="Marker3D" parent="ZoneRadar/Spawns"]
+transform = Transform3D(0.6139, 0, -0.7894, 0, 1, 0, 0.7894, 0, 0.6139, -36, -1.9, 28)
+
+[node name="Spawn2" type="Marker3D" parent="ZoneRadar/Spawns"]
+transform = Transform3D(0.6139, 0, 0.7894, 0, 1, 0, -0.7894, 0, 0.6139, 36, -1.9, 28)
+
+[node name="Spawn3" type="Marker3D" parent="ZoneRadar/Spawns"]
+transform = Transform3D(-0.6139, 0, -0.7894, 0, 1, 0, 0.7894, 0, -0.6139, -36, -1.9, -28)
+
+[node name="Spawn4" type="Marker3D" parent="ZoneRadar/Spawns"]
+transform = Transform3D(-0.6139, 0, 0.7894, 0, 1, 0, -0.7894, 0, -0.6139, 36, -1.9, -28)
+
+[node name="Barriers" type="Node3D" parent="ZoneRadar"]
+
+[node name="Barrier" type="CSGBox3D" parent="ZoneRadar/Barriers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -32.15)
+use_collision = true
+size = Vector3(12.4, 4, 0.3)
+material = ExtResource("20_barrier")
+
+[node name="RMotor" type="CSGCombiner3D" parent="Geometry"]
+use_collision = true
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -250)
+size = Vector3(100, 0.5, 100)
+material = ExtResource("4_concrete")
+
+[node name="WallN" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75, -300.25)
+size = Vector3(101, 14.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, 6.75, -199.75)
+size = Vector3(44.5, 14.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS2" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, -199.75)
+size = Vector3(12, 6, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallS3" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.25, 6.75, -199.75)
+size = Vector3(44.5, 14.5, 0.5)
+material = ExtResource("2_rock")
+
+[node name="WallW" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.25, 6.75, -250)
+size = Vector3(0.5, 14.5, 100)
+material = ExtResource("2_rock")
+
+[node name="WallE" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.25, 6.75, -250)
+size = Vector3(0.5, 14.5, 100)
+material = ExtResource("2_rock")
+
+[node name="HangarWall" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.25, 6, -292)
+size = Vector3(0.5, 12, 16)
+material = ExtResource("10_metal")
+
+[node name="HangarWall2" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.25, 6, -292)
+size = Vector3(0.5, 12, 16)
+material = ExtResource("10_metal")
+
+[node name="HangarRoof" type="CSGBox3D" parent="Geometry/RMotor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.3, -291.75)
+size = Vector3(50, 0.6, 16.5)
+material = ExtResource("10_metal")
+
+[node name="RMotorSolid" type="CSGCombiner3D" parent="Props"]
+use_collision = true
+
+[node name="HangarDoorL" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5.5, -283.45)
+size = Vector3(10, 11, 0.3)
+material = ExtResource("22_rust")
+
+[node name="HangarDoorR" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 5.5, -283.45)
+size = Vector3(10, 11, 0.3)
+material = ExtResource("22_rust")
+
+[node name="Label6" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.4, -283.2)
+pixel_size = 0.01
+modulate = Color(1, 0.85, 0.45, 1)
+text = "АНГАР №3"
+font_size = 96
+outline_size = 12
+
+[node name="Container" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 1.3, -215)
+size = Vector3(2.6, 2.6, 6)
+material = ExtResource("22_rust")
+
+[node name="Container2" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 2.6, -222)
+size = Vector3(2.6, 5.2, 6)
+material = ExtResource("22_rust")
+
+[node name="Container3" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1.3, -275)
+size = Vector3(2.6, 2.6, 6)
+material = ExtResource("22_rust")
+
+[node name="Container4" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 1.3, -275)
+size = Vector3(6, 2.6, 2.6)
+material = ExtResource("22_rust")
+
+[node name="ConcreteBlock" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(0.9848, 0, 0.1736, 0, 1, 0, -0.1736, 0, 0.9848, -14, 0.6, -228)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock2" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 14, 0.6, -232)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock3" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(0.1736, 0, 0.9848, 0, 1, 0, -0.9848, 0, 0.1736, -22, 0.6, -250)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock4" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 22, 0.6, -255)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock5" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.6, -262)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock6" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(0.9962, 0, 0.0872, 0, 1, 0, -0.0872, 0, 0.9962, 10, 0.6, -270)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock7" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.6, -240)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="ConcreteBlock8" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0.6, -242)
+size = Vector3(2.4, 1.2, 1)
+material = ExtResource("4_concrete")
+
+[node name="Sandbags" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, -208)
+size = Vector3(4, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="Sandbags2" type="CSGBox3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, -208)
+size = Vector3(4, 1, 0.9)
+material = ExtResource("3_gravel")
+
+[node name="LightPole" type="CSGCylinder3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 4, -205)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="RMotorDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="Flood" type="CSGBox3D" parent="Props/RMotorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 8.2, -205)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light6" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 7.5, -205)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="LightPole2" type="CSGCylinder3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 4, -205)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood2" type="CSGBox3D" parent="Props/RMotorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 8.2, -205)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light7" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 7.5, -205)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="LightPole3" type="CSGCylinder3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 4, -280)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood3" type="CSGBox3D" parent="Props/RMotorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 8.2, -280)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light8" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 7.5, -280)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="LightPole4" type="CSGCylinder3D" parent="Props/RMotorSolid"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 4, -280)
+radius = 0.15
+height = 8
+sides = 8
+material = ExtResource("10_metal")
+
+[node name="Flood4" type="CSGBox3D" parent="Props/RMotorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 8.2, -280)
+size = Vector3(1, 0.5, 0.4)
+material = ExtResource("11_lamp_cold")
+
+[node name="Light9" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 7.5, -280)
+light_color = Color(0.8, 0.9, 1, 1)
+light_energy = 2.2
+omni_range = 22
+
+[node name="HangarLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -292)
+light_color = Color(1, 0.85, 0.6, 1)
+light_energy = 2.5
+omni_range = 22
+
+[node name="Rpg" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -205)
+script = ExtResource("15_pickup")
+kind = 2
+weapon = ExtResource("23_rpg")
+
+[node name="Rpg2" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -205)
+script = ExtResource("15_pickup")
+kind = 2
+weapon = ExtResource("23_rpg")
+
+[node name="Rpg3" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, -294)
+script = ExtResource("15_pickup")
+kind = 2
+weapon = ExtResource("23_rpg")
+
+[node name="Ammo4" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 0, -294)
+script = ExtResource("15_pickup")
+kind = 1
+
+[node name="Health4" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 0, -206)
+script = ExtResource("15_pickup")
+kind = 0
+
+[node name="Health5" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, -250)
+script = ExtResource("15_pickup")
+kind = 0
+
+[node name="Grenade2" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 0, -250)
+script = ExtResource("15_pickup")
+kind = 3
+
+[node name="Bandit7" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9701, 0, -0.2425, 0, 1, 0, 0.2425, 0, -0.9701, -20, 0, -280)
+
+[node name="Bandit8" parent="Enemies" instance=ExtResource("12_bandit")]
+transform = Transform3D(-0.9701, 0, 0.2425, 0, 1, 0, -0.2425, 0, -0.9701, 20, 0, -280)
+
+[node name="TankPath" type="Node3D" parent="."]
+
+[node name="P1" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -272)
+
+[node name="P2" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -262)
+
+[node name="P3" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, -228)
+
+[node name="P4" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -218)
+
+[node name="P5" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -228)
+
+[node name="P6" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -262)
+
+[node name="P7" type="Marker3D" parent="TankPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -245)
+
+[node name="TankSpawns" type="Node3D" parent="."]
+
+[node name="S1" type="Marker3D" parent="TankSpawns"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -46, 0, -212)
+
+[node name="S2" type="Marker3D" parent="TankSpawns"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 46, 0, -212)
+
+[node name="S3" type="Marker3D" parent="TankSpawns"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -46, 0, -290)
+
+[node name="S4" type="Marker3D" parent="TankSpawns"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 46, 0, -290)
+
+[node name="Tank" type="CharacterBody3D" parent="Enemies"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.1, -277)
+script = ExtResource("24_tank_boss")
+path_points = NodePath("../../TankPath")
+henchman_points = NodePath("../../TankSpawns")
+henchman_scene = ExtResource("12_bandit")
+heavy_scene = ExtResource("18_heavy")
+
+[node name="Explosives" type="Node3D" parent="."]
+
+[node name="FuelTank" parent="Explosives" instance=ExtResource("25_fuel_tank")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, -60)
+
+[node name="FuelTank2" parent="Explosives" instance=ExtResource("25_fuel_tank")]
+transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, 30, 0, -60)
+
+[node name="FuelTank3" parent="Explosives" instance=ExtResource("25_fuel_tank")]
+transform = Transform3D(0.2756, 0, 0.9613, 0, 1, 0, -0.9613, 0, 0.2756, -35, 0, -230)
+
+[node name="FuelTank4" parent="Explosives" instance=ExtResource("25_fuel_tank")]
+transform = Transform3D(-0.3584, 0, 0.9336, 0, 1, 0, -0.9336, 0, -0.3584, 35, 0, -255)
+
+[node name="FuelTank5" parent="Explosives" instance=ExtResource("25_fuel_tank")]
+transform = Transform3D(-0.848, 0, 0.5299, 0, 1, 0, -0.5299, 0, -0.848, -20, 0, -268)
+
+[node name="Car" parent="Explosives" instance=ExtResource("26_explosive_car")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 12, 0, -70)
+
+[node name="Car2" parent="Explosives" instance=ExtResource("26_explosive_car")]
+transform = Transform3D(0.1736, 0, 0.9848, 0, 1, 0, -0.9848, 0, 0.1736, -12, 0, -78)
+
+[node name="Tnt" parent="Explosives" instance=ExtResource("27_tnt_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -45)
+
+[node name="Barrel" parent="Explosives" instance=ExtResource("28_explosive_barrel")]
+transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, 16, 0, -120)
+
+[node name="Tnt2" parent="Explosives" instance=ExtResource("27_tnt_crate")]
+transform = Transform3D(0.2756, 0, 0.9613, 0, 1, 0, -0.9613, 0, 0.2756, -16, 0, -180)
+
+[node name="Tnt3" parent="Explosives" instance=ExtResource("27_tnt_crate")]
+transform = Transform3D(-0.3584, 0, 0.9336, 0, 1, 0, -0.9336, 0, -0.3584, 18, 0, -196)
+
+[node name="Barrel2" parent="Explosives" instance=ExtResource("28_explosive_barrel")]
+transform = Transform3D(-0.848, 0, 0.5299, 0, 1, 0, -0.5299, 0, -0.848, -40, 0, -260)
+
+[node name="Tnt4" parent="Explosives" instance=ExtResource("27_tnt_crate")]
+transform = Transform3D(-0.9962, 0, -0.0872, 0, 1, 0, 0.0872, 0, -0.9962, 40, 0, -230)
+
+[node name="OutdoorDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="PineTrunk" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 2.1467, -87.3607)
+radius = 0.3
+height = 4.2933
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 3.0053, -87.3607)
+size = Vector3(3.2, 2.0608, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 4.0357, -87.3607)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown2" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 4.8944, -87.3607)
+size = Vector3(2.4, 2.0608, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow2" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 5.9248, -87.3607)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown3" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 6.7835, -87.3607)
+size = Vector3(1.5, 2.0608, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow3" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.3016, 7.8139, -87.3607)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk2" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 2.0657, -23.9233)
+radius = 0.3
+height = 4.1313
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown4" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 2.8919, -23.9233)
+size = Vector3(3.2, 1.983, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow4" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 3.8834, -23.9233)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown5" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 4.7097, -23.9233)
+size = Vector3(2.4, 1.983, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow5" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 5.7012, -23.9233)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown6" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 6.5275, -23.9233)
+size = Vector3(1.5, 1.983, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow6" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.9596, 7.519, -23.9233)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk3" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 2.2663, -104.8723)
+radius = 0.3
+height = 4.5325
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown7" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 3.1728, -104.8723)
+size = Vector3(3.2, 2.1756, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow7" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 4.2606, -104.8723)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown8" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 5.1671, -104.8723)
+size = Vector3(2.4, 2.1756, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow8" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 6.2549, -104.8723)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown9" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 7.1614, -104.8723)
+size = Vector3(1.5, 2.1756, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow9" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.2628, 8.2492, -104.8723)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk4" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 1.9149, -94.2403)
+radius = 0.3
+height = 3.8299
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown10" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 2.6809, -94.2403)
+size = Vector3(3.2, 1.8384, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow10" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 3.6001, -94.2403)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown11" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 4.3661, -94.2403)
+size = Vector3(2.4, 1.8384, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow11" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 5.2853, -94.2403)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown12" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 6.0512, -94.2403)
+size = Vector3(1.5, 1.8384, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow12" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.7453, 6.9704, -94.2403)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk5" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 1.8332, -205.3975)
+radius = 0.3
+height = 3.6664
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown13" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 2.5665, -205.3975)
+size = Vector3(3.2, 1.7599, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow13" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 3.4464, -205.3975)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown14" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 4.1797, -205.3975)
+size = Vector3(2.4, 1.7599, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow14" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 5.0597, -205.3975)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown15" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 5.7929, -205.3975)
+size = Vector3(1.5, 1.7599, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow15" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.1829, 6.6729, -205.3975)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk6" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 2.3333, -190.1609)
+radius = 0.3
+height = 4.6666
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown16" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 3.2666, -190.1609)
+size = Vector3(3.2, 2.24, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow16" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 4.3866, -190.1609)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown17" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 5.3199, -190.1609)
+size = Vector3(2.4, 2.24, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow17" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 6.4399, -190.1609)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown18" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 7.3732, -190.1609)
+size = Vector3(1.5, 2.24, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow18" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.0387, 8.4932, -190.1609)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk7" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 2.3909, -287.9059)
+radius = 0.3
+height = 4.7817
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown19" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 3.3472, -287.9059)
+size = Vector3(3.2, 2.2952, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow19" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 4.4948, -287.9059)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown20" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 5.4512, -287.9059)
+size = Vector3(2.4, 2.2952, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow20" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 6.5988, -287.9059)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown21" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 7.5551, -287.9059)
+size = Vector3(1.5, 2.2952, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow21" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.478, 8.7027, -287.9059)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk8" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 2.1143, -103.2782)
+radius = 0.3
+height = 4.2285
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown22" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 2.96, -103.2782)
+size = Vector3(3.2, 2.0297, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow22" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 3.9748, -103.2782)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown23" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 4.8205, -103.2782)
+size = Vector3(2.4, 2.0297, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow23" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 5.8354, -103.2782)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown24" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 6.6811, -103.2782)
+size = Vector3(1.5, 2.0297, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow24" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -75.6785, 7.6959, -103.2782)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk9" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 2.4222, -154.5466)
+radius = 0.3
+height = 4.8445
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown25" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 3.3911, -154.5466)
+size = Vector3(3.2, 2.3254, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow25" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 4.5538, -154.5466)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown26" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 5.5227, -154.5466)
+size = Vector3(2.4, 2.3254, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow26" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 6.6854, -154.5466)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown27" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 7.6543, -154.5466)
+size = Vector3(1.5, 2.3254, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow27" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81.3981, 8.817, -154.5466)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk10" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 2.5482, -245.8161)
+radius = 0.3
+height = 5.0965
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown28" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 3.5675, -245.8161)
+size = Vector3(3.2, 2.4463, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow28" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 4.7907, -245.8161)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown29" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 5.81, -245.8161)
+size = Vector3(2.4, 2.4463, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow29" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 7.0331, -245.8161)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown30" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 8.0524, -245.8161)
+size = Vector3(1.5, 2.4463, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow30" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.3884, 9.2756, -245.8161)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk11" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 1.8395, -41.8365)
+radius = 0.3
+height = 3.6791
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown31" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 2.5753, -41.8365)
+size = Vector3(3.2, 1.766, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow31" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 3.4583, -41.8365)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown32" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 4.1941, -41.8365)
+size = Vector3(2.4, 1.766, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow32" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 5.0771, -41.8365)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown33" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 5.8129, -41.8365)
+size = Vector3(1.5, 1.766, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow33" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.4826, 6.6959, -41.8365)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk12" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 2.1619, -265.0167)
+radius = 0.3
+height = 4.3237
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown34" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 3.0266, -265.0167)
+size = Vector3(3.2, 2.0754, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow34" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 4.0643, -265.0167)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown35" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 4.9291, -265.0167)
+size = Vector3(2.4, 2.0754, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow35" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 5.9668, -265.0167)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown36" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 6.8315, -265.0167)
+size = Vector3(1.5, 2.0754, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow36" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0215, 7.8692, -265.0167)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk13" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 1.9184, 11.0831)
+radius = 0.3
+height = 3.8367
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown37" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 2.6857, 11.0831)
+size = Vector3(3.2, 1.8416, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow37" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 3.6065, 11.0831)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown38" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 4.3739, 11.0831)
+size = Vector3(2.4, 1.8416, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow38" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 5.2947, 11.0831)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown39" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 6.0621, 11.0831)
+size = Vector3(1.5, 1.8416, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow39" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.4564, 6.9829, 11.0831)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk14" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 2.187, -155.1439)
+radius = 0.3
+height = 4.3741
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown40" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 3.0619, -155.1439)
+size = Vector3(3.2, 2.0996, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow40" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 4.1116, -155.1439)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown41" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 4.9865, -155.1439)
+size = Vector3(2.4, 2.0996, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow41" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 6.0362, -155.1439)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown42" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 6.9111, -155.1439)
+size = Vector3(1.5, 2.0996, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow42" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.4757, 7.9608, -155.1439)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk15" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 2.1992, -186.0135)
+radius = 0.3
+height = 4.3985
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown43" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 3.0789, -186.0135)
+size = Vector3(3.2, 2.1113, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow43" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 4.1346, -186.0135)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown44" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 5.0143, -186.0135)
+size = Vector3(2.4, 2.1113, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow44" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 6.0699, -186.0135)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown45" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 6.9496, -186.0135)
+size = Vector3(1.5, 2.1113, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow45" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.7169, 8.0052, -186.0135)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk16" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 2.4535, -271.279)
+radius = 0.3
+height = 4.9069
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown46" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 3.4349, -271.279)
+size = Vector3(3.2, 2.3553, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow46" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 4.6125, -271.279)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown47" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 5.5939, -271.279)
+size = Vector3(2.4, 2.3553, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow47" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 6.7716, -271.279)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown48" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 7.753, -271.279)
+size = Vector3(1.5, 2.3553, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow48" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.2593, 8.9306, -271.279)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk17" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 2.6939, -80.3362)
+radius = 0.3
+height = 5.3879
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown49" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 3.7715, -80.3362)
+size = Vector3(3.2, 2.5862, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow49" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 5.0646, -80.3362)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown50" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 6.1422, -80.3362)
+size = Vector3(2.4, 2.5862, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow50" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 7.4353, -80.3362)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown51" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 8.5128, -80.3362)
+size = Vector3(1.5, 2.5862, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow51" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.6496, 9.8059, -80.3362)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk18" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 2.118, -78.6937)
+radius = 0.3
+height = 4.2359
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown52" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 2.9651, -78.6937)
+size = Vector3(3.2, 2.0332, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow52" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 3.9817, -78.6937)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown53" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 4.8289, -78.6937)
+size = Vector3(2.4, 2.0332, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow53" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 5.8455, -78.6937)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown54" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 6.6927, -78.6937)
+size = Vector3(1.5, 2.0332, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow54" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.707, 7.7093, -78.6937)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk19" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 1.9387, -217.223)
+radius = 0.3
+height = 3.8774
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown55" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 2.7142, -217.223)
+size = Vector3(3.2, 1.8612, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow55" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 3.6448, -217.223)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown56" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 4.4203, -217.223)
+size = Vector3(2.4, 1.8612, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow56" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 5.3508, -217.223)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown57" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 6.1263, -217.223)
+size = Vector3(1.5, 1.8612, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow57" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9603, 7.0569, -217.223)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk20" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 1.8478, -287.5776)
+radius = 0.3
+height = 3.6957
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown58" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 2.587, -287.5776)
+size = Vector3(3.2, 1.7739, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow58" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 3.4739, -287.5776)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown59" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 4.2131, -287.5776)
+size = Vector3(2.4, 1.7739, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow59" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 5.1, -287.5776)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown60" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 5.8391, -287.5776)
+size = Vector3(1.5, 1.7739, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow60" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.122, 6.7261, -287.5776)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk21" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 2.336, 14.188)
+radius = 0.3
+height = 4.6721
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown61" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 3.2705, 14.188)
+size = Vector3(3.2, 2.2426, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow61" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 4.3918, 14.188)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown62" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 5.3262, 14.188)
+size = Vector3(2.4, 2.2426, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow62" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 6.4475, 14.188)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown63" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 7.3819, 14.188)
+size = Vector3(1.5, 2.2426, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow63" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -66.6233, 8.5032, 14.188)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk22" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 2.7398, -46.4311)
+radius = 0.3
+height = 5.4796
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown64" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 3.8357, -46.4311)
+size = Vector3(3.2, 2.6302, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow64" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 5.1508, -46.4311)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown65" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 6.2467, -46.4311)
+size = Vector3(2.4, 2.6302, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow65" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 7.5618, -46.4311)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown66" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 8.6578, -46.4311)
+size = Vector3(1.5, 2.6302, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow66" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.7335, 9.9729, -46.4311)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk23" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 1.949, -270.2916)
+radius = 0.3
+height = 3.8981
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown67" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 2.7287, -270.2916)
+size = Vector3(3.2, 1.8711, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow67" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 3.6642, -270.2916)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown68" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 4.4438, -270.2916)
+size = Vector3(2.4, 1.8711, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow68" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 5.3793, -270.2916)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown69" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 6.159, -270.2916)
+size = Vector3(1.5, 1.8711, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow69" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.1948, 7.0945, -270.2916)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk24" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 1.9324, -149.7732)
+radius = 0.3
+height = 3.8648
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown70" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 2.7054, -149.7732)
+size = Vector3(3.2, 1.8551, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow70" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 3.6329, -149.7732)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown71" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 4.4059, -149.7732)
+size = Vector3(2.4, 1.8551, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow71" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 5.3334, -149.7732)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown72" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 6.1064, -149.7732)
+size = Vector3(1.5, 1.8551, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow72" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.5097, 7.0339, -149.7732)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk25" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 2.0414, -8.1727)
+radius = 0.3
+height = 4.0827
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown73" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 2.8579, -8.1727)
+size = Vector3(3.2, 1.9597, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow73" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 3.8378, -8.1727)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown74" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 4.6543, -8.1727)
+size = Vector3(2.4, 1.9597, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow74" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 5.6342, -8.1727)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown75" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 6.4507, -8.1727)
+size = Vector3(1.5, 1.9597, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow75" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -76.5335, 7.4306, -8.1727)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="PineTrunk26" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 2.4913, -6.6435)
+radius = 0.3
+height = 4.9825
+sides = 6
+material = ExtResource("8_tree_trunk")
+
+[node name="PineCrown76" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 3.4878, -6.6435)
+size = Vector3(3.2, 2.3916, 3.2)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow76" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 4.6836, -6.6435)
+size = Vector3(2.56, 0.2, 2.56)
+material = ExtResource("1_snow")
+
+[node name="PineCrown77" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 5.6801, -6.6435)
+size = Vector3(2.4, 2.3916, 2.4)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow77" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 6.8759, -6.6435)
+size = Vector3(1.92, 0.2, 1.92)
+material = ExtResource("1_snow")
+
+[node name="PineCrown78" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 7.8724, -6.6435)
+size = Vector3(1.5, 2.3916, 1.5)
+material = ExtResource("9_tree_leaves")
+
+[node name="PineSnow78" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.072, 9.0682, -6.6435)
+size = Vector3(1.2, 0.2, 1.2)
+material = ExtResource("1_snow")
+
+[node name="Mountain" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -130, 27, -150)
+size = Vector3(120, 70, 140)
+material = ExtResource("1_snow")
+
+[node name="Mountain2" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 32, -150)
+size = Vector3(120, 80, 140)
+material = ExtResource("1_snow")
+
+[node name="Mountain3" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 47, -380)
+size = Vector3(300, 110, 140)
+material = ExtResource("1_snow")
+
+[node name="Mountain4" type="CSGBox3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 17, 90)
+size = Vector3(300, 50, 140)
+material = ExtResource("1_snow")
+
+[node name="Moon" type="CSGCylinder3D" parent="Props/OutdoorDecor"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 90, 120, -420)
+radius = 9
+height = 1
+sides = 24
+material = ExtResource("11_lamp_cold")
+
+[node name="Snow" type="Node3D" parent="."]
+script = ExtResource("29_rain")
+snow = true
+
+[node name="Player" parent="." instance=ExtResource("30_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_R")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.9397, -0.2106, 0.2695, 0, 0.788, 0.6157, -0.342, 0.5785, -0.7405, 0, 40, 0)
+light_color = Color(0.65, 0.75, 1, 1)
+light_energy = 0.45
+shadow_enabled = true
+directional_shadow_max_distance = 60.0
+directional_shadow_mode = 1
+
+[node name="Route" type="Node3D" parent="."]
+
+[node name="P00" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="P01" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -128)
+
+[node name="P02" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -132)
+
+[node name="P03" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -198)
+
+[node name="P04" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -202)
+
+[node name="P05" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -240)
+
+[node name="HUD" parent="." instance=ExtResource("39_hud")]

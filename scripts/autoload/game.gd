@@ -8,8 +8,8 @@ signal economy_changed
 
 const SAVE_PATH := "user://save.cfg"
 ## Версия сохранения. 2 — в эпизод 2 добавлен уровень на вертолёте (номер 9),
-## номера уровней после него сдвинулись на один.
-const SAVE_VERSION := 2
+## 3 — в эпизод 3 добавлена радарная станция (номер 13); номера уровней после них сдвинулись.
+const SAVE_VERSION := 3
 const MENU_SCENE := "res://scenes/main_menu.tscn"
 const TRAIN_SCENE := "res://scenes/levels/level_train.tscn"
 const CHASE_SCENE := "res://scenes/levels/level_chase.tscn"
@@ -31,6 +31,7 @@ const LEVELS := [
 	# Эпизод 3: Аляска.
 	{"title": "Золотой прииск", "scene": "res://scenes/levels/level_11_gold_mine.tscn", "reward": 800},
 	{"title": "Заброшенный городок", "scene": "res://scenes/levels/level_12_ghost_town.tscn", "reward": 1000},
+	{"title": "Радарная станция", "scene": "res://scenes/levels/level_radar.tscn", "reward": 1100},
 	{"title": "Аляска", "scene": "res://scenes/levels/level_13_alaska.tscn", "reward": 1200},
 ]
 ## Эпизоды: уровни идут по порядку с first до city, а город в конце нужно освободить —
@@ -38,7 +39,7 @@ const LEVELS := [
 const EPISODES := [
 	{"title": "Эпизод 1 · Нью-Йорк", "city_name": "Нью-Йорк", "first": 0, "city": 4},
 	{"title": "Эпизод 2 · Сан-Франциско", "city_name": "Сан-Франциско", "first": 5, "city": 10},
-	{"title": "Эпизод 3 · Аляска", "city_name": "Аляска", "first": 11, "city": 13},
+	{"title": "Эпизод 3 · Аляска", "city_name": "Аляска", "first": 11, "city": 14},
 ]
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
@@ -75,7 +76,7 @@ const PROPERTIES := [
 		{"id": "punching_bag", "title": "Боксёрская груша", "price": 3000, "perk": "max_health", "value": 15.0,
 				"text": "+15 к здоровью"},
 	]},
-	{"id": "cabin", "city": 13, "title": "Бревенчатый дом у озера", "price": 12000, "upgrades": [
+	{"id": "cabin", "city": 14, "title": "Бревенчатый дом у озера", "price": 12000, "upgrades": [
 		{"id": "stove", "title": "Печь и медвежья шкура", "price": 3000, "perk": "max_health", "value": 15.0,
 				"text": "+15 к здоровью"},
 		{"id": "workbench", "title": "Верстак оружейника", "price": 4500, "perk": "damage", "value": 0.1,
@@ -518,6 +519,8 @@ func load_data() -> void:
 	var version := int(config.get_value("progress", "save_version", 1))
 	if version < 2:
 		_insert_level(9)
+	if version < 3:
+		_insert_level(13)
 
 
 ## Старое сохранение: перед уровнем at вставлен новый — сдвигаем номера уровней.

@@ -188,6 +188,13 @@ func on_boss_fight(_boss: Boss) -> void:
 	Audio.play_music("music_combat")
 
 
+## Повержена техника-босс (танк): уровень пройден.
+func on_vehicle_destroyed(vehicle: Node) -> void:
+	Audio.play_music("music_explore")
+	if vehicle.get("completes_level"):
+		get_tree().create_timer(3.0, false).timeout.connect(complete)
+
+
 func on_boss_defeated(boss: Boss) -> void:
 	Audio.play_music("music_explore")
 	Game.slow_motion(1.4, 0.2)
