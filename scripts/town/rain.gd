@@ -17,6 +17,7 @@ var _covered := false
 
 
 func _ready() -> void:
+	amount = maxi(roundi(amount * Game.particle_density()), 100)
 	if snow:
 		_make_snow()
 		return

@@ -14,6 +14,10 @@ signal closed
 @onready var _noir: CheckButton = %Noir
 @onready var _music: CheckButton = %Music
 @onready var _blood: CheckButton = %Blood
+@onready var _show_fps: CheckButton = %ShowFps
+@onready var _graphics: Button = %GraphicsButton
+
+const GRAPHICS_NAMES := ["Низкая (быстрее)", "Средняя", "Высокая"]
 
 
 func _ready() -> void:
@@ -26,6 +30,8 @@ func _ready() -> void:
 	_noir.toggled.connect(func(on: bool) -> void: Game.set_setting("noir", on))
 	_music.toggled.connect(func(on: bool) -> void: Audio.set_music_enabled(on))
 	_blood.toggled.connect(func(on: bool) -> void: Game.set_setting("blood", on))
+	_show_fps.toggled.connect(func(on: bool) -> void: Game.set_setting("show_fps", on))
+	_graphics.pressed.connect(_on_graphics)
 	%DoneButton.pressed.connect(_on_done)
 	visibility_changed.connect(_sync)
 
@@ -44,7 +50,17 @@ func _sync() -> void:
 	_noir.set_pressed_no_signal(bool(Game.settings.get("noir", true)))
 	_music.set_pressed_no_signal(bool(Game.settings.get("music", true)))
 	_blood.set_pressed_no_signal(bool(Game.settings.get("blood", true)))
+	_show_fps.set_pressed_no_signal(bool(Game.settings.get("show_fps", false)))
+	_shadows.set_pressed_no_signal(bool(Game.settings.shadows))
+	_graphics.text = GRAPHICS_NAMES[Game.graphics_quality()]
 	_update_labels()
+
+
+## Графика по кругу: низкая → средняя → высокая. Тени включаются по пресету.
+func _on_graphics() -> void:
+	Audio.play("ui_click")
+	Game.set_graphics((Game.graphics_quality() + 1) % 3)
+	_sync()
 
 
 func _on_sensitivity(value: float) -> void:

@@ -116,6 +116,7 @@ func bind_player(player: Player) -> void:
 
 
 func _process(delta: float) -> void:
+	_update_fps(delta)
 	if _player:
 		_crosshair.on_target = _player.aim_target != null
 		_crosshair.on_head = _crosshair.on_target and _player.aim_is_head
@@ -398,6 +399,21 @@ func _on_weapon_changed(weapon: WeaponData) -> void:
 	_reload_bar.hide()
 	# Кнопка оптики видна только у снайперской винтовки.
 	%ScopeButton.visible = weapon.scope_fov > 0.0
+
+
+var _fps_timer := 0.0
+
+
+## Счётчик кадров в секунду (включается в настройках).
+func _update_fps(delta: float) -> void:
+	var label := %FpsLabel as Label
+	label.visible = bool(Game.settings.get("show_fps", false))
+	if not label.visible:
+		return
+	_fps_timer -= delta
+	if _fps_timer <= 0.0:
+		_fps_timer = 0.5
+		label.text = "FPS %d" % Engine.get_frames_per_second()
 
 
 ## Герой у пулемёта в вертолёте: прыжок и рывок не нужны, джойстик — только если им рулят (погоня).

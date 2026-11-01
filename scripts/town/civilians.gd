@@ -10,6 +10,8 @@ extends Node3D
 
 
 func _ready() -> void:
+	# На слабой графике прохожих меньше.
+	count = roundi(count * [0.5, 0.75, 1.0][Game.graphics_quality()])
 	if not Game.is_liberated(Game.current_level):
 		return
 	await get_tree().physics_frame

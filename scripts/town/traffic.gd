@@ -17,6 +17,7 @@ static var _light_materials := {}
 
 
 func _ready() -> void:
+	count = maxi(roundi(count * [0.6, 0.8, 1.0][Game.graphics_quality()]), 2)
 	if not Game.is_liberated(Game.current_level):
 		return
 	for i in corners.size():

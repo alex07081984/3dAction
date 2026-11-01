@@ -53,16 +53,41 @@ theme_override_font_sizes/font_size = 40
 text = "Настройки"
 horizontal_alignment = 1
 
-[node name="SensitivityRow" type="HBoxContainer" parent="Center/Panel/VBox"]
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/VBox"]
+custom_minimum_size = Vector2(760, 470)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Items" type="VBoxContainer" parent="Center/Panel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="GraphicsRow" type="HBoxContainer" parent="Center/Panel/VBox/Scroll/Items"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="Center/Panel/VBox/SensitivityRow"]
+[node name="Label" type="Label" parent="Center/Panel/VBox/Scroll/Items/GraphicsRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "Графика"
+
+[node name="GraphicsButton" type="Button" parent="Center/Panel/VBox/Scroll/Items/GraphicsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+text = "Средняя"
+
+[node name="SensitivityRow" type="HBoxContainer" parent="Center/Panel/VBox/Scroll/Items"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="Center/Panel/VBox/Scroll/Items/SensitivityRow"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 text = "Чувствительность"
 
-[node name="Sensitivity" type="HSlider" parent="Center/Panel/VBox/SensitivityRow"]
+[node name="Sensitivity" type="HSlider" parent="Center/Panel/VBox/Scroll/Items/SensitivityRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 56)
 layout_mode = 2
@@ -72,22 +97,22 @@ max_value = 2.5
 step = 0.05
 value = 1.0
 
-[node name="SensitivityValue" type="Label" parent="Center/Panel/VBox/SensitivityRow"]
+[node name="SensitivityValue" type="Label" parent="Center/Panel/VBox/Scroll/Items/SensitivityRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "1.0"
 
-[node name="VolumeRow" type="HBoxContainer" parent="Center/Panel/VBox"]
+[node name="VolumeRow" type="HBoxContainer" parent="Center/Panel/VBox/Scroll/Items"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="Center/Panel/VBox/VolumeRow"]
+[node name="Label" type="Label" parent="Center/Panel/VBox/Scroll/Items/VolumeRow"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 text = "Громкость"
 
-[node name="Volume" type="HSlider" parent="Center/Panel/VBox/VolumeRow"]
+[node name="Volume" type="HSlider" parent="Center/Panel/VBox/Scroll/Items/VolumeRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 56)
 layout_mode = 2
@@ -97,47 +122,53 @@ max_value = 1.0
 step = 0.05
 value = 0.8
 
-[node name="VolumeValue" type="Label" parent="Center/Panel/VBox/VolumeRow"]
+[node name="VolumeValue" type="Label" parent="Center/Panel/VBox/Scroll/Items/VolumeRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "1.0"
 
-[node name="AimAssist" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="AimAssist" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Помощь в прицеливании"
 
-[node name="AutoFire" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="AutoFire" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Автоогонь (стреляет сам, когда прицел на враге)"
 
-[node name="Shadows" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="Shadows" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Тени (выключите, если игра тормозит)"
 
-[node name="Noir" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="Noir" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"
 
-[node name="Music" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="Music" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Музыка"
 
-[node name="Blood" type="CheckButton" parent="Center/Panel/VBox"]
+[node name="Blood" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Много крови: куски тел, оторванные руки, пятна"
+
+[node name="ShowFps" type="CheckButton" parent="Center/Panel/VBox/Scroll/Items"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Показывать FPS (кадры в секунду)"
 
 [node name="DoneButton" type="Button" parent="Center/Panel/VBox"]
 unique_name_in_owner = true

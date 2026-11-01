@@ -395,6 +395,18 @@ step = 0.5
 value = 0.0
 show_percentage = false
 
+[node name="FpsLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = 24.0
+offset_top = 122.0
+offset_right = 200.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+text = ""
+
 [node name="ComboLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
 layout_mode = 1

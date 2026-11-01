@@ -12,7 +12,7 @@ const PLAYER_MASK := 2
 
 @export var boss_name := "Боевой вертолёт"
 @export var phases := 3
-@export var phase_health := 1500.0
+@export var phase_health := 1300.0
 @export var reward := 900
 @export var orbit_radius := 32.0
 @export var gun_damage := 5

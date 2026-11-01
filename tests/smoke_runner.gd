@@ -25,6 +25,8 @@ func _run() -> void:
 	_game.settings.aim_assist = true
 	_game.settings.auto_fire = false
 	_game.settings.blood = true
+	_game.settings.show_fps = false
+	_game.set_graphics(2)
 	# Замедления времени мешают проверкам по кадрам — включаем их только в своей проверке.
 	_game.slowmo_enabled = false
 
@@ -59,6 +61,7 @@ func _run() -> void:
 	await _test_train()
 	await _test_chase()
 	await _test_tank()
+	await _test_graphics_and_balance()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -1195,6 +1198,43 @@ func _test_tank() -> void:
 	while not _game.is_level_unlocked(14) and Time.get_ticks_msec() - started < 8000:
 		await get_tree().process_frame
 	_check(_game.is_level_unlocked(14), "после танка — освобождать Аляску")
+	_game.reset_progress()
+
+
+func _test_graphics_and_balance() -> void:
+	_game.reset_progress()
+	# Низкая графика: меньше разрешение 3D, физика 30 раз в секунду, без теней, свет и надписи гаснут вдали.
+	_game.set_graphics(0)
+	var level := await _fresh_level(2)
+	_check(is_equal_approx(get_tree().root.scaling_3d_scale, 0.7) and Engine.physics_ticks_per_second == 30
+			and Engine.max_fps == 60, "низкая графика: 70% разрешения, физика 30 Гц, 60 кадров")
+	var sun := level.find_children("*", "DirectionalLight3D", true, false)[0] as DirectionalLight3D
+	var lamp := level.find_children("*", "OmniLight3D", true, false)[0] as OmniLight3D
+	var sign := level.find_children("*", "Label3D", true, false)[0] as Label3D
+	_check(not sun.shadow_enabled and lamp.distance_fade_enabled and sign.visibility_range_end > 0.0,
+			"на низкой графике нет теней, дальний свет и надписи гаснут")
+	_check(is_equal_approx(_game.particle_density(), 0.5), "на низкой графике вдвое меньше частиц")
+	_game.set_graphics(1)
+	_check(is_equal_approx(get_tree().root.scaling_3d_scale, 0.85) and sun.shadow_enabled
+			and sun.directional_shadow_mode == DirectionalLight3D.SHADOW_ORTHOGONAL, "средняя графика: тени попроще")
+	_game.set_graphics(2)
+	_check(is_equal_approx(get_tree().root.scaling_3d_scale, 1.0) and Engine.physics_ticks_per_second == 60
+			and not lamp.distance_fade_enabled, "высокая графика: всё на максимум")
+	_game.set_setting("show_fps", true)
+	await _seconds(0.7)
+	var fps := level.hud.get_node("%FpsLabel") as Label
+	_check(fps.visible and fps.text.begins_with("FPS"), "счётчик кадров на экране (%s)" % fps.text)
+	_game.set_setting("show_fps", false)
+	# Баланс: в поздних эпизодах враги крепче и за них больше платят.
+	_game.current_level = 0
+	var easy: float = _game.enemy_health_multiplier()
+	_game.current_level = 12
+	var hard: float = _game.enemy_health_multiplier()
+	_check(is_equal_approx(easy, 1.0) and is_equal_approx(hard, 1.3), "эпизод 3: враги на 30% крепче")
+	var money: int = _game.money
+	_game.reward_kill(false)
+	_check(_game.money - money == 20, "в эпизоде 3 за врага $20 (в первом — $10)")
+	_game.current_level = 0
 	_game.reset_progress()
 
 

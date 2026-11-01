@@ -150,6 +150,18 @@ def settings_panel():
     v = "Center/Panel/VBox"
     s.node("Title", "Label", v, layout="container", theme_override_font_sizes__font_size=40,
            text="Настройки", horizontal_alignment=1)
+    # Пунктов много — прокрутка, чтобы панель влезала в экран телефона.
+    s.node("Scroll", "ScrollContainer", v, layout="container", custom_minimum_size="Vector2(760, 470)",
+           horizontal_scroll_mode=0)
+    s.node("Items", "VBoxContainer", f"{v}/Scroll", layout="container", size_flags_horizontal=3,
+           theme_override_constants__separation=10)
+    done_parent = v
+    v = f"{v}/Scroll/Items"
+    s.node("GraphicsRow", "HBoxContainer", v, layout="container", theme_override_constants__separation=16)
+    s.node("Label", "Label", f"{v}/GraphicsRow", layout="container", custom_minimum_size="Vector2(260, 0)",
+           text="Графика")
+    s.node("GraphicsButton", "Button", f"{v}/GraphicsRow", layout="container", unique=True,
+           custom_minimum_size="Vector2(400, 56)", text="Средняя")
     for row, label, slider, value_label, lo, hi, step in (
             ("SensitivityRow", "Чувствительность", "Sensitivity", "SensitivityValue", 0.3, 2.5, 0.05),
             ("VolumeRow", "Громкость", "Volume", "VolumeValue", 0.0, 1.0, 0.05)):
@@ -165,11 +177,12 @@ def settings_panel():
                        ("Shadows", "Тени (выключите, если игра тормозит)"),
                        ("Noir", "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"),
                        ("Music", "Музыка"),
-                       ("Blood", "Много крови: куски тел, оторванные руки, пятна")):
+                       ("Blood", "Много крови: куски тел, оторванные руки, пятна"),
+                       ("ShowFps", "Показывать FPS (кадры в секунду)")):
         s.node(name, "CheckButton", v, layout="container", unique=True, custom_minimum_size="Vector2(0, 50)",
                text=text)
-    s.node("DoneButton", "Button", v, layout="container", unique=True, custom_minimum_size="Vector2(0, 76)",
-           text="Готово")
+    s.node("DoneButton", "Button", done_parent, layout="container", unique=True,
+           custom_minimum_size="Vector2(0, 76)", text="Готово")
     s.write("ui/settings_panel.tscn")
     fix_props("ui/settings_panel.tscn")
 
@@ -252,6 +265,9 @@ def hud():
     s.node("RageBar", "ProgressBar", "TopBar", layout="top_left", offsets=(24, 62, 324, 74), unique=True,
            mouse_filter=2, theme_override_styles__background=hp_bg, theme_override_styles__fill=rage_fill,
            step=0.5, value=0.0, show_percentage=False)
+    s.node("FpsLabel", "Label", "TopBar", layout="top_left", offsets=(24, 122, 200, 148), unique=True,
+           theme_override_font_sizes__font_size=20, theme_override_colors__font_color="Color(0.7, 1, 0.7, 1)",
+           text="", visible=False)
     s.node("ComboLabel", "Label", "TopBar", layout="top_left", offsets=(24, 80, 470, 120), unique=True,
            theme_override_font_sizes__font_size=30, theme_override_colors__font_color="Color(1, 0.8, 0.3, 1)",
            text="")

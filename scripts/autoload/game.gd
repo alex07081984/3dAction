@@ -95,6 +95,8 @@ var settings := {
 	"noir": true,
 	"music": true,
 	"blood": true,
+	"graphics": 2,  ## 0 — низкая, 1 — средняя, 2 — высокая (на телефоне по умолчанию средняя).
+	"show_fps": false,
 }
 var unlocked_levels := 1
 ## Рекорды: индекс уровня -> {"time": секунды, "kills": убийства, "headshots": хедшоты}.
@@ -133,6 +135,8 @@ var _slowmo_scale := 1.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if OS.has_feature("mobile"):
+		settings.graphics = 1
 	load_data()
 	apply_settings()
 
@@ -330,17 +334,27 @@ func level_reward(index: int, tier := -1) -> int:
 
 
 ## Множители для врагов на текущей сложности.
+## В поздних эпизодах враги крепче и больнее бьют (+15% здоровья и +10% урона за эпизод),
+## на повторах — ещё сильнее.
 func enemy_health_multiplier() -> float:
-	return 1.0 + 0.3 * current_tier
+	return (1.0 + 0.3 * current_tier) * (1.0 + 0.15 * (difficulty_episode() - 1))
 
 
 func enemy_damage_multiplier() -> float:
-	return 1.0 + 0.2 * current_tier
+	return (1.0 + 0.2 * current_tier) * (1.0 + 0.1 * (difficulty_episode() - 1))
+
+
+## Эпизод, по которому считается сила врагов (в дороге — эпизод назначения или отправления, что дальше).
+func difficulty_episode() -> int:
+	if current_level >= 0:
+		return episode_of(current_level)
+	return maxi(travel_from, travel_to)
 
 
 ## Награда за убийство (combo — множитель серии убийств). Возвращает, сколько денег начислено.
 func reward_kill(headshot: bool, combo := 1) -> int:
-	var amount := roundi((10 + (5 if headshot else 0)) * reward_multiplier() * maxi(combo, 1))
+	var base := 10 + 5 * (difficulty_episode() - 1) + (5 if headshot else 0)
+	var amount := roundi(base * reward_multiplier() * maxi(combo, 1))
 	add_money(amount)
 	return amount
 
@@ -471,6 +485,63 @@ func apply_settings() -> void:
 	var volume := float(settings.volume)
 	AudioServer.set_bus_mute(bus, volume <= 0.001)
 	AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(volume, 0.001)))
+	_apply_graphics()
+
+
+# --- Графика -----------------------------------------------------------------------------
+
+func graphics_quality() -> int:
+	return clampi(int(settings.get("graphics", 2)), 0, 2)
+
+
+## Доля частиц (кровь, искры, дождь, снег): на слабой графике — меньше.
+func particle_density() -> float:
+	return [0.5, 0.75, 1.0][graphics_quality()]
+
+
+## Пресет графики: разрешение 3D, частота физики, ограничение кадров.
+func _apply_graphics() -> void:
+	var quality := graphics_quality()
+	var tree := get_tree()
+	if tree and tree.root:
+		tree.root.scaling_3d_scale = [0.7, 0.85, 1.0][quality]
+	Engine.physics_ticks_per_second = 30 if quality == 0 else 60
+	Engine.max_fps = 0 if quality == 2 else 60
+
+
+## Сменить пресет графики: заодно включает или выключает тени (их потом можно переключить отдельно).
+func set_graphics(quality: int) -> void:
+	settings.graphics = clampi(quality, 0, 2)
+	settings.shadows = quality >= 1
+	apply_settings()
+	save_data()
+	settings_changed.emit()
+	var scene := get_tree().current_scene if get_tree() else null
+	if scene:
+		optimize_scene(scene)
+
+
+## Настройки уровня под пресет: тени, дальность света и надписей.
+func optimize_scene(root: Node) -> void:
+	var quality := graphics_quality()
+	var shadows := bool(settings.get("shadows", true))
+	for node in root.find_children("*", "DirectionalLight3D", true, false):
+		var sun := node as DirectionalLight3D
+		sun.shadow_enabled = shadows
+		if quality <= 1:
+			# Одна карта теней вместо двух и поближе — вдвое меньше работы.
+			sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+			sun.directional_shadow_max_distance = minf(sun.directional_shadow_max_distance, 35.0)
+	var light_range: float = [32.0, 55.0, 0.0][quality]
+	for node in root.find_children("*", "OmniLight3D", true, false):
+		var lamp := node as OmniLight3D
+		lamp.distance_fade_enabled = quality < 2
+		if quality < 2:
+			lamp.distance_fade_begin = light_range
+			lamp.distance_fade_length = 10.0
+	var label_range: float = [40.0, 70.0, 0.0][quality]
+	for node in root.find_children("*", "Label3D", true, false):
+		(node as Label3D).visibility_range_end = label_range
 
 
 func save_data() -> void:

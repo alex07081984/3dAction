@@ -57,9 +57,8 @@ func _ready() -> void:
 		zone.wave_started.connect(_on_wave_started)
 		zone.cleared.connect(_on_zone_cleared)
 
-	var shadows: bool = Game.settings.get("shadows", true)
-	for light in find_children("*", "DirectionalLight3D"):
-		(light as DirectionalLight3D).shadow_enabled = shadows
+	# Тени, дальность света и надписей — по пресету графики.
+	Game.optimize_scene(self)
 
 	Audio.play_music("music_explore")
 	var tier: int = Game.current_tier

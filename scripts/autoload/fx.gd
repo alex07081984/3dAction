@@ -3,12 +3,15 @@ extends Node
 ## следы от пуль и лужи крови. Всё создаётся кодом и само исчезает.
 ## Эффекты кладутся в текущую сцену, поэтому пропадают при рестарте уровня.
 
-const MAX_DECALS := 64
+const MAX_DECALS := 64  ## Следов на высокой графике; на средней и низкой — меньше.
+const MAX_BURSTS := [10, 18, 30]  ## Сколько вспышек частиц может лететь одновременно.
 const WORLD_MASK := 1
 
 var _materials := {}
 var _decals: Array = []
 var _splats: Array[Texture2D] = []
+var _meshes := {}
+var _bursts := 0
 
 
 func muzzle_flash(position: Vector3, direction: Vector3) -> void:
@@ -382,7 +385,7 @@ func _decal(position: Vector3, normal: Vector3, color: Color, size: float, textu
 	decal.scale = Vector3(size, 1.0, size)
 	_decals = _decals.filter(func(item: Variant) -> bool: return is_instance_valid(item))
 	_decals.append(decal)
-	while _decals.size() > MAX_DECALS:
+	while _decals.size() > [24, 40, MAX_DECALS][Game.graphics_quality()]:
 		var old: Variant = _decals.pop_front()
 		if is_instance_valid(old):
 			old.queue_free()
@@ -394,10 +397,16 @@ func _burst(position: Vector3, direction: Vector3, color: Color, amount: int, sp
 	var root := _root()
 	if root == null:
 		return
+	# Слабая графика: меньше частиц, и не больше нескольких вспышек сразу (очередь из пулемёта).
+	if _bursts >= MAX_BURSTS[Game.graphics_quality()]:
+		return
+	amount = maxi(roundi(amount * Game.particle_density()), 2)
+	_bursts += 1
 	var particles := _make_particles(color, size)
 	particles.one_shot = true
 	particles.explosiveness = 0.95
 	particles.amount = amount
+	particles.tree_exiting.connect(func() -> void: _bursts = maxi(_bursts - 1, 0))
 	particles.lifetime = lifetime
 	particles.direction = direction.normalized() if direction.length_squared() > 0.0001 else Vector3.UP
 	particles.spread = spread
@@ -412,10 +421,14 @@ func _burst(position: Vector3, direction: Vector3, color: Color, amount: int, sp
 
 func _make_particles(color: Color, size: float) -> CPUParticles3D:
 	var particles := CPUParticles3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = Vector3.ONE * size
-	mesh.material = _material(color, true)
-	particles.mesh = mesh
+	# Один меш на цвет и размер — не создаём новый на каждую каплю крови.
+	var key := "%s_%.3f" % [color.to_html(), size]
+	if not _meshes.has(key):
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3.ONE * size
+		mesh.material = _material(color, true)
+		_meshes[key] = mesh
+	particles.mesh = _meshes[key]
 	particles.scale_amount_min = 0.6
 	particles.scale_amount_max = 1.3
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

@@ -14,7 +14,7 @@ const PLAYER_MASK := 2
 
 @export var boss_name := "Танк"
 @export var phases := 3
-@export var phase_health := 1000.0
+@export var phase_health := 850.0
 @export var reward := 1200
 @export var completes_level := true
 @export var move_speed := 3.2

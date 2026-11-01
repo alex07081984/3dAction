@@ -1147,7 +1147,7 @@ func _register_debris(body: RigidBody3D) -> void:
 	# Обломки прошлых уровней уже удалены вместе со сценой — выкидываем их из списка.
 	_debris = _debris.filter(func(item: Variant) -> bool: return is_instance_valid(item))
 	_debris.append(body)
-	while _debris.size() > MAX_DEBRIS:
+	while _debris.size() > [20, 30, MAX_DEBRIS][Game.graphics_quality()]:
 		var old: Variant = _debris.pop_front()
 		if is_instance_valid(old):
 			old.queue_free()
