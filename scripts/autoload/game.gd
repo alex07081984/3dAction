@@ -12,6 +12,7 @@ const SAVE_PATH := "user://save.cfg"
 const SAVE_VERSION := 2
 const MENU_SCENE := "res://scenes/main_menu.tscn"
 const TRAIN_SCENE := "res://scenes/levels/level_train.tscn"
+const CHASE_SCENE := "res://scenes/levels/level_chase.tscn"
 const TOWN_INDEX := 4
 const MAX_TIER := 10
 const LEVELS := [
@@ -116,6 +117,7 @@ var traveled_routes: Array = []
 ## Текущая поездка: откуда и куда (номера эпизодов).
 var travel_from := 1
 var travel_to := 2
+var travel_mode := "train"  ## train — поезд, chase — погоня по шоссе.
 var owned_properties: Array = []
 var owned_upgrades: Array = []  # строки вида "shack/bed"
 var current_level := -1
@@ -263,15 +265,16 @@ func has_traveled(a: int, b: int) -> bool:
 	return route_key(a, b) in traveled_routes
 
 
-## Поездка на поезде из текущего города в эпизод to_episode.
-func start_travel(to_episode: int) -> void:
+## Дорога из текущего города в эпизод to_episode: поездом (train) или машиной (chase).
+func start_travel(to_episode: int, mode := "train") -> void:
 	travel_from = episode_of(current_level) if current_level >= 0 else latest_episode()
 	travel_to = to_episode
+	travel_mode = mode
 	save_data()
 	current_level = -1
 	current_tier = 0
 	_reset_runtime_state()
-	get_tree().change_scene_to_file(TRAIN_SCENE)
+	get_tree().change_scene_to_file(CHASE_SCENE if mode == "chase" else TRAIN_SCENE)
 
 
 ## Доехали: маршрут открыт для самолёта, награда за дорогу. Возвращает награду.

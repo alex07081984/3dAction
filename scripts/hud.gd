@@ -22,6 +22,7 @@ var _money_tween: Tween
 var _entrance_level := -1
 var _property_id := ""
 var _banner_tween: Tween
+var _travel_episode := 2
 
 @onready var _health_bar: ProgressBar = %HealthBar
 @onready var _health_label: Label = %HealthLabel
@@ -69,9 +70,12 @@ func _ready() -> void:
 	%EntranceCancelButton.pressed.connect(_close_panels)
 	%PropertyCloseButton.pressed.connect(_close_panels)
 	%PropertyBuyButton.pressed.connect(_buy_property)
+	%TravelTrainButton.pressed.connect(_start_travel.bind("train"))
+	%TravelCarButton.pressed.connect(_start_travel.bind("chase"))
+	%TravelCancelButton.pressed.connect(_close_panels)
 	_settings.closed.connect(_close_settings)
 	add_to_group("hud")
-	for overlay in [_pause_menu, _settings, _game_over, _complete, _entrance_panel, _property_panel]:
+	for overlay in [_pause_menu, _settings, _game_over, _complete, _entrance_panel, _property_panel, %TravelPanel]:
 		overlay.hide()
 	set_town_available(false)
 	Game.economy_changed.connect(_update_money)
@@ -150,7 +154,7 @@ func toggle_pause() -> void:
 	if _settings.visible:
 		_close_settings()
 		return
-	if _entrance_panel.visible or _property_panel.visible:
+	if _entrance_panel.visible or _property_panel.visible or %TravelPanel.visible:
 		_close_panels()
 		return
 	set_paused(not get_tree().paused)
@@ -238,6 +242,22 @@ func show_entrance(level_index: int) -> void:
 	_open_panel(_entrance_panel)
 
 
+## Дорога в другой город: выбор — поезд или машина.
+func show_travel(episode: int) -> void:
+	_travel_episode = episode
+	%TravelTitle.text = "Дорога: %s" % Game.city_name(episode)
+	var plane := " Самолётом этот маршрут уже открыт — аэропорт." if Game.has_traveled(Game.latest_episode(), episode) else ""
+	%TravelInfo.text = "Поезд — пробиться через вагоны к паровозу, на крышах опасны тоннели.\n" + \
+			"Машина — рулите и отстреливайтесь от погони: мотоциклы, машины банды и вертолёт." + plane
+	_open_panel(%TravelPanel)
+
+
+func _start_travel(mode: String) -> void:
+	Audio.play("ui_click")
+	_close_panels()
+	Game.start_travel(_travel_episode, mode)
+
+
 func show_property(property_id: String) -> void:
 	_property_id = property_id
 	_refresh_property()
@@ -314,6 +334,7 @@ func _open_panel(panel: Control) -> void:
 func _close_panels() -> void:
 	_entrance_panel.hide()
 	_property_panel.hide()
+	%TravelPanel.hide()
 	get_tree().paused = false
 	_touch_controls.show()
 
@@ -379,12 +400,12 @@ func _on_weapon_changed(weapon: WeaponData) -> void:
 	%ScopeButton.visible = weapon.scope_fov > 0.0
 
 
-## Герой у пулемёта в вертолёте: джойстик, прыжок и рывок не нужны.
-func set_mounted(value: bool) -> void:
+## Герой у пулемёта в вертолёте: прыжок и рывок не нужны, джойстик — только если им рулят (погоня).
+func set_mounted(value: bool, steering := false) -> void:
 	for path in ["Joystick", "JumpButton", "DodgeButton"]:
 		var node := _touch_controls.get_node_or_null(path) as Control
 		if node:
-			node.visible = not value
+			node.visible = not value or (steering and path == "Joystick")
 
 
 func _on_rage_changed(value: float, active: bool) -> void:
@@ -482,7 +503,8 @@ func _hide_gameplay() -> void:
 
 
 func _blocking_overlay_visible() -> bool:
-	return _game_over.visible or _complete.visible or _entrance_panel.visible or _property_panel.visible
+	return _game_over.visible or _complete.visible or _entrance_panel.visible or _property_panel.visible \
+			or %TravelPanel.visible
 
 
 func _emit(sig: Signal) -> void:

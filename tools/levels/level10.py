@@ -345,10 +345,10 @@ L.explosives([(-43.5, 0, -30), (-28.5, 0, -43), (-45, 0, 43), (-28, 0, 43.5), (6
               (14, HILL, -97.5), (-14, HILL, -110.5), (42.5, 0, 6.5)], pattern="BBC")
 L.cars([(-3.8, 0, 22, 0), (39.2, 0, -20, 180), (-39.2, 0, -20, 0)])
 L.pickup("weapon", (0, 0, 28), weapon="rpg")
-# Вокзалы: поезда в другие города (бой в вагонах; после поездки маршрут открыт для самолёта).
+# Дорога в другие города: поезд или погоня на машине (после поездки маршрут открыт для самолёта).
 L.interactable("train_station", "StationNY", "Entrances", (58.5, 1.5, -36), (3, 3, 6), episode="1")
-L.label("ВОКЗАЛ → НЬЮ-ЙОРК", (60.4, 3.6, -36), yaw=-90, size=48, color="Color(0.75, 0.9, 1, 1)")
+L.label("ДОРОГА → НЬЮ-ЙОРК", (60.4, 3.6, -36), yaw=-90, size=48, color="Color(0.75, 0.9, 1, 1)")
 L.interactable("train_station", "StationAlaska", "Entrances", (-58.5, 1.5, -36), (3, 3, 6), episode="3")
-L.label("ВОКЗАЛ → АЛЯСКА", (-60.4, 3.6, -36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
+L.label("ДОРОГА → АЛЯСКА", (-60.4, 3.6, -36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
 L.write("scenes/levels/level_10_san_francisco.tscn", env, ["pistol", "shotgun", "magnum", "rifle"],
         script_path="res://scripts/town.gd")

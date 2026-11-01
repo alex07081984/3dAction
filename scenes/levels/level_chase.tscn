@@ -1,0 +1,304 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://materials/white_paint.tres" id="1_white_paint"]
+[ext_resource type="Material" path="res://materials/metal.tres" id="2_metal"]
+[ext_resource type="Material" path="res://materials/car_red.tres" id="3_car_red"]
+[ext_resource type="Material" path="res://materials/dark_glass.tres" id="4_dark_glass"]
+[ext_resource type="Material" path="res://materials/sofa.tres" id="5_sofa"]
+[ext_resource type="Material" path="res://materials/black_metal.tres" id="6_black_metal"]
+[ext_resource type="Material" path="res://materials/lamp.tres" id="7_lamp"]
+[ext_resource type="Material" path="res://materials/lamp_red.tres" id="8_lamp_red"]
+[ext_resource type="Script" path="res://scripts/blocky_character.gd" id="9_blocky_character"]
+[ext_resource type="Script" path="res://scripts/attack_helicopter.gd" id="10_attack_helicopter"]
+[ext_resource type="Material" path="res://materials/rock.tres" id="11_rock"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="12_player"]
+[ext_resource type="Shader" path="res://materials/night_sky.gdshader" id="13_night_sky"]
+[ext_resource type="Script" path="res://scripts/chase_level.gd" id="14_chase_level"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="15_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="16_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="17_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="18_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="19_rifle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="20_hud"]
+
+[sub_resource type="BoxShape3D" id="Box_1"]
+size = Vector3(80, 1, 700)
+
+[sub_resource type="ShaderMaterial" id="SkyMat_C"]
+shader = ExtResource("13_night_sky")
+shader_parameter/moon_direction = Vector3(-0.2835, 0.5592, -0.779)
+shader_parameter/horizon_color = Color(0.15, 0.15, 0.19, 1)
+
+[sub_resource type="Sky" id="Sky_C"]
+sky_material = SubResource("SkyMat_C")
+
+[sub_resource type="Environment" id="Env_C"]
+background_mode = 2
+sky = SubResource("Sky_C")
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.43, 0.55, 1)
+ambient_light_energy = 0.85
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.14, 0.15, 0.19, 1)
+fog_density = 0.006
+fog_sky_affect = 0.3
+
+[node name="LevelChase" type="Node3D"]
+script = ExtResource("14_chase_level")
+level_index = -1
+title = "Шоссе"
+objective = "Оторвитесь от погони банды"
+start_weapons = Array[ExtResource("15_weapon_data")]([ExtResource("16_pistol"), ExtResource("17_shotgun"), ExtResource("18_magnum"), ExtResource("19_rifle")])
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="RoadBody" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -100)
+
+[node name="Shape" type="CollisionShape3D" parent="Geometry/RoadBody"]
+shape = SubResource("Box_1")
+
+[node name="RoadDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="EdgeLine" type="CSGBox3D" parent="Props/RoadDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.65, 0.015, -100)
+size = Vector3(0.2, 0.03, 520)
+material = ExtResource("1_white_paint")
+
+[node name="EdgeLine2" type="CSGBox3D" parent="Props/RoadDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.65, 0.015, -100)
+size = Vector3(0.2, 0.03, 520)
+material = ExtResource("1_white_paint")
+
+[node name="Guardrail" type="CSGBox3D" parent="Props/RoadDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.3, 0.7, -100)
+size = Vector3(0.16, 0.3, 520)
+material = ExtResource("2_metal")
+
+[node name="Guardrail2" type="CSGBox3D" parent="Props/RoadDecor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.3, 0.7, -100)
+size = Vector3(0.16, 0.3, 520)
+material = ExtResource("2_metal")
+
+[node name="PlayerCar" type="Node3D" parent="."]
+
+[node name="Body" type="CSGCombiner3D" parent="PlayerCar"]
+
+[node name="Floor" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+size = Vector3(2, 0.5, 4.6)
+material = ExtResource("3_car_red")
+
+[node name="SideL" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 1, 0)
+size = Vector3(0.12, 0.5, 4.6)
+material = ExtResource("3_car_red")
+
+[node name="SideR" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 1, 0)
+size = Vector3(0.12, 0.5, 4.6)
+material = ExtResource("3_car_red")
+
+[node name="Hood" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -1.65)
+size = Vector3(2, 0.35, 1.3)
+material = ExtResource("3_car_red")
+
+[node name="Trunk" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 1.85)
+size = Vector3(2, 0.35, 0.9)
+material = ExtResource("3_car_red")
+
+[node name="Windshield" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, -0.95)
+size = Vector3(1.8, 0.55, 0.06)
+material = ExtResource("4_dark_glass")
+
+[node name="FrontSeat" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -0.2)
+size = Vector3(1.7, 0.45, 0.6)
+material = ExtResource("5_sofa")
+
+[node name="FrontBack" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0.15)
+size = Vector3(1.7, 0.6, 0.15)
+material = ExtResource("5_sofa")
+
+[node name="RearSeat" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 1)
+size = Vector3(1.7, 0.45, 0.7)
+material = ExtResource("5_sofa")
+
+[node name="WheelsF" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, -1.4)
+size = Vector3(2.08, 0.76, 0.76)
+material = ExtResource("6_black_metal")
+
+[node name="WheelsR" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 1.45)
+size = Vector3(2.08, 0.76, 0.76)
+material = ExtResource("6_black_metal")
+
+[node name="Bumper" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -2.35)
+size = Vector3(2, 0.25, 0.15)
+material = ExtResource("2_metal")
+
+[node name="Grille" type="CSGBox3D" parent="PlayerCar/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -2.32)
+size = Vector3(1.2, 0.3, 0.05)
+material = ExtResource("2_metal")
+
+[node name="Headlight" type="CSGBox3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0.85, -2.33)
+cast_shadow = 0
+size = Vector3(0.35, 0.2, 0.05)
+material = ExtResource("7_lamp")
+
+[node name="Taillight" type="CSGBox3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0.95, 2.31)
+cast_shadow = 0
+size = Vector3(0.35, 0.18, 0.05)
+material = ExtResource("8_lamp_red")
+
+[node name="Headlight2" type="CSGBox3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.85, -2.33)
+cast_shadow = 0
+size = Vector3(0.35, 0.2, 0.05)
+material = ExtResource("7_lamp")
+
+[node name="Taillight2" type="CSGBox3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.95, 2.31)
+cast_shadow = 0
+size = Vector3(0.35, 0.18, 0.05)
+material = ExtResource("8_lamp_red")
+
+[node name="Beam" type="SpotLight3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 0.9928, 0.1197, 0, -0.1197, 0.9928, 0, 1, -2.4)
+light_color = Color(1, 0.95, 0.8, 1)
+light_energy = 4.0
+spot_range = 45.0
+spot_angle = 28.0
+
+[node name="Driver" type="Node3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.35, -0.2)
+script = ExtResource("9_blocky_character")
+outfit = "suit"
+hat = "fedora"
+weapon = ""
+jacket_color = Color(0.25, 0.25, 0.27, 1)
+hat_color = Color(0.15, 0.15, 0.16, 1)
+
+[node name="Seat" type="Marker3D" parent="PlayerCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 1.17, 1)
+
+[node name="ChaseHeli" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 60, 200)
+script = ExtResource("10_attack_helicopter")
+boss_name = "Вертолёт банды"
+phases = 2
+phase_health = 700.0
+reward = 600
+orbit_radius = 26.0
+
+[node name="FarDecor" type="CSGCombiner3D" parent="Props"]
+
+[node name="FarHill" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9397, 0, -0.342, 0, 1, 0, 0.342, 0, 0.9397, -440, 10, -900)
+size = Vector3(180, 60, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill2" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9986, 0, -0.0523, 0, 1, 0, 0.0523, 0, 0.9986, 493, 28.5, -780)
+size = Vector3(180, 97, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill3" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9703, 0, 0.2419, 0, 1, 0, -0.2419, 0, 0.9703, -546, 47, -660)
+size = Vector3(180, 134, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill4" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9877, 0, -0.1564, 0, 1, 0, 0.1564, 0, 0.9877, 479, 25.5, -540)
+size = Vector3(180, 91, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill5" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9903, 0, 0.1392, 0, 1, 0, -0.1392, 0, 0.9903, -532, 44, -420)
+size = Vector3(180, 128, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill6" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9659, 0, -0.2588, 0, 1, 0, 0.2588, 0, 0.9659, 465, 22.5, -300)
+size = Vector3(180, 85, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill7" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9994, 0, 0.0349, 0, 1, 0, -0.0349, 0, 0.9994, -518, 41, -180)
+size = Vector3(180, 122, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill8" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9455, 0, 0.3256, 0, 1, 0, -0.3256, 0, 0.9455, 451, 19.5, -60)
+size = Vector3(180, 79, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill9" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9976, 0, -0.0698, 0, 1, 0, 0.0698, 0, 0.9976, -504, 38, 60)
+size = Vector3(180, 116, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill10" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9744, 0, 0.225, 0, 1, 0, -0.225, 0, 0.9744, 557, 16.5, 180)
+size = Vector3(180, 73, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill11" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9848, 0, -0.1736, 0, 1, 0, 0.1736, 0, 0.9848, -490, 35, 300)
+size = Vector3(180, 110, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill12" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9925, 0, 0.1219, 0, 1, 0, -0.1219, 0, 0.9925, 543, 13.5, 420)
+size = Vector3(180, 67, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill13" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9613, 0, -0.2756, 0, 1, 0, 0.2756, 0, 0.9613, -476, 32, 540)
+size = Vector3(180, 104, 200)
+material = ExtResource("11_rock")
+
+[node name="FarHill14" type="CSGBox3D" parent="Props/FarDecor"]
+transform = Transform3D(0.9998, 0, 0.0175, 0, 1, 0, -0.0175, 0, 0.9998, 529, 10.5, 660)
+size = Vector3(180, 61, 200)
+material = ExtResource("11_rock")
+
+[node name="Player" parent="." instance=ExtResource("12_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 1.17, 1)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_C")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.9397, 0.1913, -0.2835, 0, 0.829, 0.5592, 0.342, 0.5255, -0.779, 0, 60, 0)
+light_color = Color(0.65, 0.72, 1, 1)
+light_energy = 0.5
+shadow_enabled = true
+directional_shadow_max_distance = 60.0
+directional_shadow_mode = 1
+
+[node name="Route" type="Node3D" parent="."]
+
+[node name="P00" type="Marker3D" parent="Route"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 1.17, 1)
+
+[node name="HUD" parent="." instance=ExtResource("20_hud")]

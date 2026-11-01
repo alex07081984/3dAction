@@ -4657,7 +4657,7 @@ shape = SubResource("Box_17")
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, 36)
 pixel_size = 0.01
 modulate = Color(0.75, 0.9, 1, 1)
-text = "ВОКЗАЛ → САН-ФРАНЦИСКО"
+text = "ДОРОГА → САН-ФРАНЦИСКО"
 font_size = 48
 outline_size = 12
 
@@ -4673,7 +4673,7 @@ shape = SubResource("Box_18")
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, -36)
 pixel_size = 0.01
 modulate = Color(0.75, 0.9, 1, 1)
-text = "ВОКЗАЛ → АЛЯСКА"
+text = "ДОРОГА → АЛЯСКА"
 font_size = 48
 outline_size = 12
 

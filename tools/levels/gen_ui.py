@@ -326,6 +326,15 @@ def hud():
     dialog(s, "PropertyPanel", ".", "Недвижимость", [("PropertyCloseButton", "Закрыть")], style,
            extra=[property_body])
 
+    def travel_info(vbox):
+        s.node("TravelInfo", "Label", vbox, layout="container", unique=True,
+               custom_minimum_size="Vector2(560, 0)", theme_override_font_sizes__font_size=24,
+               horizontal_alignment=1, autowrap_mode=3)
+
+    dialog(s, "TravelPanel", ".", "Дорога", [("TravelTrainButton", "Поезд: бой в вагонах"),
+                                            ("TravelCarButton", "Машина: погоня по шоссе"),
+                                            ("TravelCancelButton", "Отмена")], style, extra=[travel_info])
+
     def stats(vbox):
         s.node("StarRating", "Control", vbox, layout="container", unique=True, mouse_filter=2,
                custom_minimum_size="Vector2(300, 74)", script=stars)
@@ -340,7 +349,8 @@ def hud():
            dim="Color(0, 0.15, 0.05, 0.6)", extra=[stats], title_unique=False)
     s.write("ui/hud.tscn")
     text = open(os.path.join(ROOT, "ui/hud.tscn")).read()
-    for panel, unique_title in (("EntrancePanel", "EntranceTitle"), ("PropertyPanel", "PropertyTitle")):
+    for panel, unique_title in (("EntrancePanel", "EntranceTitle"), ("PropertyPanel", "PropertyTitle"),
+                                ("TravelPanel", "TravelTitle")):
         text = text.replace(f'[node name="Title" type="Label" parent="{panel}/Center/Panel/VBox"]',
                             f'[node name="{unique_title}" type="Label" parent="{panel}/Center/Panel/VBox"]\n'
                             'unique_name_in_owner = true')

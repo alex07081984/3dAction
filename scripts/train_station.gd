@@ -1,25 +1,24 @@
 class_name TrainStation
 extends Interactable
-## Вокзал: поезд в другой город (эпизод). Поездка — отдельный уровень на идущем поезде.
-## После неё маршрут открыт и для самолёта (быстро и без боя).
+## Дорога в другой город (эпизод): поездом (бой в вагонах) или машиной (погоня по шоссе).
+## После любой поездки маршрут открыт и для самолёта (быстро и без боя).
 
-@export var episode := 2  ## Номер эпизода, куда идёт поезд.
+@export var episode := 2  ## Номер эпизода, куда ведёт дорога.
 
 
 func get_prompt() -> String:
 	var city := Game.city_name(episode)
 	if not active:
-		return "Поезд: %s — пока закрыто" % city
-	return "Поезд: %s · бой в вагонах, награда в конце" % city
+		return "Дорога: %s — пока закрыто" % city
+	return "Дорога: %s · поезд или машина" % city
 
 
 func get_button_text() -> String:
-	return "Ехать"
+	return "В путь"
 
 
 func interact(player: Player) -> void:
 	if not active:
 		return
 	super.interact(player)
-	Audio.play("ui_click")
-	Game.start_travel(episode)
+	get_tree().call_group("hud", "show_travel", episode)

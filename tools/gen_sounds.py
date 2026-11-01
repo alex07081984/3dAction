@@ -501,6 +501,12 @@ def extra_sounds():
     whistle = sum(np.sin(2 * np.pi * fr * t) + 0.3 * np.sin(4 * np.pi * fr * t) for fr in (311.0, 370.0, 466.0))
     whistle *= np.clip(t / 0.08, 0, 1) * np.clip((1.6 - t) / 0.3, 0, 1)
     save("train_horn", finish(lowpass(whistle * 0.3 + bandpass_noise(1.6, 800, 3000) * 0.08, 2500), gain=0.55, drive=1.2))
+    # Мотор машины: низкий гул с гармониками и шум шин, петля 1,2 с.
+    t = t_axis(1.2)
+    engine = sum(np.sin(2 * np.pi * fr * t) * a for fr, a in ((60.0, 0.6), (120.0, 0.35), (180.0, 0.2), (240.0, 0.1)))
+    engine *= 0.8 + 0.2 * np.sin(2 * np.pi * 10.0 * t)
+    engine = engine * 0.5 + lowpass(noise(1.2), 600) * 0.5 + highpass(lowpass(noise(1.2), 3000), 1200) * 0.1
+    save("engine", finish(engine, gain=0.55, drive=1.4))
 
 
 if __name__ == "__main__":

@@ -909,6 +909,74 @@ custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
 text = "Закрыть"
 
+[node name="TravelPanel" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="TravelPanel"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="TravelPanel"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="TravelPanel/Center"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="VBox" type="VBoxContainer" parent="TravelPanel/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TravelTitle" type="Label" parent="TravelPanel/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "Дорога"
+horizontal_alignment = 1
+
+[node name="TravelInfo" type="Label" parent="TravelPanel/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TravelTrainButton" type="Button" parent="TravelPanel/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "Поезд: бой в вагонах"
+
+[node name="TravelCarButton" type="Button" parent="TravelPanel/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "Машина: погоня по шоссе"
+
+[node name="TravelCancelButton" type="Button" parent="TravelPanel/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+text = "Отмена"
+
 [node name="LevelComplete" type="Control" parent="."]
 unique_name_in_owner = true
 visible = false

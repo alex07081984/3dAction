@@ -57,6 +57,7 @@ func _run() -> void:
 	await _test_helicopter()
 	await _test_save_migration()
 	await _test_train()
+	await _test_chase()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -1053,6 +1054,97 @@ func _test_train() -> void:
 	await _frames(10)
 	var north := get_tree().current_scene as TrainLevel
 	_check(north != null and north.get_route() == ["coast", "forest", "snow"], "поезд на Аляску: побережье, тайга, снег")
+	_game.reset_progress()
+
+
+func _test_chase() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 6
+	_game.town_liberated = true
+	_game.completions[4] = 1
+	var town := await _fresh_level(_game.TOWN_INDEX)
+	var road := town.find_children("*", "TrainStation").filter(func(t: Variant) -> bool: return t.episode == 2)[0] as TrainStation
+	road.interact(town.player)
+	await _frames(2)
+	_check(town.hud.get_node("%TravelPanel").visible, "на выезде из города — выбор: поезд или машина")
+	town.hud.get_node("%TravelCarButton").pressed.emit()
+	await _frames(10)
+	var chase := get_tree().current_scene as ChaseLevel
+	_check(chase != null and chase.title.begins_with("Шоссе"), "погоня по шоссе загружается")
+	if chase == null:
+		return
+	var player := chase.player
+	player.max_health = 100000
+	player.health = 100000
+	_check(player.mount != null and chase.hud.get_node("TouchControls/Joystick").visible
+			and not chase.hud.get_node("TouchControls/JumpButton").visible, "герой в машине, джойстиком рулят")
+	var x0 := chase.get_car_x()
+	Input.action_press("move_right")
+	await _seconds(0.8)
+	Input.action_release("move_right")
+	_check(chase.get_car_x() > x0 + 2.0, "машина перестраивается вправо (%.1f м)" % (chase.get_car_x() - x0))
+	Input.action_press("move_forward")
+	await _seconds(1.0)
+	Input.action_release("move_forward")
+	_check(chase.speed > 32.0, "газ — быстрее (%.0f м/с)" % chase.speed)
+	# Попутная машина приближается, а врезаться в неё больно.
+	var traffic := chase.spawn_traffic(ChaseCar.Kind.TRAFFIC, 0.0, -80.0)
+	var tz := traffic.global_position.z
+	await _seconds(0.5)
+	_check(traffic.global_position.z > tz + 3.0, "попутные машины остаются позади")
+	var hp := player.health
+	chase.spawn_traffic(ChaseCar.Kind.TRAFFIC, chase.get_car_x(), -1.0)
+	await _frames(3)
+	_check(player.health < hp, "врезались в попутную — больно")
+	# Погоня: мотоциклы банды догоняют.
+	chase.spawn_wave(0)
+	_check(chase.get_pursuer_count() == 3, "волна 1: три мотоцикла банды")
+	var started := Time.get_ticks_msec()
+	var near := false
+	while not near and Time.get_ticks_msec() - started < 10000:
+		await get_tree().physics_frame
+		for car in get_tree().get_nodes_in_group("chase_cars"):
+			if car.hostile and car.global_position.z < 20.0:
+				near = true
+	_check(near, "мотоциклы догоняют машину героя")
+	var bikes := get_tree().get_nodes_in_group("chase_cars").filter(func(c: Variant) -> bool: return c.hostile and not c.wrecked)
+	var kills := chase.kills
+	var first := bikes[0] as ChaseCar
+	first.take_hit(1000.0, first.global_position + Vector3.UP * 0.25, Vector3.BACK)
+	_check(first.wrecked and chase.kills == kills + 1, "мотоцикл взрывается — убийство засчитано")
+	var second := bikes[1] as ChaseCar
+	second.take_hit(60.0, second.global_position + Vector3.UP * 2.0, Vector3.BACK)
+	_check(not second.is_rider_alive() and chase.headshots >= 1, "хедшот стрелку — мотоцикл без седока")
+	await _seconds(2.0)
+	_check(second.wrecked or not is_instance_valid(second), "без седока мотоцикл разбивается")
+	# Ящик на дороге.
+	player.health = 50000
+	var box := Pickup.new()
+	box.kind = Pickup.Kind.HEALTH
+	box.add_to_group("road_items")
+	chase.add_child(box)
+	box.global_position = Vector3(chase.get_car_x() - 0.45, 0.2, -30.0)
+	started = Time.get_ticks_msec()
+	while is_instance_valid(box) and Time.get_ticks_msec() - started < 4000:
+		await get_tree().physics_frame
+	_check(player.health > 50000, "аптечку на дороге подбирают, проехав по ней")
+	# Финал: вертолёт банды.
+	for car in get_tree().get_nodes_in_group("chase_cars"):
+		if car.hostile and not car.wrecked:
+			car.explode()
+	chase.wave = 3
+	chase.start_boss()
+	await _seconds(1.0)
+	var heli := chase.get_node("ChaseHeli") as AttackHelicopter
+	_check(heli.active and heli.phases == 2, "в конце прилетает вертолёт банды")
+	heli.take_hit(heli.health + 1.0, heli.global_position, Vector3.FORWARD)
+	await _seconds(1.5)
+	heli.take_hit(heli.health + 1.0, heli.global_position, Vector3.FORWARD)
+	started = Time.get_ticks_msec()
+	while not _game.has_traveled(1, 2) and Time.get_ticks_msec() - started < 15000:
+		await get_tree().process_frame
+	_check(_game.has_traveled(1, 2) and chase.hud.get_node("%CompleteTitle").text == "Приехали: Сан-Франциско!",
+			"оторвались — приехали в Сан-Франциско")
 	_game.reset_progress()
 
 
