@@ -54,6 +54,8 @@ func _run() -> void:
 	await _test_arcade()
 	await _test_gore()
 	await _test_rpg_and_cars()
+	await _test_helicopter()
+	await _test_save_migration()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -86,16 +88,16 @@ func _test_level_structure(index: int) -> void:
 	_check(enemies >= 8, "%s: врагов на постах %d" % [title, enemies])
 	var zones := level.find_children("*", "WaveZone")
 	_check(zones.size() >= 2 and zones.size() <= 3, "%s: мест с волнами %d" % [title, zones.size()])
-	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac", 11: "Sniper"}
+	var bosses := {2: "FatBoss", 3: "ThinBoss", 6: "Croupier", 7: "Warden", 8: "Maniac", 12: "Sniper"}
 	if bosses.has(index):
 		_check(level.get_node_or_null("Enemies/" + bosses[index]) is Boss, "%s: босс %s" % [title, bosses[index]])
 	var boss_ends_level: bool = bosses.has(index) and (level.get_node("Enemies/" + bosses[index]) as Boss).completes_level
-	if not _game.is_city(index) and not boss_ends_level:
+	if not _game.is_city(index) and not boss_ends_level and not level is HeliLevel:
 		_check(level.has_node("Exit"), "%s: есть выход" % title)
 	var explosives := level.get_node_or_null("Explosives")
 	_check(explosives != null and explosives.get_child_count() >= 8,
 			"%s: бочки и баллоны (%d)" % [title, explosives.get_child_count() if explosives else 0])
-	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5][index]
+	var expected_weapons: int = [1, 2, 3, 3, 3, 3, 4, 4, 4, 2, 4, 4, 4, 5][index]
 	_check(level.player.weapons.size() == expected_weapons, "%s: стартовое оружие (%d)" % [title, level.player.weapons.size()])
 	var problems := _route_problems(level)
 	_check(problems.is_empty(), "%s: маршрут от старта до выхода проходим %s" % [title, problems])
@@ -507,16 +509,17 @@ func _test_episode_two() -> void:
 	await _frames(3)
 	_check(bridge.hud.get_node("%NextButton").text == "Следующий уровень" and _game.is_level_unlocked(9),
 			"после моста — освобождать Сан-Франциско")
-	var city := await _fresh_level(9, false)
+	_game.unlocked_levels = 11
+	var city := await _fresh_level(10, false)
 	_check(not city.get("hub_mode") and city.find_children("*", "WaveZone").size() == 3,
 			"Сан-Франциско сначала надо освободить: три района")
 	city.complete()
 	await _frames(3)
 	_check(city.hud.get_node("%CompleteTitle").text == "Эпизод 2 пройден!", "освобождение города завершает эпизод 2")
-	_check(_game.is_liberated(9) and _game.travel_target(2) == 9, "Сан-Франциско стал базой")
-	var hub := await _fresh_level(9)
+	_check(_game.is_liberated(10) and _game.travel_target(2) == 10, "Сан-Франциско стал базой")
+	var hub := await _fresh_level(10)
 	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
-	_check(hub.get("hub_mode") and doors.size() == 4, "на базе в Сан-Франциско 4 входа на уровни (%d)" % doors.size())
+	_check(hub.get("hub_mode") and doors.size() == 5, "на базе в Сан-Франциско 5 входов, включая вертолёт (%d)" % doors.size())
 	_check(_game.is_property_available("flat"), "в Сан-Франциско продаётся квартира")
 	var tram := hub.get_node("CableCar") as Node3D
 	var tram_start := tram.global_position
@@ -633,20 +636,20 @@ func _test_living_town() -> void:
 
 func _test_episode_three() -> void:
 	_game.reset_progress()
-	_game.unlocked_levels = 11
+	_game.unlocked_levels = 12
 	_game.town_liberated = true
-	_game.liberated_cities = [9]
-	_check(_game.episode_of(10) == 3 and _game.is_episode_open(3), "после Сан-Франциско открыт эпизод 3 · Аляска")
-	var sf := await _fresh_level(9)
+	_game.liberated_cities = [10]
+	_check(_game.episode_of(11) == 3 and _game.is_episode_open(3), "после Сан-Франциско открыт эпизод 3 · Аляска")
+	var sf := await _fresh_level(10)
 	var planes := sf.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.episode == 3 and t.active)
 	_check(planes.size() == 1, "из Сан-Франциско летает самолёт на Аляску")
-	_check(_game.travel_target(3) == 10, "перелёт на Аляску ведёт на прииск")
+	_check(_game.travel_target(3) == 11, "перелёт на Аляску ведёт на прииск")
 	var town := await _fresh_level(_game.TOWN_INDEX)
 	_check(town.find_children("*", "TravelPoint").any(func(t: Variant) -> bool: return t.episode == 3 and t.active),
 			"из первого города тоже можно улететь на Аляску")
 
 	# Прииск: снег, ящики с динамитом, снайперы на крышах.
-	var mine := await _fresh_level(10, false)
+	var mine := await _fresh_level(11, false)
 	var snow := mine.get_node_or_null("Snow")
 	_check(snow is Rain and snow.snow, "на Аляске идёт снег")
 	var tnt := mine.get_node("Explosives").get_children().filter(func(n: Node) -> bool: return String(n.name).begins_with("Tnt"))
@@ -656,11 +659,11 @@ func _test_episode_three() -> void:
 			"на крышах сидят снайперы (%d)" % marksmen.size())
 	mine.complete()
 	await _frames(3)
-	_check(mine.hud.get_node("%NextButton").text == "Следующий уровень" and _game.is_level_unlocked(11),
+	_check(mine.hud.get_node("%NextButton").text == "Следующий уровень" and _game.is_level_unlocked(12),
 			"после прииска — заброшенный городок")
 
 	# Заброшенный городок: винтовка охотника у старта и оптика.
-	var ghost := await _fresh_level(11, false)
+	var ghost := await _fresh_level(12, false)
 	var player := ghost.player
 	player.max_health = 100000
 	player.health = 100000
@@ -717,17 +720,17 @@ func _test_episode_three() -> void:
 	_check(boss.phase == 3 and boss.shot_sound == "sniper", "3-я фаза Снайпера")
 	boss.apply_shot(boss.health + 1.0, true, boss.global_position + Vector3.UP * 1.7, Vector3.FORWARD, deagle)
 	await _seconds(3.5)
-	_check((not is_instance_valid(boss) or boss.defeated) and _game.is_level_unlocked(12), "победа над Снайпером завершает уровень")
+	_check((not is_instance_valid(boss) or boss.defeated) and _game.is_level_unlocked(13), "победа над Снайпером завершает уровень")
 
 	# Аляска: освобождение и база.
-	var alaska := await _fresh_level(12, false)
+	var alaska := await _fresh_level(13, false)
 	_check(not alaska.get("hub_mode") and alaska.find_children("*", "WaveZone").size() == 3,
 			"Аляску сначала надо освободить: три района")
 	alaska.complete()
 	await _frames(3)
 	_check(alaska.hud.get_node("%CompleteTitle").text == "Эпизод 3 пройден!", "освобождение Аляски завершает эпизод 3")
-	_check(_game.is_liberated(12) and _game.travel_target(3) == 12, "Аляска стала базой")
-	var hub := await _fresh_level(12)
+	_check(_game.is_liberated(13) and _game.travel_target(3) == 13, "Аляска стала базой")
+	var hub := await _fresh_level(13)
 	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
 	_check(hub.get("hub_mode") and doors.size() == 2, "на базе Аляски входы на прииск и в городок (%d)" % doors.size())
 	var flights := hub.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.active)
@@ -736,7 +739,7 @@ func _test_episode_three() -> void:
 	_game.money = 20000
 	_check(_game.is_property_available("cabin") and _game.buy_property("cabin") and _game.buy_upgrade("cabin", "stove"),
 			"бревенчатый дом у озера и печь покупаются")
-	var cabin := await _fresh_level(12)
+	var cabin := await _fresh_level(13)
 	_check(cabin.player.global_position.distance_to(Vector3(-51, 0, 48)) < 2.0, "на базе Аляски появляемся дома")
 	_check(cabin.get_node("Properties/cabin/Furniture/stove").visible, "печь стоит в доме")
 
@@ -847,7 +850,7 @@ func hud_splats(level: Level) -> int:
 
 func _test_rpg_and_cars() -> void:
 	# РПГ: ракета разносит группу врагов.
-	var ghost := await _fresh_level(11)
+	var ghost := await _fresh_level(12)
 	var player := ghost.player
 	player.max_health = 100000
 	player.health = 100000
@@ -901,6 +904,106 @@ func _test_rpg_and_cars() -> void:
 	_check(tanks.size() >= 2 and tanks[0].blast_radius >= 9.0, "в порту цистерны с топливом (%d)" % tanks.size())
 	var rpgs := port.get_node("Pickups").get_children().filter(func(n: Node) -> bool: return n is Pickup and n.weapon and n.weapon.id == "rpg")
 	_check(rpgs.size() == 1, "в порту лежит РПГ")
+
+
+func _test_helicopter() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 10
+	var level := await _fresh_level(9, false) as HeliLevel
+	_check(level != null, "уровень на вертолёте загружается")
+	if level == null:
+		return
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	_check(player.mount != null and player.current_weapon.id == "minigun", "герой у пулемёта в двери вертолёта")
+	_check(not level.hud.get_node("TouchControls/Joystick").visible, "в вертолёте нет джойстика ходьбы")
+	var heli := level.get_node("Helicopter") as Node3D
+	var start := heli.global_position
+	await _seconds(2.0)
+	_check(heli.global_position.distance_to(start) > 5.0, "вертолёт летит сам (%.0f м)" % heli.global_position.distance_to(start))
+	_check(player.global_position.distance_to(level.get_node("Helicopter/Seat").global_position) < 0.5, "герой летит вместе с вертолётом")
+	# Камера не уходит за кабину.
+	player.camera_rig.set_yaw(player.camera_rig.get_yaw() + PI)
+	await _frames(3)
+	var relative := wrapf(player.camera_rig.get_yaw() - (heli.rotation.y - PI / 2.0), -PI, PI)
+	_check(absf(relative) <= deg_to_rad(level.door_limit_deg) + 0.05, "из двери нельзя развернуться назад в кабину")
+
+	# Пирс: вертолёт зависает, пока не зачищено место с волнами.
+	level.jump_to_waypoint(4)
+	await _seconds(1.0)
+	var zone := level.get_node("ZonePier") as WaveZone
+	_check(zone.active and level.is_hovering() and level.get_waypoint_index() == 4, "над пирсом вертолёт зависает — волны банды")
+	var pistol: WeaponData = load("res://weapons/pistol.tres")
+	for i in 900:
+		if zone.done:
+			break
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			if enemy.is_alive():
+				enemy.apply_shot(1000.0, false, enemy.global_position + Vector3.UP, Vector3.FORWARD, pistol)
+		await get_tree().physics_frame
+	await _seconds(1.5)
+	_check(zone.done and level.get_waypoint_index() > 4, "пирс зачищен — летим дальше")
+
+	# Вражеские ракеты можно сбить очередью.
+	var target_point := player.global_position + Vector3.UP * 1.2
+	var from := target_point + (heli.global_basis * Vector3(1, 0.3, 0)).normalized() * 30.0
+	var rocket := Rocket.launch(level, from, target_point - from, 8.0, 3.5, 0.0, 20, null, true)
+	await _frames(2)
+	await _aim_at(player, rocket.global_position)
+	var hp := player.health
+	Input.action_press("fire")
+	for i in 60:
+		await get_tree().physics_frame
+		if not is_instance_valid(rocket) or rocket.is_exploded():
+			break
+		await _aim_at(player, rocket.global_position)
+	Input.action_release("fire")
+	_check(not is_instance_valid(rocket) or rocket.is_exploded(), "вражескую ракету сбивают очередью")
+	_check(player.health == hp, "сбитая ракета не ранит героя")
+
+	# Босс: боевой вертолёт.
+	for name in ["ZoneAlcatraz", "ZoneBridge"]:
+		(level.get_node(name) as WaveZone).done = true
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		enemy.queue_free()
+	level.jump_to_waypoint(11)
+	await _seconds(1.0)
+	var boss := level.get_node("AttackHelicopter") as AttackHelicopter
+	_check(boss.active and boss.visible and level.hud.get_node("%BossBar").visible, "вылетает боевой вертолёт — полоса босса")
+	var missiles := false
+	for i in 12 * 60:
+		await get_tree().physics_frame
+		if not get_tree().get_nodes_in_group("hostile_rockets").is_empty():
+			missiles = true
+			break
+	_check(missiles, "боевой вертолёт пускает ракеты")
+	var rpg_shot: WeaponData = load("res://weapons/heli_rockets.tres")
+	Explosive.blast(level, boss.global_position, 6.0, boss.health + 10.0, 0)
+	_check(boss.phase == 2, "ракета по вертолёту — фаза 2, дымит")
+	await _seconds(1.5)
+	boss.take_hit(boss.health + 1.0, boss.global_position, Vector3.FORWARD)
+	await _seconds(1.5)
+	boss.take_hit(boss.health + 1.0, boss.global_position, Vector3.FORWARD)
+	_check(boss.defeated, "боевой вертолёт сбит")
+	var started := Time.get_ticks_msec()
+	while not _game.is_level_unlocked(10) and Time.get_ticks_msec() - started < 15000:
+		await get_tree().process_frame
+	_check(_game.is_level_unlocked(10) and rpg_shot != null, "после вертолёта — освобождать Сан-Франциско")
+
+
+func _test_save_migration() -> void:
+	# Старое сохранение (до уровня на вертолёте): номера уровней после моста сдвигаются.
+	_game.reset_progress()
+	_game.unlocked_levels = 11
+	_game.records = {9: {"time": 100.0, "kills": 5, "headshots": 1}, 3: {"time": 50.0, "kills": 1, "headshots": 0}}
+	_game.completions = {9: 2, 10: 1}
+	_game.liberated_cities = [9]
+	_game._insert_level(9)
+	_check(_game.records.has(10) and _game.records.has(3) and not _game.records.has(9), "рекорды старых уровней переехали")
+	_check(int(_game.completions.get(10, 0)) == 2 and int(_game.completions.get(11, 0)) == 1, "прохождения переехали")
+	_check(_game.liberated_cities == [10] and _game.unlocked_levels == 12, "Сан-Франциско остался освобождённым")
+	_game.reset_progress()
 
 
 ## Подходим к спрятавшемуся боссу так, чтобы он был на виду.

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "heli_rockets"
+display_name = "Ракеты"
+short_name = "Ракет"
+model = "rpg"
+sound = "rpg"
+damage = 230.0
+pellets = 1
+spread_deg = 0.8
+fire_interval = 0.5
+max_range = 150.0
+headshot_multiplier = 1.0
+impulse = 14.0
+gib_damage = 70.0
+projectile = "rocket"
+projectile_speed = 55.0
+blast_radius = 6.5
+player_blast_damage = 30
+magazine = 4
+reload_time = 3.0
+infinite_ammo = true
+start_reserve = 0
+max_reserve = 0
+ammo_per_pickup = 0
+recoil_deg = 3.0
+shake = 0.35
+crosshair_kick = 18.0

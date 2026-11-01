@@ -448,6 +448,19 @@ static func build_weapon_model(kind: String) -> Node3D:
 					[Vector3(0.05, 0.12, 0.3), Vector3(0, 0.02, 0.24), walnut, 0.015]]
 			muzzle_at = Vector3(0, 0.085, -1.08)
 			support_at = Vector3(0, -0.005, -0.42)
+		"minigun":
+			var gunmetal := Color(0.2, 0.2, 0.22)
+			boxes = [[Vector3(0.16, 0.16, 0.36), Vector3(0, 0.07, -0.02), gunmetal, 0.03],
+					[Vector3(0.12, 0.12, 0.08), Vector3(0, 0.07, -0.24), black, 0.02],
+					[Vector3(0.025, 0.025, 0.6), Vector3(0.035, 0.105, -0.55), black],
+					[Vector3(0.025, 0.025, 0.6), Vector3(-0.035, 0.105, -0.55), black],
+					[Vector3(0.025, 0.025, 0.6), Vector3(0.035, 0.035, -0.55), black],
+					[Vector3(0.025, 0.025, 0.6), Vector3(-0.035, 0.035, -0.55), black],
+					[Vector3(0.13, 0.13, 0.05), Vector3(0, 0.07, -0.78), gunmetal, 0.02],
+					[Vector3(0.05, 0.14, 0.06), Vector3(0, -0.06, 0.05), black, 0.01],
+					[Vector3(0.18, 0.16, 0.22), Vector3(0.14, 0.02, 0.0), Color(0.25, 0.27, 0.18), 0.02]]
+			muzzle_at = Vector3(0, 0.07, -0.86)
+			support_at = Vector3(0, 0.0, -0.22)
 		"rpg":
 			var olive := Color(0.24, 0.27, 0.18)
 			boxes = [[Vector3(0.1, 0.1, 1.0), Vector3(0, 0.09, -0.2), olive, 0.03],

@@ -68,7 +68,7 @@ fog_sky_affect = 0.4
 
 [node name="Level11GoldMine" type="Node3D"]
 script = ExtResource("32_level")
-level_index = 10
+level_index = 11
 title = "Золотой прииск"
 objective = "Пробейтесь через прииск к лифту наверх"
 start_weapons = Array[ExtResource("33_weapon_data")]([ExtResource("34_pistol"), ExtResource("35_shotgun"), ExtResource("36_magnum"), ExtResource("37_rifle")])

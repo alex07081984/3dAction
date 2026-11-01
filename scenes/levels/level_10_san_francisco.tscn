@@ -129,9 +129,12 @@ size = Vector3(6, 3, 3)
 size = Vector3(3, 3, 6)
 
 [sub_resource type="BoxShape3D" id="Box_19"]
-size = Vector3(3, 3, 6)
+size = Vector3(4, 3, 2.4)
 
 [sub_resource type="BoxShape3D" id="Box_20"]
+size = Vector3(3, 3, 6)
+
+[sub_resource type="BoxShape3D" id="Box_21"]
 size = Vector3(3, 3, 6)
 
 [sub_resource type="ShaderMaterial" id="SkyMat_10"]
@@ -156,7 +159,7 @@ fog_sky_affect = 0.35
 
 [node name="Level10SanFrancisco" type="Node3D"]
 script = ExtResource("67_town")
-level_index = 9
+level_index = 10
 title = "Сан-Франциско"
 objective = "Освободите город: зачистите три района"
 start_weapons = Array[ExtResource("68_weapon_data")]([ExtResource("69_pistol"), ExtResource("70_shotgun"), ExtResource("71_magnum"), ExtResource("72_rifle")])
@@ -2326,13 +2329,29 @@ level_index = 8
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/BridgeRoad"]
 shape = SubResource("Box_18")
 
+[node name="Helipad" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.5, 1.5, -43.6)
+script = ExtResource("52_level_entrance")
+level_index = 9
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/Helipad"]
+shape = SubResource("Box_19")
+
+[node name="Label14" type="Label3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.5, 8, -45.4)
+pixel_size = 0.01
+modulate = Color(0.6, 0.8, 1, 1)
+text = "ВЕРТОЛЁТ ПОЛИЦИИ"
+font_size = 48
+outline_size = 12
+
 [node name="Airport" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, 0)
 script = ExtResource("53_travel_point")
 episode = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/Airport"]
-shape = SubResource("Box_19")
+shape = SubResource("Box_20")
 
 [node name="AirportAlaska" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, 36)
@@ -2340,7 +2359,7 @@ script = ExtResource("53_travel_point")
 episode = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/AirportAlaska"]
-shape = SubResource("Box_20")
+shape = SubResource("Box_21")
 
 [node name="StreetLamps" type="Node3D" parent="."]
 script = ExtResource("54_street_lamps")

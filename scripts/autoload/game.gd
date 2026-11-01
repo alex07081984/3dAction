@@ -7,6 +7,9 @@ signal settings_changed
 signal economy_changed
 
 const SAVE_PATH := "user://save.cfg"
+## Версия сохранения. 2 — в эпизод 2 добавлен уровень на вертолёте (номер 9),
+## номера уровней после него сдвинулись на один.
+const SAVE_VERSION := 2
 const MENU_SCENE := "res://scenes/main_menu.tscn"
 const TOWN_INDEX := 4
 const MAX_TIER := 10
@@ -21,6 +24,7 @@ const LEVELS := [
 	{"title": "Казино", "scene": "res://scenes/levels/level_7_casino.tscn", "reward": 450},
 	{"title": "Алькатрас", "scene": "res://scenes/levels/level_8_prison.tscn", "reward": 600},
 	{"title": "Мост Золотые Ворота", "scene": "res://scenes/levels/level_9_bridge.tscn", "reward": 700},
+	{"title": "Вертолёт над заливом", "scene": "res://scenes/levels/level_heli_bay.tscn", "reward": 800},
 	{"title": "Сан-Франциско", "scene": "res://scenes/levels/level_10_san_francisco.tscn", "reward": 900},
 	# Эпизод 3: Аляска.
 	{"title": "Золотой прииск", "scene": "res://scenes/levels/level_11_gold_mine.tscn", "reward": 800},
@@ -31,8 +35,8 @@ const LEVELS := [
 ## после этого он становится базой с входами на уровни эпизода. Между базами летают самолёты.
 const EPISODES := [
 	{"title": "Эпизод 1", "first": 0, "city": 4},
-	{"title": "Эпизод 2 · Сан-Франциско", "first": 5, "city": 9},
-	{"title": "Эпизод 3 · Аляска", "first": 10, "city": 12},
+	{"title": "Эпизод 2 · Сан-Франциско", "first": 5, "city": 10},
+	{"title": "Эпизод 3 · Аляска", "first": 11, "city": 13},
 ]
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
@@ -61,7 +65,7 @@ const PROPERTIES := [
 		{"id": "pool", "title": "Бассейн", "price": 6000, "perk": "max_health", "value": 20.0,
 				"text": "+20 к здоровью"},
 	]},
-	{"id": "flat", "city": 9, "title": "Квартира в викторианском доме", "price": 8000, "upgrades": [
+	{"id": "flat", "city": 10, "title": "Квартира в викторианском доме", "price": 8000, "upgrades": [
 		{"id": "espresso", "title": "Кофемашина", "price": 2000, "perk": "money", "value": 0.1,
 				"text": "+10% денег за задания"},
 		{"id": "magnum_safe", "title": "Сейф с патронами .44", "price": 2500, "perk": "ammo", "value": 0.25,
@@ -69,7 +73,7 @@ const PROPERTIES := [
 		{"id": "punching_bag", "title": "Боксёрская груша", "price": 3000, "perk": "max_health", "value": 15.0,
 				"text": "+15 к здоровью"},
 	]},
-	{"id": "cabin", "city": 12, "title": "Бревенчатый дом у озера", "price": 12000, "upgrades": [
+	{"id": "cabin", "city": 13, "title": "Бревенчатый дом у озера", "price": 12000, "upgrades": [
 		{"id": "stove", "title": "Печь и медвежья шкура", "price": 3000, "perk": "max_health", "value": 15.0,
 				"text": "+15 к здоровью"},
 		{"id": "workbench", "title": "Верстак оружейника", "price": 4500, "perk": "damage", "value": 0.1,
@@ -422,6 +426,7 @@ func save_data() -> void:
 	var config := ConfigFile.new()
 	for key in settings:
 		config.set_value("settings", key, settings[key])
+	config.set_value("progress", "save_version", SAVE_VERSION)
 	config.set_value("progress", "unlocked_levels", unlocked_levels)
 	config.set_value("progress", "liberated_cities", liberated_cities)
 	config.set_value("progress", "money", money)
@@ -456,6 +461,23 @@ func load_data() -> void:
 		completions[index] = int(config.get_value("completions", str(index), 0))
 		if config.has_section_key("stars", str(index)):
 			stars[index] = int(config.get_value("stars", str(index), 0))
+	var version := int(config.get_value("progress", "save_version", 1))
+	if version < 2:
+		_insert_level(9)
+
+
+## Старое сохранение: перед уровнем at вставлен новый — сдвигаем номера уровней.
+func _insert_level(at: int) -> void:
+	var shift := func(index: int) -> int: return index + 1 if index >= at else index
+	for table in [records, completions, stars]:
+		var moved := {}
+		for index in table:
+			moved[shift.call(int(index))] = table[index]
+		table.clear()
+		table.merge(moved)
+	liberated_cities = liberated_cities.map(func(city: Variant) -> int: return shift.call(int(city)))
+	if unlocked_levels > at:
+		unlocked_levels = mini(unlocked_levels + 1, LEVELS.size())
 
 
 ## Сброс прогресса (для тестов).

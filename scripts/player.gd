@@ -71,6 +71,8 @@ var scoped := false
 ## а герой двигается и стреляет в обычном темпе, без перезарядки и с бонусом к урону.
 var rage := 0.0
 var _rage_left := 0.0
+## Точка, к которой пристёгнут герой (дверь вертолёта): стоит на месте, только целится и стреляет.
+var mount: Node3D
 
 @onready var model: BlockyCharacter = $Model
 @onready var camera_rig: CameraRig = $CameraRig
@@ -93,6 +95,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _dead and mount:
+		global_position = mount.global_position
+		return
 	if _dead:
 		velocity.x = move_toward(velocity.x, 0.0, acceleration * delta)
 		velocity.z = move_toward(velocity.z, 0.0, acceleration * delta)
@@ -117,22 +122,13 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("interact") and is_instance_valid(interactable) and interactable.active:
 		interactable.interact(self)
 
-	var direction := _get_move_direction()
 	# В ярости мир замедлен, а герой — нет: скорость пересчитываем на настоящие секунды.
 	var haste := 1.0 / maxf(Engine.time_scale, 0.05) if is_raging() else 1.0
-	if _dodge_left > 0.0:
-		velocity.x = _dodge_dir.x * dodge_speed * haste
-		velocity.z = _dodge_dir.z * dodge_speed * haste
+	if mount:
+		global_position = mount.global_position
+		velocity = Vector3.ZERO
 	else:
-		var accel := (acceleration if is_on_floor() else air_acceleration) * haste * haste
-		var speed := move_speed * (0.45 if scoped else 1.0) * haste
-		var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(direction * speed, accel * delta)
-		velocity.x = horizontal.x
-		velocity.z = horizontal.z
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = jump_velocity
-	_apply_gravity(delta)
-	move_and_slide()
+		_move(delta, haste)
 
 	# Персонаж разворачивается туда, куда смотрит камера.
 	model.rotation.y = lerp_angle(model.rotation.y, camera_rig.get_yaw(), 1.0 - exp(-turn_speed * delta))
@@ -172,6 +168,44 @@ func is_dodging() -> bool:
 
 func is_reloading() -> bool:
 	return _reload_left > 0.0
+
+
+func _move(delta: float, haste: float) -> void:
+	var direction := _get_move_direction()
+	if _dodge_left > 0.0:
+		velocity.x = _dodge_dir.x * dodge_speed * haste
+		velocity.z = _dodge_dir.z * dodge_speed * haste
+	else:
+		var accel := (acceleration if is_on_floor() else air_acceleration) * haste * haste
+		var speed := move_speed * (0.45 if scoped else 1.0) * haste
+		var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(direction * speed, accel * delta)
+		velocity.x = horizontal.x
+		velocity.z = horizontal.z
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			velocity.y = jump_velocity
+	_apply_gravity(delta)
+	move_and_slide()
+
+
+## Пристегнуть героя к точке (дверь вертолёта) или отстегнуть (null).
+func mount_to(node: Node3D) -> void:
+	mount = node
+	if node == null:
+		camera_rig.distance = 3.0
+		camera_rig.shoulder_offset = 0.6
+		camera_rig.height = 1.55
+		camera_rig.follow_speed = 18.0
+		return
+	global_position = node.global_position
+	velocity = Vector3.ZERO
+	# Камера ближе к плечу и чуть выше: за спиной — кабина вертолёта.
+	camera_rig.distance = 2.5
+	camera_rig.shoulder_offset = 0.9
+	camera_rig.height = 1.3
+	camera_rig.follow_speed = 90.0
+	camera_rig.set_pitch(-0.3)
+	reset_physics_interpolation()
+	camera_rig.snap_to_target()
 
 
 func is_raging() -> bool:
@@ -404,9 +438,11 @@ func _shoot(weapon: WeaponData) -> void:
 				if head:
 					results[enemy].point = end
 			elif hit.collider.has_method("take_hit"):
-				# Бочки и баллоны.
+				# Бочки, баллоны, машины и боевой вертолёт.
 				hit.collider.take_hit(weapon.damage * bonus, end, dir)
 				Fx.sparks(end, hit.normal)
+				if (hit.collider as Node).is_in_group("vehicles"):
+					hit_confirmed.emit(false, false)
 			elif not impact_shown or i % 3 == 0:
 				Fx.sparks(end, hit.normal)
 				Fx.bullet_hole(end, hit.normal)
@@ -414,6 +450,7 @@ func _shoot(weapon: WeaponData) -> void:
 					Audio.play_at("impact", end, -6.0)
 				impact_shown = true
 		Fx.tracer(muzzle, end)
+		_intercept_rockets(_aim_start, end)
 
 	for enemy in results:
 		var info: Dictionary = results[enemy]
@@ -429,6 +466,21 @@ func _shoot(weapon: WeaponData) -> void:
 	# Выстрел слышат враги поблизости.
 	get_tree().call_group("enemies", "hear_noise", global_position, 22.0)
 	get_tree().call_group("civilians", "panic", global_position, 30.0)
+
+
+## Пуля сбивает вражескую ракету, если прошла рядом с ней.
+func _intercept_rockets(from: Vector3, to: Vector3) -> void:
+	var segment := to - from
+	if segment.length_squared() < 0.01:
+		return
+	for node in get_tree().get_nodes_in_group("hostile_rockets"):
+		var rocket := node as Rocket
+		if rocket == null or rocket.is_exploded():
+			continue
+		var t := clampf((rocket.global_position - from).dot(segment) / segment.length_squared(), 0.0, 1.0)
+		if from.lerp(to, t).distance_to(rocket.global_position) < 1.5:
+			rocket.detonate()
+			hit_confirmed.emit(false, false)
 
 
 ## РПГ: ракета летит из ствола туда, куда смотрит прицел.
@@ -470,8 +522,12 @@ func _update_aim() -> void:
 		aim_target = direct
 		aim_is_head = direct.get_hit_part(_aim_start, forward) == "head"
 		return
+	if hit and (hit.collider as Node).is_in_group("vehicles"):
+		aim_target = hit.collider
+		return
 	if not Game.settings.get("aim_assist", true):
 		return
+	_assist_rockets(origin, forward, skip)
 
 	# В оптике помощь в прицеливании сужается вместе с обзором.
 	var best_angle := deg_to_rad(aim_assist_deg) * camera_rig.zoom_ratio()
@@ -495,6 +551,23 @@ func _update_aim() -> void:
 			aim_target = enemy
 			aim_is_head = is_head
 			_aim_point = point
+
+
+## Помощь в прицеливании наводит и на летящие в героя ракеты.
+func _assist_rockets(origin: Vector3, forward: Vector3, skip: float) -> void:
+	var best := deg_to_rad(aim_assist_deg * 1.5) * camera_rig.zoom_ratio()
+	for node in get_tree().get_nodes_in_group("hostile_rockets"):
+		var rocket := node as Rocket
+		if rocket == null or rocket.is_exploded():
+			continue
+		var to_point := rocket.global_position - origin
+		if to_point.dot(forward) < skip:
+			continue
+		var angle := forward.angle_to(to_point)
+		if angle < best:
+			best = angle
+			aim_target = rocket
+			_aim_point = rocket.global_position
 
 
 func _spread(direction: Vector3, degrees: float) -> Vector3:
@@ -575,7 +648,7 @@ func _get_move_direction() -> Vector3:
 
 
 func _try_dodge() -> void:
-	if _dodge_cooldown_left > 0.0 or not is_on_floor():
+	if mount or _dodge_cooldown_left > 0.0 or not is_on_floor():
 		return
 	var direction := _get_move_direction()
 	if direction.length_squared() < 0.01:

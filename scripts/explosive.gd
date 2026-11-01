@@ -148,6 +148,16 @@ static func blast(source: Node3D, center: Vector3, radius: float, damage: float,
 		var closeness := 1.0 - distance / radius
 		enemy.apply_blast(damage * (0.25 + 0.75 * closeness), center, 7.0 + 14.0 * closeness)
 
+	# Техника (боевой вертолёт) получает урон от взрывов без проверки видимости.
+	for node in tree.get_nodes_in_group("vehicles"):
+		var vehicle := node as Node3D
+		if vehicle == null or vehicle == source or not vehicle.has_method("take_hit"):
+			continue
+		var gap := center.distance_to(vehicle.global_position)
+		if gap < radius + 2.0:
+			var near := clampf(1.0 - gap / (radius + 2.0), 0.2, 1.0)
+			vehicle.take_hit(damage * near, center, (vehicle.global_position - center).normalized())
+
 	var player := tree.get_first_node_in_group("player") as Player
 	if player and player.is_alive():
 		var target := player.global_position + Vector3.UP

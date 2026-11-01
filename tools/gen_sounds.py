@@ -483,6 +483,13 @@ def extra_sounds():
     beat = np.sin(2 * np.pi * 55 * t) * (np.exp(-t / 0.08) + 0.8 * np.exp(-np.clip(t - 0.28, 0, None) / 0.08) * (t > 0.28))
     roar = lowpass(noise(1.4), 400) * np.clip(t / 0.3, 0, 1) * np.exp(-np.clip(t - 0.6, 0, None) / 0.4)
     save("rage", finish(beat * 1.2 + roar * 0.9 + sweep(1.4, 70, 35) * 0.4 * np.exp(-t / 0.7), drive=2.0))
+    # Пулемёт: короткий сухой выстрел (очередь складывается из них).
+    save("minigun", finish(gunshot(0.18, 200, 90, 0.02, 0.006, 3000, 0.03, 1200, 0.06, 0.25), gain=0.75, drive=1.8))
+    # Вертолёт: гул двигателя и хлопки лопастей (12 в секунду), петля без шва.
+    t = t_axis(2.0)
+    chop = 0.5 + 0.5 * np.cos(2 * np.pi * 12 * t) ** 8
+    rotor = lowpass(noise(2.0), 300) * chop * 1.4 + np.sin(2 * np.pi * 48 * t) * 0.15 + highpass(lowpass(noise(2.0), 2500), 800) * 0.12
+    save("helicopter", finish(rotor, gain=0.6, drive=1.2))
 
 
 if __name__ == "__main__":

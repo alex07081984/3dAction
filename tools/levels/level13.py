@@ -9,7 +9,7 @@ import random
 
 random.seed(13)
 L = Level("Level13Alaska", {
-    "level_index": "12",
+    "level_index": "13",
     "title": '"Аляска"',
     "objective": '"Освободите город: зачистите три района"',
 })
@@ -252,9 +252,9 @@ for kind, pos in (("health", (-36, 0, -30)), ("ammo", (-30, 0, -36)), ("health",
     L.pickup(kind, pos)
 
 # --- База: входы на уровни эпизода, аэродром --------------------------------------------------
-L.interactable("level_entrance", "MineRoad", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="10")
+L.interactable("level_entrance", "MineRoad", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="11")
 label("ДОРОГА НА ПРИИСК", (-60.4, 3.6, 0), yaw=90, size=56)
-L.interactable("level_entrance", "GhostTrail", "Entrances", (0, 1.5, -58.5), (6, 3, 3), level_index="11")
+L.interactable("level_entrance", "GhostTrail", "Entrances", (0, 1.5, -58.5), (6, 3, 3), level_index="12")
 for x in (-3.5, 3.5):
     L.box("Props", "TrailPost", (x, 2.2, -61), (0.4, 4.4, 0.4), "wood")
 L.box_ext("Props", "TrailBeam", -4, 4, 4.1, 4.6, -61.2, -60.8, "wood", collide=False)

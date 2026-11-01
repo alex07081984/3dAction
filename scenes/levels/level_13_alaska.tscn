@@ -113,7 +113,7 @@ fog_sky_affect = 0.35
 
 [node name="Level13Alaska" type="Node3D"]
 script = ExtResource("49_town")
-level_index = 12
+level_index = 13
 title = "Аляска"
 objective = "Освободите город: зачистите три района"
 start_weapons = Array[ExtResource("50_weapon_data")]([ExtResource("51_pistol"), ExtResource("52_shotgun"), ExtResource("53_magnum"), ExtResource("54_rifle"), ExtResource("55_sniper")])
@@ -1524,7 +1524,7 @@ kind = 1
 [node name="MineRoad" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, 1.5, 0)
 script = ExtResource("33_level_entrance")
-level_index = 10
+level_index = 11
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/MineRoad"]
 shape = SubResource("Box_9")
@@ -1540,7 +1540,7 @@ outline_size = 12
 [node name="GhostTrail" type="Area3D" parent="Entrances"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -58.5)
 script = ExtResource("33_level_entrance")
-level_index = 11
+level_index = 12
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/GhostTrail"]
 shape = SubResource("Box_10")

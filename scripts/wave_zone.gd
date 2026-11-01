@@ -19,6 +19,9 @@ signal cleared(zone: WaveZone)
 @export var heavy_scene: PackedScene
 @export var spawn_interval := 0.45
 @export var pause_between_waves := 1.8
+## Дальность обзора появившихся врагов (0 — как в их сцене). Для уровня на вертолёте — больше.
+@export var enemy_sight_range := 0.0
+@export var enemy_stationary := false  ## Появившиеся враги не сходят с места.
 
 var active := false
 var done := false
@@ -75,7 +78,12 @@ func _next_wave() -> void:
 func _spawn(scene: PackedScene, point: Node3D) -> void:
 	var enemy := scene.instantiate() as Enemy
 	enemy.alerted = true
-	enemy.hold_position = false
+	enemy.hold_position = enemy_stationary
+	enemy.stationary = enemy_stationary
+	if enemy_sight_range > 0.0:
+		enemy.sight_range = enemy_sight_range
+		enemy.effective_range = enemy_sight_range * 0.75
+		enemy.view_angle_deg = 220.0
 	enemy.drop_ammo_chance = 0.35
 	enemy.died.connect(_on_enemy_died)
 	var container := get_tree().current_scene.get_node_or_null("Enemies")

@@ -99,6 +99,11 @@ func get_pitch() -> float:
 	return _arm.rotation.x + _kick
 
 
+## Задать наклон прицела (радианы, меньше нуля — вниз).
+func set_pitch(value: float) -> void:
+	_arm.rotation.x = clampf(value, deg_to_rad(min_pitch_deg), deg_to_rad(max_pitch_deg))
+
+
 func get_yaw_basis() -> Basis:
 	return Basis(Vector3.UP, rotation.y)
 

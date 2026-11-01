@@ -6,7 +6,7 @@ import random
 
 random.seed(11)
 L = Level("Level11GoldMine", {
-    "level_index": "10",
+    "level_index": "11",
     "title": '"Золотой прииск"',
     "objective": '"Пробейтесь через прииск к лифту наверх"',
 })

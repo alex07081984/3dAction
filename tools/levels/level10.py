@@ -8,7 +8,7 @@ import random
 
 random.seed(10)
 L = Level("Level10SanFrancisco", {
-    "level_index": "9",
+    "level_index": "10",
     "title": '"Сан-Франциско"',
     "objective": '"Освободите город: зачистите три района"',
 })
@@ -276,6 +276,8 @@ L.interactable("level_entrance", "PortGate", "Entrances", (39, 1.5, 18), (3, 3, 
 L.interactable("level_entrance", "CasinoDoor", "Entrances", (6, 1.5, -18), (3, 3, 4), level_index="6")
 L.interactable("level_entrance", "Ferry", "Entrances", (-50, 1.5, 58.5), (6, 3, 3), level_index="7")
 L.interactable("level_entrance", "BridgeRoad", "Entrances", (-58.5, 1.5, 0), (3, 3, 6), level_index="8")
+L.interactable("level_entrance", "Helipad", "Entrances", (50.5, 1.5, -43.6), (4, 3, 2.4), level_index="9")
+L.label("ВЕРТОЛЁТ ПОЛИЦИИ", (50.5, 8.0, -45.4), size=48, color="Color(0.6, 0.8, 1, 1)")
 L.interactable("travel_point", "Airport", "Entrances", (58.5, 1.5, 0), (3, 3, 6), episode="1")
 L.interactable("travel_point", "AirportAlaska", "Entrances", (58.5, 1.5, 36), (3, 3, 6), episode="3")
 

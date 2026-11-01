@@ -287,7 +287,7 @@ class Level:
         self.node(name, None, "Enemies", instance=scene, transform=xform(pos, rot_y(yaw_to(pos, look_at))), **props)
 
     def wave_zone(self, name, center, size, spawns, barriers, title="Засада!", waves=2, first=4, extra=2,
-                  rusher=0.3, heavy=0, gunner_kind="gunner", rusher_kind="rusher", heavy_kind="heavy"):
+                  rusher=0.3, heavy=0, gunner_kind="gunner", rusher_kind="rusher", heavy_kind="heavy", **zone_props):
         script = self.ext_res("Script", "res://scripts/wave_zone.gd")
         shape = self.sub_res("BoxShape3D", {"size": f"Vector3({f(size[0])}, {f(size[1])}, {f(size[2])})"}, "Box")
         z = self.node(name, "Area3D", ".", transform=xform(center), script=script, title=f'"{title}"',
@@ -295,7 +295,7 @@ class Level:
                       rusher_share=f(rusher), heavy_in_last_wave=str(heavy),
                       gunner_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{gunner_kind}.tscn"),
                       rusher_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{rusher_kind}.tscn"),
-                      heavy_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{heavy_kind}.tscn"))
+                      heavy_scene=self.ext_res("PackedScene", f"res://scenes/enemies/{heavy_kind}.tscn"), **zone_props)
         self.node("CollisionShape3D", "CollisionShape3D", z, shape=shape)
         sp = self.node("Spawns", "Node3D", z)
         for p in spawns:

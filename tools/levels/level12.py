@@ -8,7 +8,7 @@ import random
 
 random.seed(12)
 L = Level("Level12GhostTown", {
-    "level_index": "11",
+    "level_index": "12",
     "title": '"Заброшенный городок"',
     "objective": '"Возьмите винтовку охотника и зачистите городок"',
 })

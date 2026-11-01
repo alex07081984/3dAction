@@ -379,6 +379,14 @@ func _on_weapon_changed(weapon: WeaponData) -> void:
 	%ScopeButton.visible = weapon.scope_fov > 0.0
 
 
+## Герой у пулемёта в вертолёте: джойстик, прыжок и рывок не нужны.
+func set_mounted(value: bool) -> void:
+	for path in ["Joystick", "JumpButton", "DodgeButton"]:
+		var node := _touch_controls.get_node_or_null(path) as Control
+		if node:
+			node.visible = not value
+
+
 func _on_rage_changed(value: float, active: bool) -> void:
 	%RageBar.value = value
 	%RageButton.visible = value >= 100.0 and not active

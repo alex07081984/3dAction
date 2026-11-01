@@ -1,7 +1,8 @@
 class_name Rocket
 extends Node3D
-## Ракета (РПГ игрока, позже — ракеты вертолёта и снаряды танка): летит по прямой,
-## оставляет дымный след и взрывается при попадании во что угодно.
+## Ракета (РПГ игрока, ракеты боевого вертолёта): летит по прямой, оставляет дымный след
+## и взрывается при попадании во что угодно. Вражеская ракета мигает красным,
+## и её можно сбить на лету очередью.
 
 const WORLD_MASK := 1
 const PLAYER_MASK := 2
@@ -14,6 +15,8 @@ var damage := 200.0
 var player_damage := 40
 var mask := WORLD_MASK | ENEMY_MASK
 var exclude: Array[RID] = []
+## Вражеская ракета: летит в игрока, мигает и пищит, её можно сбить.
+var hostile := false
 
 var _life := LIFETIME
 var _done := false
@@ -30,6 +33,7 @@ static func launch(parent: Node, from: Vector3, direction: Vector3, speed: float
 	rocket.damage = blast_damage
 	rocket.player_damage = damage_to_player
 	rocket.mask = WORLD_MASK | (PLAYER_MASK if hits_player else ENEMY_MASK)
+	rocket.hostile = hits_player
 	if shooter:
 		rocket.exclude.append(shooter.get_rid())
 	parent.add_child(rocket)
@@ -44,8 +48,16 @@ func is_exploded() -> bool:
 	return _done
 
 
+## Сбита пулей: взрывается там, где летит.
+func detonate() -> void:
+	if not _done:
+		_explode(global_position)
+
+
 func _ready() -> void:
 	add_to_group("rockets")
+	if hostile:
+		add_to_group("hostile_rockets")
 	_build()
 
 
@@ -113,6 +125,23 @@ func _build() -> void:
 	flame.position = Vector3(0, 0, 0.35)
 	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(flame)
+	if hostile:
+		# Красный мигающий огонёк и писк — видно и слышно, что ракета летит в вас.
+		var beacon := MeshInstance3D.new()
+		var dot := SphereMesh.new()
+		dot.radius = 0.16
+		dot.height = 0.32
+		var red := StandardMaterial3D.new()
+		red.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		red.albedo_color = Color(1, 0.1, 0.05)
+		dot.material = red
+		beacon.mesh = dot
+		beacon.position = Vector3(0, 0, -0.2)
+		add_child(beacon)
+		var blink := beacon.create_tween().set_loops()
+		blink.tween_property(beacon, "visible", false, 0.12)
+		blink.tween_property(beacon, "visible", true, 0.12)
+		Audio.play_at("beep", global_position, 0.0, 1.3)
 	var light := OmniLight3D.new()
 	light.light_color = Color(1.0, 0.6, 0.3)
 	light.light_energy = 2.0

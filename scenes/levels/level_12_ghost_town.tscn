@@ -66,7 +66,7 @@ fog_sky_affect = 0.4
 
 [node name="Level12GhostTown" type="Node3D"]
 script = ExtResource("33_level")
-level_index = 11
+level_index = 12
 title = "Заброшенный городок"
 objective = "Возьмите винтовку охотника и зачистите городок"
 start_weapons = Array[ExtResource("34_weapon_data")]([ExtResource("35_pistol"), ExtResource("36_shotgun"), ExtResource("37_magnum"), ExtResource("38_rifle")])
