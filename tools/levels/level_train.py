@@ -192,7 +192,7 @@ for i in range(14):
           collide=False, shadow=False, rows=rot_y(random.uniform(-20, 20)))
 
 L.player((0, FLOOR, -1.5), 0)
-L.waypoint((0, FLOOR, -1.5), (0, FLOOR, -113))
+L.waypoint((0.13, FLOOR, -1.5), (0.13, FLOOR, -113))
 
 MOON_YAW, MOON_PITCH = 200, -34
 moon_dir = (math.sin(math.radians(MOON_YAW)) * math.cos(math.radians(MOON_PITCH)), -math.sin(math.radians(MOON_PITCH)),

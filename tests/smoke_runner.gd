@@ -331,7 +331,8 @@ func _test_dismemberment() -> void:
 	# Заряд дроби в ногу: нога отлетает, враг прыгает на одной, потом падает.
 	var hopper: Enemy = null
 	var attempts := 0
-	for attempt in 8:
+	# Дробь летит с разбросом — иногда заряд уходит в корпус, поэтому даём несколько попыток.
+	for attempt in 14:
 		attempts += 1
 		var enemy := _spawn_enemy(level, "gunner", player.global_position + Vector3(0.3, 0, -4.5))
 		await _frames(3)
