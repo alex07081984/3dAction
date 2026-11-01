@@ -66,13 +66,14 @@
 [ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="64_gas_cylinder"]
 [ext_resource type="PackedScene" path="res://scenes/props/explosive_car.tscn" id="65_explosive_car"]
 [ext_resource type="Resource" path="res://weapons/rpg.tres" id="66_rpg"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="67_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="68_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="69_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="70_shotgun"]
-[ext_resource type="Resource" path="res://weapons/magnum.tres" id="71_magnum"]
-[ext_resource type="Resource" path="res://weapons/rifle.tres" id="72_rifle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="73_hud"]
+[ext_resource type="Script" path="res://scripts/train_station.gd" id="67_train_station"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="68_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="69_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="70_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="71_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="72_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="73_rifle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="74_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(58, 6, 1)
@@ -137,6 +138,12 @@ size = Vector3(3, 3, 6)
 [sub_resource type="BoxShape3D" id="Box_21"]
 size = Vector3(3, 3, 6)
 
+[sub_resource type="BoxShape3D" id="Box_22"]
+size = Vector3(3, 3, 6)
+
+[sub_resource type="BoxShape3D" id="Box_23"]
+size = Vector3(3, 3, 6)
+
 [sub_resource type="ShaderMaterial" id="SkyMat_10"]
 shader = ExtResource("62_night_sky")
 shader_parameter/moon_direction = Vector3(-0.4045, 0.5878, -0.7006)
@@ -158,11 +165,11 @@ fog_density = 0.013
 fog_sky_affect = 0.35
 
 [node name="Level10SanFrancisco" type="Node3D"]
-script = ExtResource("67_town")
+script = ExtResource("68_town")
 level_index = 10
 title = "Сан-Франциско"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("68_weapon_data")]([ExtResource("69_pistol"), ExtResource("70_shotgun"), ExtResource("71_magnum"), ExtResource("72_rifle")])
+start_weapons = Array[ExtResource("69_weapon_data")]([ExtResource("70_pistol"), ExtResource("71_shotgun"), ExtResource("72_magnum"), ExtResource("73_rifle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -2717,6 +2724,38 @@ script = ExtResource("51_pickup")
 kind = 2
 weapon = ExtResource("66_rpg")
 
+[node name="StationNY" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.5, 1.5, -36)
+script = ExtResource("67_train_station")
+episode = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/StationNY"]
+shape = SubResource("Box_22")
+
+[node name="Label15" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 60.4, 3.6, -36)
+pixel_size = 0.01
+modulate = Color(0.75, 0.9, 1, 1)
+text = "ВОКЗАЛ → НЬЮ-ЙОРК"
+font_size = 48
+outline_size = 12
+
+[node name="StationAlaska" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, 1.5, -36)
+script = ExtResource("67_train_station")
+episode = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/StationAlaska"]
+shape = SubResource("Box_23")
+
+[node name="Label16" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, -36)
+pixel_size = 0.01
+modulate = Color(0.75, 0.9, 1, 1)
+text = "ВОКЗАЛ → АЛЯСКА"
+font_size = 48
+outline_size = 12
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -2749,4 +2788,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 14, -95.5)
 [node name="P09" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 14, -97)
 
-[node name="HUD" parent="." instance=ExtResource("73_hud")]
+[node name="HUD" parent="." instance=ExtResource("74_hud")]

@@ -74,12 +74,13 @@
 [ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="72_gas_cylinder"]
 [ext_resource type="PackedScene" path="res://scenes/props/explosive_car.tscn" id="73_explosive_car"]
 [ext_resource type="Resource" path="res://weapons/rpg.tres" id="74_rpg"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="75_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="76_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="77_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="78_shotgun"]
-[ext_resource type="Resource" path="res://weapons/deagle.tres" id="79_deagle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="80_hud"]
+[ext_resource type="Script" path="res://scripts/train_station.gd" id="75_train_station"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="76_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="77_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="78_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="79_shotgun"]
+[ext_resource type="Resource" path="res://weapons/deagle.tres" id="80_deagle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="81_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(126, 6, 1)
@@ -129,6 +130,12 @@ size = Vector3(18, 4, 18)
 [sub_resource type="BoxShape3D" id="Box_16"]
 size = Vector3(18, 4, 18)
 
+[sub_resource type="BoxShape3D" id="Box_17"]
+size = Vector3(3, 3, 6)
+
+[sub_resource type="BoxShape3D" id="Box_18"]
+size = Vector3(3, 3, 6)
+
 [sub_resource type="ShaderMaterial" id="SkyMat_5"]
 shader = ExtResource("70_night_sky")
 shader_parameter/moon_direction = Vector3(0.394, 0.6157, -0.6824)
@@ -149,11 +156,11 @@ fog_density = 0.011
 fog_sky_affect = 0.25
 
 [node name="Level5Town" type="Node3D"]
-script = ExtResource("75_town")
+script = ExtResource("76_town")
 level_index = 4
 title = "Город"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("76_weapon_data")]([ExtResource("77_pistol"), ExtResource("78_shotgun"), ExtResource("79_deagle")])
+start_weapons = Array[ExtResource("77_weapon_data")]([ExtResource("78_pistol"), ExtResource("79_shotgun"), ExtResource("80_deagle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -4638,6 +4645,38 @@ script = ExtResource("67_pickup")
 kind = 2
 weapon = ExtResource("74_rpg")
 
+[node name="StationSF" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, 1.5, 36)
+script = ExtResource("75_train_station")
+episode = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/StationSF"]
+shape = SubResource("Box_17")
+
+[node name="Label12" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, 36)
+pixel_size = 0.01
+modulate = Color(0.75, 0.9, 1, 1)
+text = "ВОКЗАЛ → САН-ФРАНЦИСКО"
+font_size = 48
+outline_size = 12
+
+[node name="StationAlaska" type="Area3D" parent="Entrances"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.5, 1.5, -36)
+script = ExtResource("75_train_station")
+episode = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrances/StationAlaska"]
+shape = SubResource("Box_18")
+
+[node name="Label13" type="Label3D" parent="Props"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -60.4, 3.6, -36)
+pixel_size = 0.01
+modulate = Color(0.75, 0.9, 1, 1)
+text = "ВОКЗАЛ → АЛЯСКА"
+font_size = 48
+outline_size = 12
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -4688,4 +4727,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -46, 0, 15)
 [node name="P15" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.5, 0, 15)
 
-[node name="HUD" parent="." instance=ExtResource("80_hud")]
+[node name="HUD" parent="." instance=ExtResource("81_hud")]

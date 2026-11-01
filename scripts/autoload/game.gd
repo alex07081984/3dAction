@@ -11,6 +11,7 @@ const SAVE_PATH := "user://save.cfg"
 ## номера уровней после него сдвинулись на один.
 const SAVE_VERSION := 2
 const MENU_SCENE := "res://scenes/main_menu.tscn"
+const TRAIN_SCENE := "res://scenes/levels/level_train.tscn"
 const TOWN_INDEX := 4
 const MAX_TIER := 10
 const LEVELS := [
@@ -18,7 +19,7 @@ const LEVELS := [
 	{"title": "Метро", "scene": "res://scenes/levels/level_2_metro.tscn", "reward": 200},
 	{"title": "Небоскрёб", "scene": "res://scenes/levels/level_3_skyscraper.tscn", "reward": 250},
 	{"title": "Особняк", "scene": "res://scenes/levels/level_4_mansion.tscn", "reward": 300},
-	{"title": "Город", "scene": "res://scenes/levels/level_5_town.tscn", "reward": 500},
+	{"title": "Нью-Йорк", "scene": "res://scenes/levels/level_5_town.tscn", "reward": 500},
 	# Эпизод 2: открывается после освобождения города, входы — на окраинах города.
 	{"title": "Порт", "scene": "res://scenes/levels/level_6_port.tscn", "reward": 400},
 	{"title": "Казино", "scene": "res://scenes/levels/level_7_casino.tscn", "reward": 450},
@@ -34,9 +35,9 @@ const LEVELS := [
 ## Эпизоды: уровни идут по порядку с first до city, а город в конце нужно освободить —
 ## после этого он становится базой с входами на уровни эпизода. Между базами летают самолёты.
 const EPISODES := [
-	{"title": "Эпизод 1", "first": 0, "city": 4},
-	{"title": "Эпизод 2 · Сан-Франциско", "first": 5, "city": 10},
-	{"title": "Эпизод 3 · Аляска", "first": 11, "city": 13},
+	{"title": "Эпизод 1 · Нью-Йорк", "city_name": "Нью-Йорк", "first": 0, "city": 4},
+	{"title": "Эпизод 2 · Сан-Франциско", "city_name": "Сан-Франциско", "first": 5, "city": 10},
+	{"title": "Эпизод 3 · Аляска", "city_name": "Аляска", "first": 11, "city": 13},
 ]
 ## Недвижимость покупается по порядку: хибара → квартира → особняк.
 ## Улучшения видны внутри как мебель и дают бонусы (perk) во всех уровнях.
@@ -109,6 +110,12 @@ var completions := {}
 var town_liberated := false
 ## Освобождённые города следующих эпизодов (номера уровней-городов).
 var liberated_cities: Array = []
+## Маршруты между городами, которые уже проехали поездом: "1-2", "2-3", "1-3".
+## По проеханному маршруту можно лететь самолётом без боя.
+var traveled_routes: Array = []
+## Текущая поездка: откуда и куда (номера эпизодов).
+var travel_from := 1
+var travel_to := 2
 var owned_properties: Array = []
 var owned_upgrades: Array = []  # строки вида "shack/bed"
 var current_level := -1
@@ -240,6 +247,48 @@ func travel_target(episode: int) -> int:
 
 func is_episode_open(episode: int) -> bool:
 	return episode >= 1 and episode <= EPISODES.size() and is_level_unlocked(int(EPISODES[episode - 1].first))
+
+
+func city_name(episode: int) -> String:
+	if episode < 1 or episode > EPISODES.size():
+		return "?"
+	return String(EPISODES[episode - 1].get("city_name", EPISODES[episode - 1].title))
+
+
+func route_key(a: int, b: int) -> String:
+	return "%d-%d" % [mini(a, b), maxi(a, b)]
+
+
+func has_traveled(a: int, b: int) -> bool:
+	return route_key(a, b) in traveled_routes
+
+
+## Поездка на поезде из текущего города в эпизод to_episode.
+func start_travel(to_episode: int) -> void:
+	travel_from = episode_of(current_level) if current_level >= 0 else latest_episode()
+	travel_to = to_episode
+	save_data()
+	current_level = -1
+	current_tier = 0
+	_reset_runtime_state()
+	get_tree().change_scene_to_file(TRAIN_SCENE)
+
+
+## Доехали: маршрут открыт для самолёта, награда за дорогу. Возвращает награду.
+func finish_travel(earned_stars := 1) -> int:
+	var key := route_key(travel_from, travel_to)
+	if not key in traveled_routes:
+		traveled_routes.append(key)
+	var reward := roundi((300 + 50 * earned_stars) * (1.0 + perk("money")))
+	add_money(reward)
+	save_data()
+	return reward
+
+
+## Эпизод последнего освобождённого города (1, если ещё ни одного).
+func latest_episode() -> int:
+	var city := latest_city()
+	return episode_of(city) if city >= 0 else 1
 
 
 func travel(episode: int) -> void:
@@ -429,6 +478,7 @@ func save_data() -> void:
 	config.set_value("progress", "save_version", SAVE_VERSION)
 	config.set_value("progress", "unlocked_levels", unlocked_levels)
 	config.set_value("progress", "liberated_cities", liberated_cities)
+	config.set_value("progress", "traveled_routes", traveled_routes)
 	config.set_value("progress", "money", money)
 	config.set_value("progress", "town_liberated", town_liberated)
 	config.set_value("progress", "properties", owned_properties)
@@ -452,6 +502,7 @@ func load_data() -> void:
 	money = int(config.get_value("progress", "money", 0))
 	town_liberated = bool(config.get_value("progress", "town_liberated", false))
 	liberated_cities = Array(config.get_value("progress", "liberated_cities", []))
+	traveled_routes = Array(config.get_value("progress", "traveled_routes", []))
 	owned_properties = Array(config.get_value("progress", "properties", []))
 	owned_upgrades = Array(config.get_value("progress", "upgrades", []))
 	for index in LEVELS.size():
@@ -489,6 +540,7 @@ func reset_progress() -> void:
 	completions = {}
 	town_liberated = false
 	liberated_cities = []
+	traveled_routes = []
 	owned_properties = []
 	owned_upgrades = []
 	economy_changed.emit()

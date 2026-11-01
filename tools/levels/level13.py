@@ -330,5 +330,10 @@ L.explosives([(-43.5, 0, -30), (-28.5, 0, -42.5), (43, 0, -43.5), (6.5, 0, -6.5)
 L.explosives([(46, 0, 20), (56, 0, 22)], pattern="F")
 L.cars([(32.8, 0, -20, 0), (-39.2, 0, 20, 180), (3.8, 0, -25, 0), (-3.8, 0, 48, 180)])
 L.pickup("weapon", (0, 0, -40), weapon="rpg")
+# Вокзалы: поезда в другие города (бой в вагонах; после поездки маршрут открыт для самолёта).
+L.interactable("train_station", "StationNY", "Entrances", (-58.5, 1.5, -36), (3, 3, 6), episode="1")
+L.label("ВОКЗАЛ → НЬЮ-ЙОРК", (-60.4, 3.6, -36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
+L.interactable("train_station", "StationSF", "Entrances", (-58.5, 1.5, 36), (3, 3, 6), episode="2")
+L.label("ВОКЗАЛ → САН-ФРАНЦИСКО", (-60.4, 3.6, 36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
 L.write("scenes/levels/level_13_alaska.tscn", env, ["pistol", "shotgun", "magnum", "rifle", "sniper"],
         script_path="res://scripts/town.gd")

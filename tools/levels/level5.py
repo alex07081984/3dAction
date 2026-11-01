@@ -546,4 +546,9 @@ L.explosives([(4.99, -0.02, 27.57), (-5.03, -0.02, -11.94), (17.06, -0.02, -7.06
 # Машины, которые горят и взрываются, и РПГ для освобождения города.
 L.cars([(-39.2, 0, -15, 0), (-3.8, 0, 22, 180)])
 L.pickup("weapon", (0, 0, -28), weapon="rpg")
+# Вокзалы: поезда в другие города (бой в вагонах; после поездки маршрут открыт для самолёта).
+L.interactable("train_station", "StationSF", "Entrances", (-58.5, 1.5, 36), (3, 3, 6), episode="2")
+L.label("ВОКЗАЛ → САН-ФРАНЦИСКО", (-60.4, 3.6, 36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
+L.interactable("train_station", "StationAlaska", "Entrances", (-58.5, 1.5, -36), (3, 3, 6), episode="3")
+L.label("ВОКЗАЛ → АЛЯСКА", (-60.4, 3.6, -36), yaw=90, size=48, color="Color(0.75, 0.9, 1, 1)")
 L.write("scenes/levels/level_5_town.tscn", env, ["pistol", "shotgun", "deagle"], script_path="res://scripts/town.gd")

@@ -15,14 +15,19 @@ func _ready() -> void:
 	for entrance in find_children("*", "LevelEntrance"):
 		var level_entrance := entrance as LevelEntrance
 		level_entrance.active = hub_mode and Game.is_level_unlocked(level_entrance.level_index)
+	# Самолётом — только по маршруту, который уже проехали поездом.
+	var here := Game.episode_of(level_index)
 	for point in find_children("*", "TravelPoint"):
 		var travel := point as TravelPoint
-		travel.active = hub_mode and Game.is_episode_open(travel.episode)
+		travel.active = hub_mode and Game.is_episode_open(travel.episode) and Game.has_traveled(here, travel.episode)
+	for point in find_children("*", "TrainStation"):
+		var station := point as TrainStation
+		station.active = hub_mode and Game.is_episode_open(station.episode)
 	_districts_left = find_children("*", "WaveZone").size()
 	super._ready()
 	if hub_mode:
 		hud.set_kills_visible(false)
-		hud.show_message("Город", _hub_hint())
+		hud.show_message(title, _hub_hint())
 		Audio.play_music("music_menu")
 	else:
 		hud.set_objective("Освободите город: осталось районов — %d" % _districts_left)
@@ -33,7 +38,7 @@ func _hub_hint() -> String:
 	for i in Game.EPISODES.size():
 		var episode: Dictionary = Game.EPISODES[i]
 		if int(episode.city) != level_index and Game.is_episode_open(i + 1) and not Game.is_liberated(int(episode.city)):
-			return "%s: летите из аэропорта" % episode.title
+			return "%s: поезд с вокзала" % episode.title
 	return "Ваша база: задания и недвижимость"
 
 

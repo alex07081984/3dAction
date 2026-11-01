@@ -490,6 +490,17 @@ def extra_sounds():
     chop = 0.5 + 0.5 * np.cos(2 * np.pi * 12 * t) ** 8
     rotor = lowpass(noise(2.0), 300) * chop * 1.4 + np.sin(2 * np.pi * 48 * t) * 0.15 + highpass(lowpass(noise(2.0), 2500), 800) * 0.12
     save("helicopter", finish(rotor, gain=0.6, drive=1.2))
+    # Поезд: стук колёс на стыках (две тележки), гул и ветер; петля 1,6 с.
+    t = t_axis(1.6)
+    train = lowpass(noise(1.6), 220) * 1.1 + highpass(lowpass(noise(1.6), 1800), 500) * 0.15
+    for at in (0.0, 0.11, 0.8, 0.91):
+        train = place(train, (lowpass(noise(0.08), 900) * env(0.08, 0.02)) * 1.6, at)
+    save("train", finish(train, gain=0.6, drive=1.3))
+    # Гудок паровоза: аккорд из трёх «свистков».
+    t = t_axis(1.6)
+    whistle = sum(np.sin(2 * np.pi * fr * t) + 0.3 * np.sin(4 * np.pi * fr * t) for fr in (311.0, 370.0, 466.0))
+    whistle *= np.clip(t / 0.08, 0, 1) * np.clip((1.6 - t) / 0.3, 0, 1)
+    save("train_horn", finish(lowpass(whistle * 0.3 + bandpass_noise(1.6, 800, 3000) * 0.08, 2500), gain=0.55, drive=1.2))
 
 
 if __name__ == "__main__":

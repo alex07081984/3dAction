@@ -56,6 +56,7 @@ func _run() -> void:
 	await _test_rpg_and_cars()
 	await _test_helicopter()
 	await _test_save_migration()
+	await _test_train()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -495,7 +496,9 @@ func _test_episode_two() -> void:
 	_check(_game.is_level_unlocked(5) and not _game.is_level_unlocked(6), "после первого города открыт эпизод 2")
 	var town := await _fresh_level(_game.TOWN_INDEX)
 	var airport := town.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.episode == 2)
-	_check(airport.size() == 1 and airport[0].active, "в первом городе открыт аэропорт в Сан-Франциско")
+	var station := town.find_children("*", "TrainStation").filter(func(t: Variant) -> bool: return t.episode == 2)
+	_check(station.size() == 1 and station[0].active and airport.size() == 1 and not airport[0].active,
+			"в Сан-Франциско сначала едут поездом, самолёт — потом")
 	_check(_game.travel_target(2) == 5, "перелёт ведёт на первый уровень эпизода 2 — порт")
 	var port := await _fresh_level(5)
 	_check(Audio.current_music() == "music_explore", "на уровне играет музыка (%s)" % Audio.current_music())
@@ -641,12 +644,12 @@ func _test_episode_three() -> void:
 	_game.liberated_cities = [10]
 	_check(_game.episode_of(11) == 3 and _game.is_episode_open(3), "после Сан-Франциско открыт эпизод 3 · Аляска")
 	var sf := await _fresh_level(10)
-	var planes := sf.find_children("*", "TravelPoint").filter(func(t: Variant) -> bool: return t.episode == 3 and t.active)
-	_check(planes.size() == 1, "из Сан-Франциско летает самолёт на Аляску")
+	var trains := sf.find_children("*", "TrainStation").filter(func(t: Variant) -> bool: return t.episode == 3 and t.active)
+	_check(trains.size() == 1, "из Сан-Франциско идёт поезд на Аляску")
 	_check(_game.travel_target(3) == 11, "перелёт на Аляску ведёт на прииск")
 	var town := await _fresh_level(_game.TOWN_INDEX)
-	_check(town.find_children("*", "TravelPoint").any(func(t: Variant) -> bool: return t.episode == 3 and t.active),
-			"из первого города тоже можно улететь на Аляску")
+	_check(town.find_children("*", "TrainStation").any(func(t: Variant) -> bool: return t.episode == 3 and t.active),
+			"из Нью-Йорка тоже идёт поезд на Аляску")
 
 	# Прииск: снег, ящики с динамитом, снайперы на крышах.
 	var mine := await _fresh_level(11, false)
@@ -730,6 +733,7 @@ func _test_episode_three() -> void:
 	await _frames(3)
 	_check(alaska.hud.get_node("%CompleteTitle").text == "Эпизод 3 пройден!", "освобождение Аляски завершает эпизод 3")
 	_check(_game.is_liberated(13) and _game.travel_target(3) == 13, "Аляска стала базой")
+	_game.traveled_routes = ["1-3", "2-3"]
 	var hub := await _fresh_level(13)
 	var doors := hub.find_children("*", "LevelEntrance").filter(func(e: Variant) -> bool: return e.active)
 	_check(hub.get("hub_mode") and doors.size() == 2, "на базе Аляски входы на прииск и в городок (%d)" % doors.size())
@@ -990,6 +994,65 @@ func _test_helicopter() -> void:
 	while not _game.is_level_unlocked(10) and Time.get_ticks_msec() - started < 15000:
 		await get_tree().process_frame
 	_check(_game.is_level_unlocked(10) and rpg_shot != null, "после вертолёта — освобождать Сан-Франциско")
+
+
+func _test_train() -> void:
+	_game.reset_progress()
+	_game.unlocked_levels = 6
+	_game.town_liberated = true
+	_game.completions[4] = 1
+	await _fresh_level(_game.TOWN_INDEX)
+	_game.start_travel(2)
+	await _frames(10)
+	var train := get_tree().current_scene as TrainLevel
+	_check(train != null and train.title.contains("Нью-Йорк") and train.title.contains("Сан-Франциско"),
+			"поезд Нью-Йорк → Сан-Франциско")
+	if train == null:
+		return
+	_check(train.get_route() == ["city", "prairie", "desert", "mountains"] and train.get_biome() == "city",
+			"за окном: окраины, прерии, пустыня, горы")
+	var prop: Dictionary = train._props[train._props.size() - 1]
+	var z0: float = prop.pos.z
+	await _seconds(1.0)
+	_check(prop.pos.z - z0 > 15.0, "пейзаж несётся мимо (%.0f м за секунду)" % (prop.pos.z - z0))
+	_check(get_tree().get_nodes_in_group("enemies").size() >= 8, "в вагонах банда (%d)" % get_tree().get_nodes_in_group("enemies").size())
+	_check(train.find_children("*", "WaveZone").size() == 2 and train.has_node("Exit"), "две засады и выход у паровоза")
+	_check(train.get_node("Explosives").get_child_count() >= 8, "в вагонах бочки и динамит")
+	var problems := _route_problems(train)
+	_check(problems.is_empty(), "по поезду можно пройти от хвоста до паровоза %s" % [problems])
+	var player := train.player
+	player.max_health = 100000
+	player.health = 100000
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		enemy.queue_free()
+	_teleport(player, Vector3(0, 4.5, -46))
+	await _frames(8)
+	_check(player.global_position.y > 4.0, "на крышу товарного вагона можно встать")
+	var hp := player.health
+	train.spawn_tunnel(20.0)
+	var started := Time.get_ticks_msec()
+	while player.health == hp and Time.get_ticks_msec() - started < 9000:
+		await get_tree().physics_frame
+	_check(player.health < hp, "тоннель сбивает с крыши (−%d)" % (hp - player.health))
+	train.complete()
+	await _frames(3)
+	_check(_game.has_traveled(1, 2) and train.hud.get_node("%CompleteTitle").text == "Приехали: Сан-Франциско!",
+			"приехали в Сан-Франциско, маршрут открыт")
+	train.hud.get_node("%NextButton").pressed.emit()
+	await _frames(10)
+	var arrived := get_tree().current_scene as Level
+	_check(arrived != null and arrived.level_index == 5, "дальше — первый уровень эпизода 2 (порт)")
+	var town := await _fresh_level(_game.TOWN_INDEX)
+	_check(town.find_children("*", "TravelPoint").any(func(t: Variant) -> bool: return t.episode == 2 and t.active),
+			"после поездки в Сан-Франциско летает и самолёт")
+	_game.liberated_cities = [10]
+	_game.unlocked_levels = 12
+	await _fresh_level(10)
+	_game.start_travel(3)
+	await _frames(10)
+	var north := get_tree().current_scene as TrainLevel
+	_check(north != null and north.get_route() == ["coast", "forest", "snow"], "поезд на Аляску: побережье, тайга, снег")
+	_game.reset_progress()
 
 
 func _test_save_migration() -> void:
