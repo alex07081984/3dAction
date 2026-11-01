@@ -62,9 +62,11 @@ for x in (-9, -4.6, 4.6, 9):
     L.box("Props", "TollBooth", (x, 1.5, -8), (1.8, 3, 3), "white_paint")
 L.box_ext("Props", "TollRoof", -11, 11, 3.2, 3.6, -10, -6, RED, collide=False)
 L.label("МОСТ ЗОЛОТЫЕ ВОРОТА", (0, 4.6, -10.1), size=72, color="Color(1, 0.85, 0.4, 1)")
-for x, z in ((6.5, -24), (-9.5, -31), (9.5, -46), (-6.5, -52), (6.5, -70), (-9.5, -84), (9.5, -96), (6.5, -112),
-             (-6.5, -118), (9.5, -134), (-9.5, -142), (6.5, -150), (-6.5, -160)):
+# Брошенные машины: часть просто стоит, а часть горит и взрывается от выстрелов.
+for x, z in ((-9.5, -31), (9.5, -46), (-9.5, -84), (9.5, -96), (9.5, -134), (6.5, -150)):
     car(x, z)
+L.cars([(6.5, 0, -24, 8), (-6.5, 0, -52, -12), (6.5, 0, -70, 170), (6.5, 0, -112, 5), (-6.5, 0, -118, -170),
+        (-9.5, 0, -142, 15), (-6.5, 0, -160, -8)])
 L.box("Props", "SchoolBus", (-6, 1.6, -95), (2.6, 3.2, 11), "plaster_yellow")
 L.box_ext("Props", "BusWindows", -7.35, -4.65, 2.2, 3.0, -100, -90, "dark_glass", collide=False, shadow=False)
 L.box_ext("Props", "Blockade", -12, -3.4, 0, 1.2, -168, -167, "barrier")
@@ -170,4 +172,5 @@ L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 60, 0), mul(r
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(4.6, 0, -35), (-4.6, 0, -85), (4.6, 0, -130), (-4.6, 0, -150), (-10, 8, -193), (10, 24, -240),
               (-12.5, TOP, -276), (12.5, TOP, -280)], pattern="BBC")
+L.pickup("weapon", (0, 0, -16), weapon="rpg")
 L.write("scenes/levels/level_9_bridge.tscn", env, ["pistol", "shotgun", "magnum", "rifle"])

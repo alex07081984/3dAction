@@ -164,8 +164,9 @@ def settings_panel():
                        ("AutoFire", "Автоогонь (стреляет сам, когда прицел на враге)"),
                        ("Shadows", "Тени (выключите, если игра тормозит)"),
                        ("Noir", "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"),
-                       ("Music", "Музыка")):
-        s.node(name, "CheckButton", v, layout="container", unique=True, custom_minimum_size="Vector2(0, 56)",
+                       ("Music", "Музыка"),
+                       ("Blood", "Много крови: куски тел, оторванные руки, пятна")):
+        s.node(name, "CheckButton", v, layout="container", unique=True, custom_minimum_size="Vector2(0, 50)",
                text=text)
     s.node("DoneButton", "Button", v, layout="container", unique=True, custom_minimum_size="Vector2(0, 76)",
            text="Готово")
@@ -180,6 +181,8 @@ def hud():
     joystick = s.ext_res("Script", "res://scripts/touch/touch_joystick.gd")
     button = s.ext_res("Script", "res://scripts/touch/touch_button.gd")
     crosshair = s.ext_res("Script", "res://scripts/ui/crosshair.gd")
+    splash = s.ext_res("Script", "res://scripts/ui/blood_splash.gd")
+    stars = s.ext_res("Script", "res://scripts/ui/star_rating.gd")
     settings = s.ext_res("PackedScene", "res://ui/settings_panel.tscn")
     hp_bg = s.sub_res("StyleBoxFlat", "StyleBox_hp_bg", bg_color="Color(0, 0, 0, 0.5)",
                       corner_radius_top_left=8, corner_radius_top_right=8,
@@ -192,6 +195,9 @@ def hud():
                             corner_radius_bottom_right=4, corner_radius_bottom_left=4)
     noir_shader = s.ext_res("Shader", "res://ui/noir.gdshader")
     noir = s.sub_res("ShaderMaterial", "ShaderMaterial_noir", shader=noir_shader)
+    rage_fill = s.sub_res("StyleBoxFlat", "StyleBox_rage", bg_color="Color(1, 0.4, 0.1, 1)",
+                          corner_radius_top_left=4, corner_radius_top_right=4,
+                          corner_radius_bottom_right=4, corner_radius_bottom_left=4)
     boss_fill = s.sub_res("StyleBoxFlat", "StyleBox_boss", bg_color="Color(0.7, 0.08, 0.06, 1)",
                           corner_radius_top_left=6, corner_radius_top_right=6,
                           corner_radius_bottom_right=6, corner_radius_bottom_left=6)
@@ -202,6 +208,10 @@ def hud():
     s.node("NoirFilter", "ColorRect", ".", layout="full", unique=True, mouse_filter=2, material=noir)
     s.node("DamageFlash", "ColorRect", ".", layout="full", unique=True, mouse_filter=2,
            color="Color(0.8, 0, 0, 0)")
+    # Ярость: экран слегка краснеет. Кровь на экране — после убийства в упор.
+    s.node("RageTint", "ColorRect", ".", layout="full", unique=True, mouse_filter=2, visible=False,
+           color="Color(0.75, 0.02, 0.0, 0.16)")
+    s.node("BloodSplash", "Control", ".", layout="full", unique=True, mouse_filter=2, script=splash)
     s.node("Crosshair", "Control", ".", layout="full", unique=True, mouse_filter=2, script=crosshair)
 
     s.node("TouchControls", "Control", ".", layout="full", unique=True, process_mode=1, mouse_filter=2)
@@ -216,6 +226,7 @@ def hud():
         ("InteractButton", "interact", "Войти", 24, (-600, -230, -460, -90), False, "Color(0.3, 1, 0.45, 0.35)"),
         ("GrenadeButton", "grenade", "Гран 2", 18, (-455, -400, -355, -300), False, "Color(0.5, 1, 0.4, 0.28)"),
         ("ScopeButton", "aim_scope", "Прицел", 18, (-305, -520, -195, -410), False, "Color(1, 0.85, 0.3, 0.3)"),
+        ("RageButton", "rage", "ЯРОСТЬ", 18, (-575, -400, -465, -290), False, "Color(1, 0.3, 0.15, 0.45)"),
     ]
     for name, action, text, size, offsets, drag, color in buttons:
         props = dict(mouse_filter=2, script=button, action=f'&"{action}"', text=text, font_size=size)
@@ -223,10 +234,11 @@ def hud():
             props["pass_drag"] = True
         if color:
             props["color"] = color
-        if name in ("InteractButton", "ScopeButton"):
+        if name in ("InteractButton", "ScopeButton", "RageButton"):
             props["visible"] = False
         s.node(name, "Control", "TouchControls", layout="bottom_right", offsets=offsets,
-               unique=(name in ("SwitchButton", "InteractButton", "GrenadeButton", "ScopeButton")), **props)
+               unique=(name in ("SwitchButton", "InteractButton", "GrenadeButton", "ScopeButton", "RageButton")),
+               **props)
     s.node("InteractPrompt", "Label", "TouchControls", layout="bottom_right", offsets=(-900, -290, -160, -240),
            unique=True, visible=False, theme_override_font_sizes__font_size=24, horizontal_alignment=1,
            theme_override_colors__font_color="Color(0.75, 1, 0.8, 1)", autowrap_mode=3)
@@ -237,6 +249,12 @@ def hud():
            step=1.0, value=100.0, show_percentage=False)
     s.node("HealthLabel", "Label", "TopBar/HealthBar", layout="full", unique=True,
            theme_override_font_sizes__font_size=22, text="100", horizontal_alignment=1, vertical_alignment=1)
+    s.node("RageBar", "ProgressBar", "TopBar", layout="top_left", offsets=(24, 62, 324, 74), unique=True,
+           mouse_filter=2, theme_override_styles__background=hp_bg, theme_override_styles__fill=rage_fill,
+           step=0.5, value=0.0, show_percentage=False)
+    s.node("ComboLabel", "Label", "TopBar", layout="top_left", offsets=(24, 80, 470, 120), unique=True,
+           theme_override_font_sizes__font_size=30, theme_override_colors__font_color="Color(1, 0.8, 0.3, 1)",
+           text="")
     s.node("ObjectiveLabel", "Label", "TopBar", layout="center_top", offsets=(-270, 14, 270, 50), unique=True,
            theme_override_font_sizes__font_size=22, horizontal_alignment=1, autowrap_mode=3,
            clip_text=True)
@@ -269,6 +287,9 @@ def hud():
     s.node("Message", "Label", ".", layout="center", offsets=(-500, -205, 500, -125), unique=True,
            theme_override_constants__outline_size=12, theme_override_font_sizes__font_size=60,
            horizontal_alignment=1, vertical_alignment=1)
+    s.node("Banner", "Label", ".", layout="center", offsets=(-500, -320, 500, -230), unique=True,
+           theme_override_constants__outline_size=16, theme_override_font_sizes__font_size=72,
+           horizontal_alignment=1, vertical_alignment=1, pivot_offset="Vector2(500, 45)")
     s.node("Subtitle", "Label", ".", layout="center", offsets=(-500, -125, 500, -81), unique=True,
            theme_override_font_sizes__font_size=28, horizontal_alignment=1, vertical_alignment=1)
     s.node("Toast", "Label", ".", layout="center_bottom", offsets=(-300, -76, 300, -36), unique=True,
@@ -306,6 +327,8 @@ def hud():
            extra=[property_body])
 
     def stats(vbox):
+        s.node("StarRating", "Control", vbox, layout="container", unique=True, mouse_filter=2,
+               custom_minimum_size="Vector2(300, 74)", script=stars)
         s.node("CompleteStats", "Label", vbox, layout="container", unique=True,
                theme_override_font_sizes__font_size=30, text="Время: 0:00", horizontal_alignment=1)
         s.node("RecordLabel", "Label", vbox, layout="container", unique=True,

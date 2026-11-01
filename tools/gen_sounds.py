@@ -35,6 +35,10 @@ def highpass(x, cutoff):
     return x - lowpass(x, cutoff)
 
 
+def bandpass_noise(duration, lo, hi):
+    return highpass(lowpass(noise(duration), hi), lo)
+
+
 def env(duration, tau, attack=0.002):
     t = t_axis(duration)
     e = np.exp(-t / tau)
@@ -470,6 +474,15 @@ def extra_sounds():
     gusts = 0.55 + 0.3 * np.sin(2 * np.pi * t / 6.0) + 0.15 * np.sin(2 * np.pi * 3 * t / 6.0 + 1.0)
     wind = lowpass(noise(6.0), 700) * 0.8 + highpass(lowpass(noise(6.0), 2200), 900) * 0.25
     save("wind", finish(wind * gusts, gain=0.5, drive=1.0))
+    # РПГ: хлопок пуска и шипящий уход ракеты.
+    launch = pad(gunshot(0.5, 90, 40, 0.06, 0.01, 900, 0.05, 300, 0.25, 0.4), 1.2)
+    whoosh = bandpass_noise(1.2, 700, 2600) * np.exp(-t_axis(1.2) / 0.45) * np.clip(t_axis(1.2) / 0.05, 0, 1)
+    save("rpg", finish(launch + whoosh * 0.7, drive=2.2))
+    # Ярость: удар сердца, гул и рёв.
+    t = t_axis(1.4)
+    beat = np.sin(2 * np.pi * 55 * t) * (np.exp(-t / 0.08) + 0.8 * np.exp(-np.clip(t - 0.28, 0, None) / 0.08) * (t > 0.28))
+    roar = lowpass(noise(1.4), 400) * np.clip(t / 0.3, 0, 1) * np.exp(-np.clip(t - 0.6, 0, None) / 0.4)
+    save("rage", finish(beat * 1.2 + roar * 0.9 + sweep(1.4, 70, 35) * 0.4 * np.exp(-t / 0.7), drive=2.0))
 
 
 if __name__ == "__main__":

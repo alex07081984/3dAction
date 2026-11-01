@@ -87,10 +87,17 @@ var settings := {
 	"shadows": true,
 	"noir": true,
 	"music": true,
+	"blood": true,
 }
 var unlocked_levels := 1
 ## Рекорды: индекс уровня -> {"time": секунды, "kills": убийства, "headshots": хедшоты}.
 var records := {}
+## Лучшие звёзды за уровень (1–3): индекс уровня -> число.
+var stars := {}
+## Замедление времени после эффектных убийств (тесты его выключают).
+var slowmo_enabled := true
+## Режим ярости: всё вокруг замедляется.
+var bullet_time := false
 var money := 0
 ## Сколько раз пройден каждый уровень. Каждое прохождение повышает сложность и награду.
 var completions := {}
@@ -106,11 +113,46 @@ var current_tier := 0
 ## Тесты выключают запись на диск, чтобы не портить настоящее сохранение.
 var save_enabled := true
 
+var _slowmo_left := 0.0
+var _slowmo_scale := 1.0
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	load_data()
 	apply_settings()
+
+
+func _process(delta: float) -> void:
+	# Время замедления считаем по настоящим часам, а не по игровым.
+	var real := delta / maxf(Engine.time_scale, 0.01)
+	if _slowmo_left > 0.0 and not get_tree().paused:
+		_slowmo_left -= real
+	var target := 1.0
+	if bullet_time:
+		target = 0.45
+	if _slowmo_left > 0.0:
+		target = minf(target, _slowmo_scale)
+	if not is_equal_approx(Engine.time_scale, target):
+		Engine.time_scale = target
+		AudioServer.playback_speed_scale = lerpf(1.0, target, 0.6)
+
+
+## Кинематографичное замедление на долю секунды (последний враг волны, босс повержен).
+func slow_motion(seconds := 0.9, scale := 0.25) -> void:
+	if not slowmo_enabled:
+		return
+	_slowmo_left = maxf(_slowmo_left, seconds)
+	_slowmo_scale = scale
+
+
+## Много крови: куски тел, оторванные руки, пятна на стенах (выключается в настройках).
+func gore() -> bool:
+	return bool(settings.get("blood", true))
+
+
+func stars_of(index: int) -> int:
+	return int(stars.get(index, 0))
 
 
 # --- Уровни ---------------------------------------------------------------------
@@ -239,15 +281,15 @@ func enemy_damage_multiplier() -> float:
 	return 1.0 + 0.2 * current_tier
 
 
-## Награда за убийство. Возвращает, сколько денег начислено.
-func reward_kill(headshot: bool) -> int:
-	var amount := roundi((10 + (5 if headshot else 0)) * reward_multiplier())
+## Награда за убийство (combo — множитель серии убийств). Возвращает, сколько денег начислено.
+func reward_kill(headshot: bool, combo := 1) -> int:
+	var amount := roundi((10 + (5 if headshot else 0)) * reward_multiplier() * maxi(combo, 1))
 	add_money(amount)
 	return amount
 
 
 ## Итог уровня: {"record": новый рекорд времени, "reward": деньги за прохождение}.
-func complete_level(index: int, time: float, kills: int, headshots: int) -> Dictionary:
+func complete_level(index: int, time: float, kills: int, headshots: int, earned_stars := 1) -> Dictionary:
 	var reward := roundi(LEVELS[index].reward * reward_multiplier())
 	add_money(reward)
 	completions[index] = int(completions.get(index, 0)) + 1
@@ -256,6 +298,7 @@ func complete_level(index: int, time: float, kills: int, headshots: int) -> Dict
 	elif is_city(index) and not index in liberated_cities:
 		liberated_cities.append(index)
 	unlocked_levels = clampi(maxi(unlocked_levels, index + 2), 1, LEVELS.size())
+	stars[index] = maxi(stars_of(index), clampi(earned_stars, 0, 3))
 	var best: Variant = records.get(index)
 	var is_record: bool = best == null or time < float(best.time)
 	if is_record:
@@ -389,6 +432,8 @@ func save_data() -> void:
 		config.set_value("records", str(index), records[index])
 	for index in completions:
 		config.set_value("completions", str(index), completions[index])
+	for index in stars:
+		config.set_value("stars", str(index), stars[index])
 	config.save(SAVE_PATH)
 
 
@@ -409,12 +454,15 @@ func load_data() -> void:
 		if record is Dictionary:
 			records[index] = record
 		completions[index] = int(config.get_value("completions", str(index), 0))
+		if config.has_section_key("stars", str(index)):
+			stars[index] = int(config.get_value("stars", str(index), 0))
 
 
 ## Сброс прогресса (для тестов).
 func reset_progress() -> void:
 	unlocked_levels = 1
 	records = {}
+	stars = {}
 	money = 0
 	completions = {}
 	town_liberated = false
@@ -431,4 +479,7 @@ static func format_time(seconds: float) -> String:
 
 func _reset_runtime_state() -> void:
 	get_tree().paused = false
+	bullet_time = false
+	_slowmo_left = 0.0
 	Engine.time_scale = 1.0
+	AudioServer.playback_speed_scale = 1.0

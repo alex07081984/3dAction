@@ -160,6 +160,7 @@ func apply_shot(amount: float, headshot: bool, point: Vector3, direction: Vector
 	_wake()
 	model.flinch(0.75 if headshot else 0.45)
 	Fx.blood(point, direction, 24 if amount >= 40.0 else 12)
+	Fx.blood_spray(point, direction, 0.5 + minf(amount, 120.0) / 120.0)
 	# Заряд дроби в ногу или руку отрывает её, даже если урона хватило бы на смерть:
 	# человечек ещё попрыгает или покорчится, а потом упадёт.
 	var limb := "" if is_wounded() else _limb_to_sever(parts, weapon, amount)
@@ -203,7 +204,7 @@ func apply_blast(amount: float, origin: Vector3, force: float) -> void:
 		if amount >= 70.0:
 			_die(BlockyCharacter.Death.GIB, direction, force)
 			return
-		if can_be_dismembered:
+		if can_be_dismembered and Game.gore():
 			var limbs := BlockyCharacter.LIMBS.duplicate()
 			limbs.shuffle()
 			for i in randi_range(1, 2):
@@ -211,6 +212,8 @@ func apply_blast(amount: float, origin: Vector3, force: float) -> void:
 		_die(BlockyCharacter.Death.FALL, direction, force)
 		return
 	model.flinch(1.0)
+	# Взрывная волна сбивает с ног и отбрасывает.
+	velocity += direction * force * 0.35
 	if can_be_dismembered and amount >= 30.0 and randf() < 0.5:
 		_take_wound(BlockyCharacter.LIMBS.pick_random(), direction, force)
 
@@ -226,7 +229,7 @@ func hear_noise(position: Vector3, radius: float) -> void:
 ## Какую конечность оторвёт этот выстрел (пусто — никакую). Отрывает, если в неё
 ## пришлось достаточно урона и заметная доля всего заряда.
 func _limb_to_sever(parts: Dictionary, weapon: WeaponData, total: float) -> String:
-	if not can_be_dismembered or weapon == null or weapon.sever_damage <= 0.0:
+	if not can_be_dismembered or weapon == null or weapon.sever_damage <= 0.0 or not Game.gore():
 		return ""
 	var best := ""
 	var best_damage := 0.0
@@ -458,10 +461,21 @@ func _die(mode: BlockyCharacter.Death, direction: Vector3, force: float) -> void
 		_:
 			Audio.play_at("death", global_position + Vector3.UP)
 	_drop_loot()
+	_splash_screen(mode)
 	var headshot := mode == BlockyCharacter.Death.HEADSHOT
 	died.emit(self, headshot)
 	get_tree().call_group("level", "register_kill", headshot)
 	queue_free()
+
+
+## Убийство в упор забрызгивает экран кровью.
+func _splash_screen(mode: BlockyCharacter.Death) -> void:
+	if not Game.gore() or mode == BlockyCharacter.Death.FALL or not is_instance_valid(_player):
+		return
+	var camera := get_viewport().get_camera_3d()
+	var distance := camera.global_position.distance_to(global_position + Vector3.UP) if camera else 99.0
+	if distance < 6.0:
+		get_tree().call_group("hud", "blood_splash", 1.0 if mode == BlockyCharacter.Death.GIB else 0.6)
 
 
 func _drop_loot() -> void:

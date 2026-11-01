@@ -105,33 +105,39 @@ text = "1.0"
 
 [node name="AimAssist" type="CheckButton" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Помощь в прицеливании"
 
 [node name="AutoFire" type="CheckButton" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Автоогонь (стреляет сам, когда прицел на враге)"
 
 [node name="Shadows" type="CheckButton" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Тени (выключите, если игра тормозит)"
 
 [node name="Noir" type="CheckButton" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"
 
 [node name="Music" type="CheckButton" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Музыка"
+
+[node name="Blood" type="CheckButton" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Много крови: куски тел, оторванные руки, пятна"
 
 [node name="DoneButton" type="Button" parent="Center/Panel/VBox"]
 unique_name_in_owner = true

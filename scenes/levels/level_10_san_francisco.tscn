@@ -64,13 +64,15 @@
 [ext_resource type="Shader" path="res://materials/night_sky.gdshader" id="62_night_sky"]
 [ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="63_explosive_barrel"]
 [ext_resource type="PackedScene" path="res://scenes/props/gas_cylinder.tscn" id="64_gas_cylinder"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="65_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="66_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="67_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="68_shotgun"]
-[ext_resource type="Resource" path="res://weapons/magnum.tres" id="69_magnum"]
-[ext_resource type="Resource" path="res://weapons/rifle.tres" id="70_rifle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="71_hud"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_car.tscn" id="65_explosive_car"]
+[ext_resource type="Resource" path="res://weapons/rpg.tres" id="66_rpg"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="67_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="68_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="69_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="70_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="71_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="72_rifle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="73_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(58, 6, 1)
@@ -153,11 +155,11 @@ fog_density = 0.013
 fog_sky_affect = 0.35
 
 [node name="Level10SanFrancisco" type="Node3D"]
-script = ExtResource("65_town")
+script = ExtResource("67_town")
 level_index = 9
 title = "Сан-Франциско"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("66_weapon_data")]([ExtResource("67_pistol"), ExtResource("68_shotgun"), ExtResource("69_magnum"), ExtResource("70_rifle")])
+start_weapons = Array[ExtResource("68_weapon_data")]([ExtResource("69_pistol"), ExtResource("70_shotgun"), ExtResource("71_magnum"), ExtResource("72_rifle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -2681,6 +2683,21 @@ transform = Transform3D(-0.1908, 0, -0.9816, 0, 1, 0, 0.9816, 0, -0.1908, -14, 1
 [node name="Cylinder3" parent="Explosives" instance=ExtResource("64_gas_cylinder")]
 transform = Transform3D(0.4384, 0, -0.8988, 0, 1, 0, 0.8988, 0, 0.4384, 42.5, 0, 6.5)
 
+[node name="Car" parent="Explosives" instance=ExtResource("65_explosive_car")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 22)
+
+[node name="Car2" parent="Explosives" instance=ExtResource("65_explosive_car")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 39.2, 0, -20)
+
+[node name="Car3" parent="Explosives" instance=ExtResource("65_explosive_car")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.2, 0, -20)
+
+[node name="Rpg" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 28)
+script = ExtResource("51_pickup")
+kind = 2
+weapon = ExtResource("66_rpg")
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -2713,4 +2730,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 14, -95.5)
 [node name="P09" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 14, -97)
 
-[node name="HUD" parent="." instance=ExtResource("71_hud")]
+[node name="HUD" parent="." instance=ExtResource("73_hud")]

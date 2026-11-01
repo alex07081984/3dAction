@@ -295,4 +295,6 @@ L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 40, 0), mul(r
 L.explosives([(-6.5, 0, -52), (6.6, 0, -70), (-6.6, 0, -86), (6.5, 0, -100), (-5.5, 0, -122), (20, 0, -98),
               (44.5, 0, -94), (62, 0, -86), (74, 0, -118), (58, 0, -136), (32, 0, -120), (90, 0, -128)],
              pattern="TBT")
+L.explosives([(28, 0, -90), (80, 0, -100)], pattern="F")
+L.pickup("weapon", (30, 0, -108), weapon="rpg")
 L.write("scenes/levels/level_12_ghost_town.tscn", env, ["pistol", "shotgun", "magnum", "rifle"])

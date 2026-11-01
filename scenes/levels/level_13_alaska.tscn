@@ -45,14 +45,17 @@
 [ext_resource type="Shader" path="res://materials/aurora_sky.gdshader" id="43_aurora_sky"]
 [ext_resource type="PackedScene" path="res://scenes/props/tnt_crate.tscn" id="44_tnt_crate"]
 [ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="45_explosive_barrel"]
-[ext_resource type="Script" path="res://scripts/town.gd" id="46_town"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="47_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="48_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="49_shotgun"]
-[ext_resource type="Resource" path="res://weapons/magnum.tres" id="50_magnum"]
-[ext_resource type="Resource" path="res://weapons/rifle.tres" id="51_rifle"]
-[ext_resource type="Resource" path="res://weapons/sniper.tres" id="52_sniper"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="53_hud"]
+[ext_resource type="PackedScene" path="res://scenes/props/fuel_tank.tscn" id="46_fuel_tank"]
+[ext_resource type="PackedScene" path="res://scenes/props/explosive_car.tscn" id="47_explosive_car"]
+[ext_resource type="Resource" path="res://weapons/rpg.tres" id="48_rpg"]
+[ext_resource type="Script" path="res://scripts/town.gd" id="49_town"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="50_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="51_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="52_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="53_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="54_rifle"]
+[ext_resource type="Resource" path="res://weapons/sniper.tres" id="55_sniper"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="56_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(126, 6, 1)
@@ -109,11 +112,11 @@ fog_density = 0.011
 fog_sky_affect = 0.35
 
 [node name="Level13Alaska" type="Node3D"]
-script = ExtResource("46_town")
+script = ExtResource("49_town")
 level_index = 12
 title = "Аляска"
 objective = "Освободите город: зачистите три района"
-start_weapons = Array[ExtResource("47_weapon_data")]([ExtResource("48_pistol"), ExtResource("49_shotgun"), ExtResource("50_magnum"), ExtResource("51_rifle"), ExtResource("52_sniper")])
+start_weapons = Array[ExtResource("50_weapon_data")]([ExtResource("51_pistol"), ExtResource("52_shotgun"), ExtResource("53_magnum"), ExtResource("54_rifle"), ExtResource("55_sniper")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -3376,6 +3379,30 @@ transform = Transform3D(-0.1908, 0, -0.9816, 0, 1, 0, 0.9816, 0, -0.1908, 30, 0,
 [node name="Tnt6" parent="Explosives" instance=ExtResource("44_tnt_crate")]
 transform = Transform3D(0.4384, 0, -0.8988, 0, 1, 0, 0.8988, 0, 0.4384, -30, 0, -6.5)
 
+[node name="FuelTank" parent="Explosives" instance=ExtResource("46_fuel_tank")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 20)
+
+[node name="FuelTank2" parent="Explosives" instance=ExtResource("46_fuel_tank")]
+transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, 56, 0, 22)
+
+[node name="Car" parent="Explosives" instance=ExtResource("47_explosive_car")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8, 0, -20)
+
+[node name="Car2" parent="Explosives" instance=ExtResource("47_explosive_car")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -39.2, 0, 20)
+
+[node name="Car3" parent="Explosives" instance=ExtResource("47_explosive_car")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, -25)
+
+[node name="Car4" parent="Explosives" instance=ExtResource("47_explosive_car")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.8, 0, 48)
+
+[node name="Rpg" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
+script = ExtResource("32_pickup")
+kind = 2
+weapon = ExtResource("48_rpg")
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -3405,4 +3432,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 0)
 [node name="P08" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
 
-[node name="HUD" parent="." instance=ExtResource("53_hud")]
+[node name="HUD" parent="." instance=ExtResource("56_hud")]

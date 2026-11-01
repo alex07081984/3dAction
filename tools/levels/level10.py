@@ -341,5 +341,7 @@ L.node("Moonlight", "DirectionalLight3D", ".",
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(-43.5, 0, -30), (-28.5, 0, -43), (-45, 0, 43), (-28, 0, 43.5), (6.5, 0, -6.5), (-6.5, 0, 6.5),
               (14, HILL, -97.5), (-14, HILL, -110.5), (42.5, 0, 6.5)], pattern="BBC")
+L.cars([(-3.8, 0, 22, 0), (39.2, 0, -20, 180), (-39.2, 0, -20, 0)])
+L.pickup("weapon", (0, 0, 28), weapon="rpg")
 L.write("scenes/levels/level_10_san_francisco.tscn", env, ["pistol", "shotgun", "magnum", "rifle"],
         script_path="res://scripts/town.gd")

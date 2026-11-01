@@ -3,11 +3,12 @@ extends Node
 ## следы от пуль и лужи крови. Всё создаётся кодом и само исчезает.
 ## Эффекты кладутся в текущую сцену, поэтому пропадают при рестарте уровня.
 
-const MAX_DECALS := 40
+const MAX_DECALS := 64
 const WORLD_MASK := 1
 
 var _materials := {}
 var _decals: Array = []
+var _splats: Array[Texture2D] = []
 
 
 func muzzle_flash(position: Vector3, direction: Vector3) -> void:
@@ -57,7 +58,20 @@ func tracer(from: Vector3, to: Vector3, color := Color(1.0, 0.9, 0.55)) -> void:
 
 
 func blood(position: Vector3, direction: Vector3, amount := 16) -> void:
+	if not Game.gore():
+		amount = maxi(amount / 4, 2)
 	_burst(position, direction, Color(0.55, 0.02, 0.02), amount, 4.5, 0.07, 0.7, 14.0, 40.0)
+
+
+## Брызги крови на стену или пол позади раны (по направлению выстрела).
+func blood_spray(position: Vector3, direction: Vector3, size := 0.8) -> void:
+	if not Game.gore() or direction.length_squared() < 0.0001:
+		return
+	var dir := (direction.normalized() + Vector3.DOWN * randf_range(0.05, 0.35)).normalized()
+	var hit := _raycast(position, position + dir * 4.0)
+	if hit.is_empty():
+		return
+	_decal(hit.position, hit.normal, Color(0.4, 0.0, 0.0, 0.95), size * randf_range(0.8, 1.3), _splat_texture())
 
 
 func sparks(position: Vector3, normal: Vector3) -> void:
@@ -67,6 +81,8 @@ func sparks(position: Vector3, normal: Vector3) -> void:
 
 ## Струя крови, которая бьёт из точки, привязанной к движущейся части тела.
 func blood_fountain(parent: Node3D, local_position: Vector3, duration := 1.2) -> void:
+	if not Game.gore():
+		return
 	var particles := _make_particles(Color(0.6, 0.0, 0.0), 0.06)
 	particles.one_shot = false
 	particles.amount = 48
@@ -297,10 +313,13 @@ func _grow_curve() -> Curve:
 
 ## Лужа крови на полу под точкой.
 func blood_pool(position: Vector3, size := 1.0) -> void:
+	if not Game.gore():
+		return
 	var hit := _raycast(position + Vector3.UP * 0.5, position + Vector3.DOWN * 3.0)
 	if hit.is_empty():
 		return
-	var pool := _decal(hit.position, hit.normal, Color(0.32, 0.0, 0.0, 0.92), size * randf_range(0.8, 1.3))
+	var pool := _decal(hit.position, hit.normal, Color(0.32, 0.0, 0.0, 0.92), size * randf_range(0.8, 1.3),
+			_splat_texture())
 	if pool:
 		var final_scale := pool.scale
 		pool.scale = final_scale * 0.2
@@ -312,14 +331,44 @@ func bullet_hole(position: Vector3, normal: Vector3) -> void:
 	_decal(position, normal, Color(0.05, 0.05, 0.05, 0.9), 0.12)
 
 
-func _decal(position: Vector3, normal: Vector3, color: Color, size: float) -> Node3D:
+## Пятно-клякса: неровное пятно с брызгами вокруг (рисуется один раз, три варианта).
+func _splat_texture() -> Texture2D:
+	if _splats.is_empty():
+		for variant in 3:
+			var image := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+			image.fill(Color(1, 1, 1, 0))
+			var blobs := [[Vector2(32, 32), randf_range(14.0, 17.0)]]
+			for i in randi_range(5, 8):
+				var angle := randf() * TAU
+				blobs.append([Vector2(32, 32) + Vector2(cos(angle), sin(angle)) * randf_range(10.0, 26.0),
+						randf_range(1.5, 5.5)])
+			var wobble := [randf() * TAU, randf() * TAU]
+			for y in 64:
+				for x in 64:
+					var p := Vector2(x + 0.5, y + 0.5)
+					var alpha := 0.0
+					for blob in blobs:
+						var offset: Vector2 = p - blob[0]
+						var radius: float = blob[1]
+						if radius > 10.0:
+							# Края главного пятна неровные.
+							var angle := offset.angle()
+							radius *= 1.0 + 0.18 * sin(angle * 5.0 + wobble[0]) + 0.1 * sin(angle * 9.0 + wobble[1])
+						alpha = maxf(alpha, clampf((radius - offset.length()) * 0.6, 0.0, 1.0))
+					if alpha > 0.0:
+						image.set_pixel(x, y, Color(1, 1, 1, alpha))
+			_splats.append(ImageTexture.create_from_image(image))
+	return _splats.pick_random()
+
+
+func _decal(position: Vector3, normal: Vector3, color: Color, size: float, texture: Texture2D = null) -> Node3D:
 	var root := _root()
 	if root == null:
 		return null
 	var decal := MeshInstance3D.new()
 	var mesh := PlaneMesh.new()
 	mesh.size = Vector2.ONE
-	mesh.material = _material(color, false)
+	mesh.material = _textured_material(color, texture) if texture else _material(color, false)
 	decal.mesh = mesh
 	decal.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	decal.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -371,6 +420,18 @@ func _make_particles(color: Color, size: float) -> CPUParticles3D:
 	particles.scale_amount_max = 1.3
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return particles
+
+
+func _textured_material(color: Color, texture: Texture2D) -> StandardMaterial3D:
+	var key := "tex_%s_%d" % [color.to_html(), texture.get_instance_id()]
+	if not _materials.has(key):
+		var material := StandardMaterial3D.new()
+		material.albedo_color = color
+		material.albedo_texture = texture
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		material.roughness = 0.3
+		_materials[key] = material
+	return _materials[key]
 
 
 func _material(color: Color, unshaded: bool) -> StandardMaterial3D:

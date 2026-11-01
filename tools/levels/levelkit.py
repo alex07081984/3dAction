@@ -258,15 +258,22 @@ class Level:
         self.node(kind.capitalize() if not weapon else weapon.capitalize(), "Area3D", "Pickups", **props)
 
     def explosives(self, spots, pattern="BBC"):
-        """Бочки (B), газовые баллоны (C) и ящики динамита (T) по очереди по шаблону."""
+        """Бочки (B), газовые баллоны (C), ящики динамита (T), машины (A) и цистерны (F)
+        по очереди по шаблону. Точка может быть (x, y, z) или (x, y, z, поворот)."""
         if not getattr(self, "_explosives_group", False):
             self.group("Explosives")
             self._explosives_group = True
-        kinds = {"B": ("explosive_barrel", "Barrel"), "C": ("gas_cylinder", "Cylinder"), "T": ("tnt_crate", "Tnt")}
-        for i, pos in enumerate(spots):
+        kinds = {"B": ("explosive_barrel", "Barrel"), "C": ("gas_cylinder", "Cylinder"), "T": ("tnt_crate", "Tnt"),
+                 "A": ("explosive_car", "Car"), "F": ("fuel_tank", "FuelTank")}
+        for i, spot in enumerate(spots):
             path, name = kinds[pattern[i % len(pattern)]]
+            yaw = spot[3] if len(spot) > 3 else i * 37.0
             scene = self.ext_res("PackedScene", f"res://scenes/props/{path}.tscn")
-            self.node(name, None, "Explosives", instance=scene, transform=xform(pos, rot_y(i * 37.0)))
+            self.node(name, None, "Explosives", instance=scene, transform=xform(spot[:3], rot_y(yaw)))
+
+    def cars(self, spots):
+        """Машины, которые горят и взрываются: [(x, y, z, поворот)]."""
+        self.explosives(spots, pattern="A")
 
     def markers(self, group, points):
         """Группа маркеров: [(имя, (x, y, z), поворот)] — места пряток, точки появления."""

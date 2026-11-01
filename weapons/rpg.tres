@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1_weapon"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = "rpg"
+display_name = "Гранатомёт РПГ"
+short_name = "РПГ"
+model = "rpg"
+sound = "rpg"
+damage = 240.0
+pellets = 1
+spread_deg = 0.6
+fire_interval = 0.9
+max_range = 120.0
+headshot_multiplier = 1.0
+impulse = 14.0
+gib_damage = 70.0
+projectile = "rocket"
+projectile_speed = 42.0
+blast_radius = 6.0
+player_blast_damage = 40
+magazine = 1
+reload_time = 2.0
+infinite_ammo = false
+start_reserve = 4
+max_reserve = 10
+ammo_per_pickup = 2
+recoil_deg = 5.0
+shake = 0.5
+crosshair_kick = 24.0

@@ -158,4 +158,6 @@ L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 40, 0), mul(r
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(-14.5, 0, -24), (14.5, 0, -30), (-13.5, 0, -40), (13, 0, -66), (-4.2, 0, -100), (16, 0, -146),
               (-9, 0, -170), (17.5, 0, -172), (-16, 0, -138)], pattern="TTB")
+L.explosives([(-25, 0, -50)], pattern="F")
+L.pickup("weapon", (0, 0, -30), weapon="rpg")
 L.write("scenes/levels/level_11_gold_mine.tscn", env, ["pistol", "shotgun", "magnum", "rifle"])

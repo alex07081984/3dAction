@@ -193,4 +193,7 @@ L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 40, 0), mul(r
 L.explosives([(-6.2, 0, -12), (6.2, 0, -24), (-17, 0, -31), (-6.2, 0, -50), (6.2, 0, -64), (17, 0, -58),
               (-8.5, 0, -88), (8.5, 0, -118), (-4.4, 0, -136), (-7.6, DECK, -185), (7, DECK, -203), (-7, DECK, -215)],
              pattern="BBC")
+# Цистерны с топливом и РПГ.
+L.explosives([(-17, 0, -26), (17, 0, -52), (-12, 0, -100)], pattern="F")
+L.pickup("weapon", (0, 0, -40), weapon="rpg")
 L.write("scenes/levels/level_6_port.tscn", env, ["pistol", "shotgun", "magnum"])

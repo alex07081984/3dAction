@@ -245,7 +245,7 @@ func get_hit_part(from: Vector3, direction: Vector3) -> String:
 
 ## Отрывает руку или ногу. Возвращает false, если её уже нет.
 func sever_limb(limb: String, direction: Vector3, force: float) -> bool:
-	if _broken or _hips == null or not _limbs.has(limb):
+	if _broken or _hips == null or not _limbs.has(limb) or not Game.gore():
 		return false
 	var root: Node3D = _limbs[limb][0]
 	var joint: Node3D = _limbs[limb][1]
@@ -317,6 +317,9 @@ func drop_weapon() -> void:
 func break_apart(mode: Death, direction: Vector3, force: float) -> void:
 	if _broken or _hips == null:
 		return
+	# «Мало крови» в настройках: тело просто падает, без кусков и оторванной головы.
+	if not Game.gore():
+		mode = Death.FALL
 	_broken = true
 	# Дальше части тела летят отдельно: у каждой свой меш, скелет больше не нужен.
 	for part in _parts:
@@ -351,8 +354,11 @@ func break_apart(mode: Death, direction: Vector3, force: float) -> void:
 				body.linear_velocity = direction * force * randf_range(0.6, 1.3) + spread
 				body.angular_velocity = Vector3(randf_range(-14, 14), randf_range(-14, 14), randf_range(-14, 14))
 				Fx.blood_fountain(body, Vector3.ZERO, 0.45)
-			for i in 6:
+			for i in 10:
 				_spawn_chunk(container, center, direction, force)
+			for i in 4:
+				var around := Vector3(randf_range(-1, 1), randf_range(-0.3, 0.6), randf_range(-1, 1))
+				Fx.blood_spray(center, around, 1.2)
 			Fx.blood(center, direction, 40)
 			Fx.blood(center, Vector3.UP, 25)
 			Fx.blood_pool(center, 1.8)
@@ -442,6 +448,17 @@ static func build_weapon_model(kind: String) -> Node3D:
 					[Vector3(0.05, 0.12, 0.3), Vector3(0, 0.02, 0.24), walnut, 0.015]]
 			muzzle_at = Vector3(0, 0.085, -1.08)
 			support_at = Vector3(0, -0.005, -0.42)
+		"rpg":
+			var olive := Color(0.24, 0.27, 0.18)
+			boxes = [[Vector3(0.1, 0.1, 1.0), Vector3(0, 0.09, -0.2), olive, 0.03],
+					[Vector3(0.13, 0.13, 0.14), Vector3(0, 0.09, 0.32), olive.darkened(0.3), 0.03],
+					[Vector3(0.16, 0.16, 0.2), Vector3(0, 0.09, -0.8), olive.lightened(0.1), 0.05],
+					[Vector3(0.06, 0.06, 0.22), Vector3(0, 0.09, -1.0), olive.darkened(0.2), 0.02],
+					[Vector3(0.05, 0.08, 0.1), Vector3(0.07, 0.16, -0.25), black],
+					[Vector3(0.045, 0.13, 0.06), Vector3(0, -0.02, 0.0), black, 0.01],
+					[Vector3(0.045, 0.12, 0.06), Vector3(0, -0.02, -0.3), wood, 0.01]]
+			muzzle_at = Vector3(0, 0.09, -1.12)
+			support_at = Vector3(0, -0.02, -0.3)
 		"knife":
 			boxes = [[Vector3(0.012, 0.045, 0.24), Vector3(0, 0.0, -0.17), Color(0.75, 0.76, 0.8)],
 					[Vector3(0.035, 0.045, 0.11), Vector3(0, 0.0, -0.01), black, 0.01]]

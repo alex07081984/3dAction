@@ -30,6 +30,13 @@ extends Resource
 @export var max_reserve := 60
 @export var ammo_per_pickup := 12
 
+@export_group("Снаряд")
+## "rocket" — оружие стреляет ракетой, которая взрывается при попадании (РПГ). Пусто — пули.
+@export var projectile := ""
+@export var projectile_speed := 45.0
+@export var blast_radius := 5.5
+@export var player_blast_damage := 40  ## Урон себе, если стрелять в упор.
+
 @export_group("Прицел")
 ## Оптический прицел: угол обзора камеры в прицеле, градусы (0 — прицела нет).
 ## Без прицела такое оружие стреляет с разбросом hip_spread_deg.

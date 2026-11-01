@@ -69,6 +69,8 @@ func _build_level_list() -> void:
 				button.text += "   · сложность %d" % (Game.tier_of(index) + 1)
 			if record is Dictionary:
 				button.text += "   · рекорд %s" % Game.format_time(record.time)
+			if Game.stars_of(index) > 0:
+				button.text += "   · звёзды %d/3" % Game.stars_of(index)
 			if Game.is_city(index) and Game.is_liberated(index):
 				button.text = "%d. %s   · ваша база" % [index + 1, title]
 			button.pressed.connect(Game.start_level.bind(index))

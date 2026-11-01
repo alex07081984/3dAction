@@ -30,13 +30,15 @@
 [ext_resource type="Shader" path="res://materials/aurora_sky.gdshader" id="28_aurora_sky"]
 [ext_resource type="PackedScene" path="res://scenes/props/tnt_crate.tscn" id="29_tnt_crate"]
 [ext_resource type="PackedScene" path="res://scenes/props/explosive_barrel.tscn" id="30_explosive_barrel"]
-[ext_resource type="Script" path="res://scripts/level.gd" id="31_level"]
-[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="32_weapon_data"]
-[ext_resource type="Resource" path="res://weapons/pistol.tres" id="33_pistol"]
-[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="34_shotgun"]
-[ext_resource type="Resource" path="res://weapons/magnum.tres" id="35_magnum"]
-[ext_resource type="Resource" path="res://weapons/rifle.tres" id="36_rifle"]
-[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="37_hud"]
+[ext_resource type="PackedScene" path="res://scenes/props/fuel_tank.tscn" id="31_fuel_tank"]
+[ext_resource type="Resource" path="res://weapons/rpg.tres" id="32_rpg"]
+[ext_resource type="Script" path="res://scripts/level.gd" id="33_level"]
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="34_weapon_data"]
+[ext_resource type="Resource" path="res://weapons/pistol.tres" id="35_pistol"]
+[ext_resource type="Resource" path="res://weapons/shotgun.tres" id="36_shotgun"]
+[ext_resource type="Resource" path="res://weapons/magnum.tres" id="37_magnum"]
+[ext_resource type="Resource" path="res://weapons/rifle.tres" id="38_rifle"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="39_hud"]
 
 [sub_resource type="BoxShape3D" id="Box_1"]
 size = Vector3(16, 4, 12)
@@ -63,11 +65,11 @@ fog_density = 0.01
 fog_sky_affect = 0.4
 
 [node name="Level12GhostTown" type="Node3D"]
-script = ExtResource("31_level")
+script = ExtResource("33_level")
 level_index = 11
 title = "Заброшенный городок"
 objective = "Возьмите винтовку охотника и зачистите городок"
-start_weapons = Array[ExtResource("32_weapon_data")]([ExtResource("33_pistol"), ExtResource("34_shotgun"), ExtResource("35_magnum"), ExtResource("36_rifle")])
+start_weapons = Array[ExtResource("34_weapon_data")]([ExtResource("35_pistol"), ExtResource("36_shotgun"), ExtResource("37_magnum"), ExtResource("38_rifle")])
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -3068,6 +3070,18 @@ transform = Transform3D(0.9848, 0, 0.1736, 0, 1, 0, -0.1736, 0, 0.9848, 32, 0, -
 [node name="Tnt8" parent="Explosives" instance=ExtResource("29_tnt_crate")]
 transform = Transform3D(0.682, 0, 0.7314, 0, 1, 0, -0.7314, 0, 0.682, 90, 0, -128)
 
+[node name="FuelTank" parent="Explosives" instance=ExtResource("31_fuel_tank")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, -90)
+
+[node name="FuelTank2" parent="Explosives" instance=ExtResource("31_fuel_tank")]
+transform = Transform3D(0.7986, 0, 0.6018, 0, 1, 0, -0.6018, 0, 0.7986, 80, 0, -100)
+
+[node name="Rpg" type="Area3D" parent="Pickups"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -108)
+script = ExtResource("6_pickup")
+kind = 2
+weapon = ExtResource("32_rpg")
+
 [node name="Route" type="Node3D" parent="."]
 
 [node name="P00" type="Marker3D" parent="Route"]
@@ -3091,4 +3105,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -105)
 [node name="P06" type="Marker3D" parent="Route"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, -105)
 
-[node name="HUD" parent="." instance=ExtResource("37_hud")]
+[node name="HUD" parent="." instance=ExtResource("39_hud")]

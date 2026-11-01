@@ -21,6 +21,7 @@ var _infinity := "∞"
 var _money_tween: Tween
 var _entrance_level := -1
 var _property_id := ""
+var _banner_tween: Tween
 
 @onready var _health_bar: ProgressBar = %HealthBar
 @onready var _health_label: Label = %HealthLabel
@@ -82,6 +83,8 @@ func _ready() -> void:
 	_subtitle.modulate.a = 0.0
 	_toast.modulate.a = 0.0
 	_reload_bar.hide()
+	%Banner.modulate.a = 0.0
+	update_combo(0, 1)
 	var font := _ammo_label.get_theme_font("font")
 	if font and not font.has_char("∞".unicode_at(0)):
 		_infinity = "--"
@@ -99,6 +102,8 @@ func bind_player(player: Player) -> void:
 	player.grenades_changed.connect(_on_grenades_changed)
 	_on_grenades_changed(player.grenades)
 	player.scope_changed.connect(_on_scope_changed)
+	player.rage_changed.connect(_on_rage_changed)
+	_on_rage_changed(player.rage, player.is_raging())
 	set_health(player.health, player.max_health)
 	if player.current_weapon:
 		_on_weapon_changed(player.current_weapon)
@@ -374,6 +379,53 @@ func _on_weapon_changed(weapon: WeaponData) -> void:
 	%ScopeButton.visible = weapon.scope_fov > 0.0
 
 
+func _on_rage_changed(value: float, active: bool) -> void:
+	%RageBar.value = value
+	%RageButton.visible = value >= 100.0 and not active
+	%RageTint.visible = active
+
+
+## Серия убийств: «КОМБО ×2 · 4» под полосой здоровья (пока множитель есть).
+func update_combo(count: int, multiplier: int) -> void:
+	var label := %ComboLabel as Label
+	if multiplier < 2:
+		label.text = ("Серия: %d" % count) if count >= 2 else ""
+		label.modulate = Color(1, 1, 1, 0.75)
+		return
+	label.text = "КОМБО ×%d · %d" % [multiplier, count]
+	label.modulate = Color.WHITE
+
+
+## Крупная надпись посреди экрана: «ХЕДШОТ!», «ДВОЙНОЕ!»…
+func show_banner(text: String, color := Color(1, 0.85, 0.3)) -> void:
+	var banner := %Banner as Label
+	banner.text = text
+	banner.add_theme_color_override("font_color", color)
+	if _banner_tween:
+		_banner_tween.kill()
+	banner.modulate.a = 1.0
+	banner.scale = Vector2(1.6, 1.6)
+	_banner_tween = create_tween()
+	_banner_tween.tween_property(banner, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_banner_tween.tween_interval(0.6)
+	_banner_tween.tween_property(banner, "modulate:a", 0.0, 0.35)
+
+
+func get_banner_text() -> String:
+	return (%Banner as Label).text if (%Banner as Label).modulate.a > 0.01 else ""
+
+
+## Кровь на экране (убийство в упор).
+func blood_splash(strength := 1.0) -> void:
+	%BloodSplash.splash(strength)
+
+
+## Звёзды и подробности на экране победы.
+func show_stars(stars: int, accuracy: float, best_combo: int) -> void:
+	%StarRating.stars = stars
+	_complete_stats.text += "\nМеткость: %d%% · лучшая серия: %d" % [roundi(accuracy * 100.0), best_combo]
+
+
 func _on_scope_changed(on: bool) -> void:
 	_crosshair.scoped = on
 	%ScopeButton.text = "Без\nоптики" if on else "Прицел"
@@ -418,6 +470,7 @@ func _hide_gameplay() -> void:
 	_touch_controls.hide()
 	_crosshair.hide()
 	_reload_bar.hide()
+	%RageTint.hide()
 
 
 func _blocking_overlay_visible() -> bool:

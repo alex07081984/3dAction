@@ -1,11 +1,17 @@
 class_name Explosive
 extends RigidBody3D
-## Взрывоопасный предмет: красная бочка или газовый баллон.
+## Взрывоопасный предмет: красная бочка, газовый баллон, ящик динамита, цистерна или машина.
 ## Бочка от слабой пули загорается и через пару секунд взрывается, от мощной — сразу.
 ## Пробитый баллон шипит, срывается с места, летит как ракета и взрывается.
-## Взрыв ранит всех вокруг (и игрока!), отрывает руки и ноги и поджигает соседние бочки.
+## Машина после нескольких попаданий загорается, взрывается и подлетает, а потом
+## остаётся лежать обгоревшим остовом.
+## Взрыв ранит всех вокруг (и игрока!), отрывает руки и ноги, отбрасывает взрывной волной
+## и поджигает соседние бочки.
 
-enum Kind { BARREL, CYLINDER }
+enum Kind { BARREL, CYLINDER, CAR }
+
+const CAR_PAINT := [Color(0.5, 0.06, 0.05), Color(0.08, 0.08, 0.09), Color(0.75, 0.73, 0.68),
+		Color(0.12, 0.2, 0.35), Color(0.3, 0.26, 0.2)]
 
 const WORLD_MASK := 1
 
@@ -18,6 +24,11 @@ const WORLD_MASK := 1
 @export var leak_time := 0.45  ## Сколько баллон шипит, прежде чем сорваться с места.
 @export var flight_time := 1.6  ## Сколько баллон летит до взрыва.
 @export var thrust := 30.0  ## Ускорение улетающего баллона.
+@export var burn_at := 0.0  ## Машина загорается, когда здоровья осталось столько.
+@export var blast_height := 0.45  ## Высота центра взрыва над основанием.
+@export var fire_offset := Vector3(0, 1.0, 0)  ## Где горит подстреленный предмет.
+@export var fire_size := 1.0
+@export var random_paint := false  ## Машина: случайный цвет кузова (узел Paint).
 
 var exploded := false
 
@@ -38,6 +49,13 @@ func _ready() -> void:
 	contact_monitor = true
 	max_contacts_reported = 4
 	body_entered.connect(_on_body_entered)
+	var paint := get_node_or_null("Paint") as MeshInstance3D
+	if random_paint and paint:
+		var material := StandardMaterial3D.new()
+		material.albedo_color = CAR_PAINT.pick_random()
+		material.roughness = 0.35
+		material.metallic = 0.3
+		paint.material_override = material
 
 
 ## Попадание пули или дроби.
@@ -45,7 +63,13 @@ func take_hit(damage: float, point: Vector3, direction: Vector3) -> void:
 	if exploded:
 		return
 	health -= damage
-	if kind == Kind.BARREL:
+	if kind == Kind.CAR:
+		Fx.sparks(point, -direction)
+		if health <= 0.0:
+			explode()
+		elif health <= burn_at and not _burning:
+			_ignite(point)
+	elif kind == Kind.BARREL:
 		if health <= 0.0:
 			explode()
 		elif not _burning:
@@ -63,6 +87,10 @@ func chain_react(from: Vector3) -> void:
 	if kind == Kind.CYLINDER and not _flying:
 		_launch((global_position - from).normalized())
 		_timer = minf(_timer, 0.9)
+	elif kind == Kind.CAR and not _burning:
+		# Соседний взрыв поджигает машину — рванёт чуть позже.
+		_ignite(global_position + Vector3.UP)
+		_timer = minf(_timer, 1.2)
 	else:
 		explode()
 
@@ -71,9 +99,32 @@ func explode() -> void:
 	if exploded or not is_inside_tree():
 		return
 	exploded = true
-	var center := global_transform * Vector3(0, 0.45 if kind == Kind.BARREL else 0.5, 0)
+	var center := global_transform * Vector3(0, blast_height, 0)
 	blast(self, center, blast_radius, blast_damage, player_damage)
-	queue_free()
+	if kind == Kind.CAR:
+		_wreck()
+	else:
+		queue_free()
+
+
+## Машина после взрыва: подлетает, кувыркается и остаётся обгоревшим остовом.
+func _wreck() -> void:
+	remove_from_group("explosives")
+	_burning = false
+	var burnt := StandardMaterial3D.new()
+	burnt.albedo_color = Color(0.07, 0.065, 0.06)
+	burnt.roughness = 1.0
+	for child in find_children("*", "MeshInstance3D", true, false):
+		(child as MeshInstance3D).material_override = burnt
+	freeze = false
+	apply_central_impulse((Vector3.UP * 7.5 + Vector3(randf_range(-1.5, 1.5), 0, randf_range(-1.5, 1.5))) * mass)
+	angular_velocity = Vector3(randf_range(-2.5, 2.5), randf_range(-1, 1), randf_range(-2.5, 2.5))
+	if not is_instance_valid(_effect):
+		_effect = Fx.fire(self, fire_offset, fire_size)
+	var fire := _effect
+	get_tree().create_timer(9.0, false).timeout.connect(func() -> void:
+		if is_instance_valid(fire):
+			fire.queue_free())
 
 
 ## Взрыв в точке: урон врагам и игроку, цепная реакция, разлёт обломков.
@@ -95,14 +146,20 @@ static func blast(source: Node3D, center: Vector3, radius: float, damage: float,
 		if distance > radius or _blocked(space, center, target, exclude):
 			continue
 		var closeness := 1.0 - distance / radius
-		enemy.apply_blast(damage * (0.25 + 0.75 * closeness), center, 5.0 + 9.0 * closeness)
+		enemy.apply_blast(damage * (0.25 + 0.75 * closeness), center, 7.0 + 14.0 * closeness)
 
 	var player := tree.get_first_node_in_group("player") as Player
 	if player and player.is_alive():
 		var target := player.global_position + Vector3.UP
 		var distance := center.distance_to(target)
 		if distance < radius and not _blocked(space, center, target, exclude):
-			player.take_damage(maxi(roundi(damage_to_player * (0.3 + 0.7 * (1.0 - distance / radius))), 1), center)
+			var closeness := 1.0 - distance / radius
+			player.take_damage(maxi(roundi(damage_to_player * (0.3 + 0.7 * closeness)), 1), center)
+			# Взрывная волна отбрасывает героя.
+			var away := player.global_position - center
+			away.y = 0.0
+			away = away.normalized() if away.length_squared() > 0.01 else Vector3.BACK
+			player.knockback(away * 9.0 * closeness + Vector3.UP * 4.0 * closeness)
 		if distance < radius * 4.0:
 			player.camera_rig.shake(0.9 * (1.0 - distance / (radius * 4.0)))
 
@@ -152,7 +209,7 @@ func _physics_process(delta: float) -> void:
 func _ignite(point: Vector3) -> void:
 	_burning = true
 	_timer = fuse_time
-	_effect = Fx.fire(self, Vector3(0, 1.0, 0))
+	_effect = Fx.fire(self, fire_offset, fire_size)
 	Audio.play_at("fire", global_position + Vector3.UP, -2.0)
 	Fx.sparks(point, Vector3.UP)
 

@@ -4,8 +4,10 @@
 [ext_resource type="Script" path="res://scripts/touch/touch_joystick.gd" id="2_touch_joystick"]
 [ext_resource type="Script" path="res://scripts/touch/touch_button.gd" id="3_touch_button"]
 [ext_resource type="Script" path="res://scripts/ui/crosshair.gd" id="4_crosshair"]
-[ext_resource type="PackedScene" path="res://ui/settings_panel.tscn" id="5_settings_panel"]
-[ext_resource type="Shader" path="res://ui/noir.gdshader" id="6_noir"]
+[ext_resource type="Script" path="res://scripts/ui/blood_splash.gd" id="5_blood_splash"]
+[ext_resource type="Script" path="res://scripts/ui/star_rating.gd" id="6_star_rating"]
+[ext_resource type="PackedScene" path="res://ui/settings_panel.tscn" id="7_settings_panel"]
+[ext_resource type="Shader" path="res://ui/noir.gdshader" id="8_noir"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hp_bg"]
 bg_color = Color(0, 0, 0, 0.5)
@@ -29,7 +31,14 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_noir"]
-shader = ExtResource("6_noir")
+shader = ExtResource("8_noir")
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_rage"]
+bg_color = Color(1, 0.4, 0.1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_boss"]
 bg_color = Color(0.7, 0.08, 0.06, 1)
@@ -74,6 +83,29 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.8, 0, 0, 0)
+
+[node name="RageTint" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.75, 0.02, 0.0, 0.16)
+
+[node name="BloodSplash" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_blood_splash")
 
 [node name="Crosshair" type="Control" parent="."]
 unique_name_in_owner = true
@@ -271,6 +303,28 @@ text = "Прицел"
 font_size = 18
 color = Color(1, 0.85, 0.3, 0.3)
 
+[node name="RageButton" type="Control" parent="TouchControls"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -575.0
+offset_top = -400.0
+offset_right = -465.0
+offset_bottom = -290.0
+mouse_filter = 2
+script = ExtResource("3_touch_button")
+action = &"rage"
+text = "ЯРОСТЬ"
+font_size = 18
+color = Color(1, 0.3, 0.15, 0.45)
+
 [node name="InteractPrompt" type="Label" parent="TouchControls"]
 unique_name_in_owner = true
 visible = false
@@ -326,6 +380,31 @@ theme_override_font_sizes/font_size = 22
 text = "100"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RageBar" type="ProgressBar" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 24.0
+offset_top = 62.0
+offset_right = 324.0
+offset_bottom = 74.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_hp_bg")
+theme_override_styles/fill = SubResource("StyleBox_rage")
+step = 0.5
+value = 0.0
+show_percentage = false
+
+[node name="ComboLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 24.0
+offset_top = 80.0
+offset_right = 470.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+text = ""
 
 [node name="ObjectiveLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
@@ -511,6 +590,26 @@ theme_override_font_sizes/font_size = 60
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Banner" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -500.0
+offset_top = -320.0
+offset_right = 500.0
+offset_bottom = -230.0
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 72
+horizontal_alignment = 1
+vertical_alignment = 1
+pivot_offset = Vector2(500, 45)
+
 [node name="Subtitle" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -618,7 +717,7 @@ custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
 text = "В главное меню"
 
-[node name="SettingsPanel" parent="." instance=ExtResource("5_settings_panel")]
+[node name="SettingsPanel" parent="." instance=ExtResource("7_settings_panel")]
 unique_name_in_owner = true
 visible = false
 
@@ -851,6 +950,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 44
 text = "Уровень пройден!"
 horizontal_alignment = 1
+
+[node name="StarRating" type="Control" parent="LevelComplete/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 74)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("6_star_rating")
 
 [node name="CompleteStats" type="Label" parent="LevelComplete/Center/Panel/VBox"]
 unique_name_in_owner = true

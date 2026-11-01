@@ -24,6 +24,9 @@ func _run() -> void:
 	_game.reset_progress()
 	_game.settings.aim_assist = true
 	_game.settings.auto_fire = false
+	_game.settings.blood = true
+	# Замедления времени мешают проверкам по кадрам — включаем их только в своей проверке.
+	_game.slowmo_enabled = false
 
 	await _test_menu()
 	for index in _game.LEVELS.size():
@@ -48,6 +51,9 @@ func _run() -> void:
 	await _test_new_bosses()
 	await _test_living_town()
 	await _test_episode_three()
+	await _test_arcade()
+	await _test_gore()
+	await _test_rpg_and_cars()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -733,6 +739,168 @@ func _test_episode_three() -> void:
 	var cabin := await _fresh_level(12)
 	_check(cabin.player.global_position.distance_to(Vector3(-51, 0, 48)) < 2.0, "на базе Аляски появляемся дома")
 	_check(cabin.get_node("Properties/cabin/Furniture/stove").visible, "печь стоит в доме")
+
+
+func _test_arcade() -> void:
+	_game.reset_progress()
+	var level := await _fresh_level(0)
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	var hud := level.hud
+	level.register_kill(false)
+	level.register_kill(false)
+	_check(hud.get_banner_text() == "ДВОЙНОЕ!", "два убийства подряд — «ДВОЙНОЕ!» (%s)" % hud.get_banner_text())
+	var money: int = _game.money
+	level.register_kill(false)
+	_check(level.combo == 3 and level.combo_multiplier() == 2, "третье убийство подряд — комбо ×2")
+	_check(_game.money - money == 20, "в комбо ×2 за врага платят вдвое ($%d)" % (_game.money - money))
+	_check(hud.get_node("%ComboLabel").text.begins_with("КОМБО ×2"), "на экране — «%s»" % hud.get_node("%ComboLabel").text)
+	await _seconds(1.0)
+	level.register_kill(true)
+	_check(hud.get_banner_text() == "ХЕДШОТ!", "надпись «ХЕДШОТ!»")
+	player.take_damage(5, player.global_position + Vector3.FORWARD)
+	_check(level.combo == 0 and hud.get_node("%ComboLabel").text == "", "ранение обрывает серию")
+
+	# Ярость: замедление, бесконечные патроны, потом всё как было.
+	var shotgun: WeaponData = load("res://weapons/shotgun.tres")
+	player.give_weapon(shotgun, false)
+	player.add_rage(200.0)
+	await _seconds(0.4)
+	_check(player.rage >= 100.0 and hud.get_node("%RageButton").visible, "шкала ярости полная — появилась кнопка «ЯРОСТЬ»")
+	var mag: int = player.get_ammo(shotgun).mag
+	_check(player.activate_rage(), "ярость включается")
+	await _frames(3)
+	_check(Engine.time_scale < 0.6 and hud.get_node("%RageTint").visible, "в ярости время замедляется, экран краснеет")
+	await _fire(player)
+	await _fire(player)
+	_check(player.get_ammo(shotgun).mag == mag, "в ярости патроны не тратятся")
+	var started := Time.get_ticks_msec()
+	while player.is_raging() and Time.get_ticks_msec() - started < 12000:
+		await get_tree().process_frame
+	await _frames(3)
+	_check(not player.is_raging() and is_equal_approx(Engine.time_scale, 1.0) and player.rage == 0.0,
+			"ярость кончилась — время снова обычное")
+
+	# Замедление после эффектного убийства.
+	_game.slowmo_enabled = true
+	_game.slow_motion(0.4, 0.25)
+	await _frames(3)
+	_check(Engine.time_scale < 0.5, "замедление времени на последнем враге")
+	started = Time.get_ticks_msec()
+	while Engine.time_scale < 1.0 and Time.get_ticks_msec() - started < 3000:
+		await get_tree().process_frame
+	_check(is_equal_approx(Engine.time_scale, 1.0), "замедление проходит само")
+	_game.slowmo_enabled = false
+
+	# Звёзды.
+	level.kills = 8
+	level.headshots = 2
+	level.shots_fired = 10
+	level.shots_hit = 5
+	_check(level.earned_stars() == 3, "меткость и хедшоты — три звезды")
+	level.shots_hit = 2
+	_check(level.earned_stars() == 2, "мазал — две звезды")
+	level.shots_hit = 5
+	level.complete()
+	await _frames(3)
+	_check(_game.stars_of(0) == 3 and hud.get_node("%StarRating").stars == 3, "звёзды видны на экране победы и сохраняются")
+
+
+func _test_gore() -> void:
+	var level := await _fresh_level(0)
+	var player := level.player
+	player.max_health = 100000
+	player.health = 100000
+	var fx := get_node("/root/Fx")
+	var decals := func() -> int: return fx._decals.filter(func(d: Variant) -> bool: return is_instance_valid(d)).size()
+	var before: int = decals.call()
+	Fx.blood_spray(player.global_position + Vector3.UP, Vector3.DOWN)
+	_check(decals.call() > before, "кровь брызгает на пол и стены")
+	var shotgun: WeaponData = load("res://weapons/shotgun.tres")
+	var victim := _spawn_enemy(level, "gunner", player.global_position + Vector3(0, 0, -2.5))
+	await _frames(3)
+	victim.apply_shot(5000.0, false, victim.global_position + Vector3.UP, Vector3.FORWARD, shotgun)
+	await _frames(3)
+	_check(hud_splats(level) > 0, "убийство в упор забрызгивает экран кровью")
+	_game.settings.blood = false
+	var debris := _debris_count(level)
+	before = decals.call()
+	var calm := _spawn_enemy(level, "gunner", player.global_position + Vector3(0, 0, -4))
+	await _frames(3)
+	calm.apply_shot(5000.0, true, calm.global_position + Vector3.UP * 1.7, Vector3.FORWARD, shotgun)
+	await _frames(3)
+	_check(_debris_count(level) - debris <= 2 and decals.call() == before, "«мало крови»: тело просто падает, без кусков и пятен")
+	var deagle: WeaponData = load("res://weapons/deagle.tres")
+	var calm2 := _spawn_enemy(level, "gunner", player.global_position + Vector3(1.5, 0, -4))
+	await _frames(3)
+	debris = _debris_count(level)
+	calm2.apply_shot(300.0, true, calm2.global_position + Vector3.UP * 1.7, Vector3.FORWARD, deagle)
+	await _frames(3)
+	_check(level.headshots >= 1 and _debris_count(level) - debris <= 1, "хедшот засчитан и без крови, голова на месте")
+	_game.settings.blood = true
+
+
+func hud_splats(level: Level) -> int:
+	return level.hud.get_node("%BloodSplash").get_splat_count()
+
+
+func _test_rpg_and_cars() -> void:
+	# РПГ: ракета разносит группу врагов.
+	var ghost := await _fresh_level(11)
+	var player := ghost.player
+	player.max_health = 100000
+	player.health = 100000
+	var rpg: WeaponData = load("res://weapons/rpg.tres")
+	player.give_weapon(rpg, false)
+	var victims := []
+	for dx in [-1.2, 0.0, 1.2]:
+		var enemy := _spawn_enemy(ghost, "gunner", Vector3(dx, 5, -13))
+		enemy.sight_range = 0.5
+		victims.append(enemy)
+	await _frames(3)
+	await _aim_at(player, Vector3(0, 6, -13))
+	await _fire(player)
+	await _frames(2)
+	_check(not get_tree().get_nodes_in_group("rockets").is_empty() or victims.any(func(e: Variant) -> bool: return not is_instance_valid(e)),
+			"РПГ выпускает ракету")
+	await _seconds(1.0)
+	_check(victims.all(func(e: Variant) -> bool: return not is_instance_valid(e) or not e.is_alive()), "ракета разносит группу врагов")
+	_check(player.get_ammo(rpg).mag == 0 or player.is_reloading(), "у РПГ одна ракета — перезарядка")
+
+	# Взрывная волна отбрасывает героя.
+	player.velocity = Vector3.ZERO
+	Explosive.blast(ghost, player.global_position + Vector3(2.5, 0.5, 0), 5.0, 0.0, 1)
+	_check(player.velocity.x < -2.0, "взрывная волна отбрасывает героя (%.1f)" % player.velocity.x)
+
+	# Машины на мосту горят и взрываются.
+	var bridge := await _fresh_level(8)
+	bridge.player.max_health = 100000
+	bridge.player.health = 100000
+	var cars := bridge.get_node("Explosives").get_children().filter(func(n: Node) -> bool: return n is Explosive and n.kind == Explosive.Kind.CAR)
+	_check(cars.size() >= 5, "на мосту машины, которые взрываются (%d)" % cars.size())
+	var car: Explosive = cars[0]
+	car.take_hit(80.0, car.global_position + Vector3.UP, Vector3.FORWARD)
+	_check(car._burning and not car.exploded, "подстреленная машина загорается")
+	var bystander := _spawn_enemy(bridge, "gunner", car.global_position + Vector3(3, 0, 0))
+	bystander.sight_range = 0.5
+	var ground := car.global_position.y
+	var peak := ground
+	var started := Time.get_ticks_msec()
+	while not car.exploded and Time.get_ticks_msec() - started < 8000:
+		await get_tree().physics_frame
+	for i in 30:
+		await get_tree().physics_frame
+		if is_instance_valid(car):
+			peak = maxf(peak, car.global_position.y)
+	_check(car.exploded and is_instance_valid(car) and peak > ground + 0.8, "машина взрывается и подлетает (%.1f м)" % (peak - ground))
+	_check(not is_instance_valid(bystander) or not bystander.is_alive(), "взрыв машины убивает врагов рядом")
+
+	var port := await _fresh_level(5)
+	var tanks := port.get_node("Explosives").get_children().filter(func(n: Node) -> bool: return String(n.name).begins_with("FuelTank"))
+	_check(tanks.size() >= 2 and tanks[0].blast_radius >= 9.0, "в порту цистерны с топливом (%d)" % tanks.size())
+	var rpgs := port.get_node("Pickups").get_children().filter(func(n: Node) -> bool: return n is Pickup and n.weapon and n.weapon.id == "rpg")
+	_check(rpgs.size() == 1, "в порту лежит РПГ")
 
 
 ## Подходим к спрятавшемуся боссу так, чтобы он был на виду.

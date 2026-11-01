@@ -13,11 +13,13 @@ signal hit_confirmed(headshot: bool, killed: bool)
 signal picked_up(text: String)
 signal grenades_changed(count: int)
 signal scope_changed(on: bool)
+signal rage_changed(value: float, active: bool)
 signal died
 
 const WORLD_MASK := 1
 const ENEMY_MASK := 4
 const FALL_LIMIT := -25.0
+const RAGE_TIME := 6.0  ## Сколько секунд (настоящих) длится ярость.
 
 @export_group("Движение")
 @export var move_speed := 6.0
@@ -65,6 +67,10 @@ var grenades := 0
 var _grenade_cooldown := 0.0
 ## Смотрим в оптический прицел снайперской винтовки.
 var scoped := false
+## Ярость копится за убийства (0–100). Полная — можно включить: всё вокруг замедляется,
+## а герой двигается и стреляет в обычном темпе, без перезарядки и с бонусом к урону.
+var rage := 0.0
+var _rage_left := 0.0
 
 @onready var model: BlockyCharacter = $Model
 @onready var camera_rig: CameraRig = $CameraRig
@@ -106,16 +112,20 @@ func _physics_process(delta: float) -> void:
 		throw_grenade()
 	if Input.is_action_just_pressed("aim_scope"):
 		toggle_scope()
+	if Input.is_action_just_pressed("rage"):
+		activate_rage()
 	if Input.is_action_just_pressed("interact") and is_instance_valid(interactable) and interactable.active:
 		interactable.interact(self)
 
 	var direction := _get_move_direction()
+	# В ярости мир замедлен, а герой — нет: скорость пересчитываем на настоящие секунды.
+	var haste := 1.0 / maxf(Engine.time_scale, 0.05) if is_raging() else 1.0
 	if _dodge_left > 0.0:
-		velocity.x = _dodge_dir.x * dodge_speed
-		velocity.z = _dodge_dir.z * dodge_speed
+		velocity.x = _dodge_dir.x * dodge_speed * haste
+		velocity.z = _dodge_dir.z * dodge_speed * haste
 	else:
-		var accel := acceleration if is_on_floor() else air_acceleration
-		var speed := move_speed * (0.45 if scoped else 1.0)
+		var accel := (acceleration if is_on_floor() else air_acceleration) * haste * haste
+		var speed := move_speed * (0.45 if scoped else 1.0) * haste
 		var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(direction * speed, accel * delta)
 		velocity.x = horizontal.x
 		velocity.z = horizontal.z
@@ -126,7 +136,7 @@ func _physics_process(delta: float) -> void:
 
 	# Персонаж разворачивается туда, куда смотрит камера.
 	model.rotation.y = lerp_angle(model.rotation.y, camera_rig.get_yaw(), 1.0 - exp(-turn_speed * delta))
-	var speed_ratio := Vector2(velocity.x, velocity.z).length() / move_speed
+	var speed_ratio := Vector2(velocity.x, velocity.z).length() / (move_speed * haste)
 	model.animate(delta, speed_ratio, true, camera_rig.get_pitch())
 	model.scale.y = 0.75 if _dodge_left > 0.0 else 1.0
 	# Если камеру прижало стеной к спине (или смотрим в оптику), прячем персонажа, чтобы он не закрывал обзор.
@@ -162,6 +172,51 @@ func is_dodging() -> bool:
 
 func is_reloading() -> bool:
 	return _reload_left > 0.0
+
+
+func is_raging() -> bool:
+	return _rage_left > 0.0
+
+
+func add_rage(amount: float) -> void:
+	if _dead or is_raging() or amount <= 0.0:
+		return
+	var was_full := rage >= 100.0
+	rage = minf(rage + amount, 100.0)
+	rage_changed.emit(rage, false)
+	if rage >= 100.0 and not was_full:
+		picked_up.emit("Ярость готова!")
+
+
+## Включить ярость, если шкала полная.
+func activate_rage() -> bool:
+	if _dead or is_raging() or rage < 100.0:
+		return false
+	_rage_left = RAGE_TIME
+	Game.bullet_time = true
+	camera_rig.shake(0.4)
+	Audio.play("rage", 2.0)
+	rage_changed.emit(rage, true)
+	return true
+
+
+func end_rage() -> void:
+	if is_raging():
+		_stop_rage()
+
+
+func _stop_rage() -> void:
+	_rage_left = 0.0
+	rage = 0.0
+	Game.bullet_time = false
+	rage_changed.emit(0.0, false)
+
+
+## Толчок взрывной волной.
+func knockback(impulse: Vector3) -> void:
+	if _dead:
+		return
+	velocity += impulse
 
 
 func has_scope() -> bool:
@@ -295,18 +350,21 @@ func _try_fire() -> void:
 	if current_weapon == null or _fire_cooldown > 0.0 or _reload_left > 0.0:
 		return
 	var state: Dictionary = _ammo[current_weapon.id]
-	if state.mag <= 0:
+	var raging := is_raging()
+	if state.mag <= 0 and not raging:
 		_fire_cooldown = 0.3
 		if current_weapon.infinite_ammo or state.reserve > 0:
 			start_reload()
 		else:
 			Audio.play("dry_fire")
 		return
-	state.mag -= 1
+	# В ярости патроны не тратятся.
+	if not raging:
+		state.mag -= 1
 	_fire_cooldown = current_weapon.fire_interval
 	_shoot(current_weapon)
 	_emit_ammo()
-	if state.mag == 0:
+	if state.mag == 0 and not raging:
 		start_reload()
 
 
@@ -314,6 +372,10 @@ func _shoot(weapon: WeaponData) -> void:
 	var space := get_world_3d().direct_space_state
 	var base_dir := (_aim_point - _aim_start).normalized()
 	var muzzle := model.get_muzzle_position()
+	var bonus := _damage_bonus * (1.5 if is_raging() else 1.0)
+	if weapon.projectile != "":
+		_launch_rocket(weapon, muzzle, bonus)
+		return
 	var results := {}  # враг -> {"damage", "head", "point", "dir", "parts"}
 	var impact_shown := false
 
@@ -333,7 +395,7 @@ func _shoot(weapon: WeaponData) -> void:
 				# Часть тела считаем по настоящей позе модели: так дробь отрывает руки и ноги.
 				var part := enemy.get_hit_part(_aim_start, dir)
 				var head := part == "head"
-				var damage := weapon.damage * (weapon.headshot_multiplier if head else 1.0) * _damage_bonus
+				var damage := weapon.damage * (weapon.headshot_multiplier if head else 1.0) * bonus
 				if not results.has(enemy):
 					results[enemy] = {"damage": 0.0, "head": false, "point": end, "dir": dir, "parts": {}}
 				results[enemy].damage += damage
@@ -343,7 +405,7 @@ func _shoot(weapon: WeaponData) -> void:
 					results[enemy].point = end
 			elif hit.collider.has_method("take_hit"):
 				# Бочки и баллоны.
-				hit.collider.take_hit(weapon.damage * _damage_bonus, end, dir)
+				hit.collider.take_hit(weapon.damage * bonus, end, dir)
 				Fx.sparks(end, hit.normal)
 			elif not impact_shown or i % 3 == 0:
 				Fx.sparks(end, hit.normal)
@@ -367,6 +429,22 @@ func _shoot(weapon: WeaponData) -> void:
 	# Выстрел слышат враги поблизости.
 	get_tree().call_group("enemies", "hear_noise", global_position, 22.0)
 	get_tree().call_group("civilians", "panic", global_position, 30.0)
+
+
+## РПГ: ракета летит из ствола туда, куда смотрит прицел.
+func _launch_rocket(weapon: WeaponData, muzzle: Vector3, bonus: float) -> void:
+	var direction := _spread((_aim_point - muzzle).normalized(), weapon.spread_deg)
+	var container := get_tree().current_scene if get_tree().current_scene else get_parent()
+	Rocket.launch(container, muzzle, direction, weapon.projectile_speed, weapon.blast_radius,
+			weapon.damage * bonus, weapon.player_blast_damage, self)
+	Fx.muzzle_flash(muzzle, direction)
+	Audio.play(weapon.sound, 0.0)
+	camera_rig.add_recoil(weapon.recoil_deg)
+	camera_rig.shake(weapon.shake)
+	model.recoil(0.5)
+	shot_fired.emit(weapon)
+	get_tree().call_group("enemies", "hear_noise", global_position, 30.0)
+	get_tree().call_group("civilians", "panic", global_position, 35.0)
 
 
 ## Где прицел: обычный луч из центра экрана, а если он мимо — помощь
@@ -472,6 +550,14 @@ func _finish_reload() -> void:
 
 
 func _tick_timers(delta: float) -> void:
+	# В ярости герой живёт по настоящим часам, а мир вокруг — замедленно.
+	if is_raging():
+		delta /= maxf(Engine.time_scale, 0.05)
+		_rage_left -= delta
+		rage = 100.0 * maxf(_rage_left, 0.0) / RAGE_TIME
+		rage_changed.emit(rage, true)
+		if _rage_left <= 0.0:
+			_stop_rage()
 	_fire_cooldown -= delta
 	_grenade_cooldown -= delta
 	_dodge_left -= delta
@@ -509,6 +595,7 @@ func _apply_gravity(delta: float) -> void:
 
 func _die(from_position: Vector3) -> void:
 	set_scoped(false)
+	end_rage()
 	_dead = true
 	aim_target = null
 	var direction := global_position - from_position

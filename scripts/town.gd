@@ -39,6 +39,7 @@ func _hub_hint() -> String:
 
 func _on_zone_cleared(_zone: WaveZone) -> void:
 	Audio.play_music("music_explore")
+	Game.slow_motion(0.9, 0.25)
 	_districts_left -= 1
 	if _districts_left > 0:
 		hud.show_message("Район освобождён!", "Осталось районов: %d" % _districts_left)
