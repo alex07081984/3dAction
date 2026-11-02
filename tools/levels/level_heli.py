@@ -143,7 +143,7 @@ for name, center, size, mat in (
         ("PillarFront", (1.15, 1.35, -1.55), (0.12, 2.8, 0.12), "black_metal"),
         ("Cockpit", (0, 0.95, -2.3), (2.2, 1.7, 1.4), "dark_glass"),
         ("Nose", (0, 0.4, -3.15), (1.6, 0.8, 0.4), "white_paint"),
-        ("Boom", (0, 1.3, 5.0), (0.5, 0.6, 6.0), "white_paint"),
+        ("Boom", (0, 1.3, 5.0), (0.5, 0.6, 6.0), "black_metal"),
         ("BoomStripe", (0, 1.0, 5.0), (0.52, 0.12, 6.0), "plaster_blue"),
         ("Fin", (0, 2.0, 7.8), (0.12, 1.5, 1.0), "plaster_blue"),
         ("SkidL", (-1.0, -0.6, 0.2), (0.12, 0.12, 4.0), "black_metal"),
@@ -162,6 +162,17 @@ for angle in (0, 90):
 L.node("CabinLight", "OmniLight3D", "Helicopter", transform=xform((-0.2, 2.3, 0.4)), light_color=WARM,
        light_energy="1.6", omni_range="5")
 L.node("Seat", "Marker3D", "Helicopter", transform=xform((1.0, 0.0, 0.2)))
+# Невидимые стенки кабины на отдельном слое 6: в них упирается только «пружина» камеры,
+# чтобы она не вылезала за борт и не закрывала обзор. Пули и враги их не замечают.
+shell = L.node("CameraShell", "StaticBody3D", "Helicopter", collision_layer="32", collision_mask="0")
+for name, center, size in (
+        ("Back", (-1.2, 1.4, 0.15), (0.3, 3.2, 4.6)),
+        ("Top", (0, 2.7, 0.15), (2.8, 0.3, 4.6)),
+        ("Bottom", (0, -0.25, 0.15), (2.8, 0.3, 4.6)),
+        ("Front", (0, 1.4, -1.85), (2.8, 3.2, 0.3)),
+        ("Rear", (0, 1.4, 2.25), (2.8, 3.2, 0.3))):
+    box = L.sub_res("BoxShape3D", {"size": f"Vector3({size[0]}, {size[1]}, {size[2]})"}, "Box")
+    L.node(name, "CollisionShape3D", shell, transform=xform(center), shape=box)
 
 # --- Маршрут полёта ----------------------------------------------------------------------------
 flight = L.group("Flight")

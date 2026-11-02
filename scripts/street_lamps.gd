@@ -4,16 +4,31 @@ extends Node3D
 ## Столбы, плафоны, круги света на асфальте и световые конусы в тумане рисуются
 ## через MultiMesh — все фонари вместе стоят всего несколько вызовов отрисовки.
 ## Настоящий свет (OmniLight3D) горит только у части фонарей: на телефоне это главная экономия.
+## Между фонарями по разные стороны улицы натянуты гирлянды тёплых лампочек — тоже MultiMesh.
 
 @export var real_light_every := 2  ## Настоящий свет у каждого N-го фонаря (0 — ни у одного).
+@export var real_light_every_high := 1  ## То же на высокой графике.
 @export var light_color := Color(1.0, 0.8, 0.52)
-@export var light_energy := 1.5
-@export var light_range := 11.0
+@export var light_energy := 2.1
+@export var light_range := 15.0
 @export var height := 4.6  ## Высота плафона.
 @export var arm_length := 1.3  ## Вынос кронштейна над дорогой.
-@export var pool_radius := 4.2  ## Радиус светлого круга на земле.
+@export var pool_radius := 5.0  ## Радиус светлого круга на земле.
+@export var garlands := true  ## Гирлянды над улицей между фонарями напротив друг друга.
+@export var garland_max_span := 20.0
 
 const POST_COLOR := Color(0.08, 0.08, 0.09)
+const BULB_STEP := 0.65  ## Шаг лампочек в гирлянде, м.
+const BULB_WARM := Color(1.0, 0.82, 0.5)
+const BULB_RED := Color(1.0, 0.18, 0.1)
+const HALO_SHADER := """
+shader_type spatial;
+render_mode unshaded, blend_add, depth_draw_never, cull_back, fog_disabled;
+void fragment() {
+	float facing = abs(dot(NORMAL, VIEW));
+	ALBEDO = COLOR.rgb * pow(facing, 4.0) * 0.55;
+}
+"""
 
 
 func _ready() -> void:
@@ -31,20 +46,117 @@ func _ready() -> void:
 	var cone_offset := Transform3D(Basis(), Vector3(0, (height - 0.2) * 0.5, -arm_length))
 	_add_multimesh("Cones", _cone_mesh(), transforms, cone_offset, false)
 	_add_colliders(transforms)
-	if real_light_every > 0:
-		for i in range(0, transforms.size(), real_light_every):
+	if garlands:
+		_add_garlands(transforms)
+	var every := real_light_every_high if Game.graphics_quality() >= 2 else real_light_every
+	if every > 0:
+		for i in range(0, transforms.size(), every):
 			var light := OmniLight3D.new()
 			light.name = "Light%d" % i
 			light.light_color = light_color
 			light.light_energy = light_energy
 			light.omni_range = light_range
-			light.omni_attenuation = 2.0
+			light.omni_attenuation = 1.2
+			# Без блика: на мокром асфальте он вспыхивает у ног героя ярким овалом.
+			light.light_specular = 0.0
 			light.shadow_enabled = false
 			light.distance_fade_enabled = true
 			light.distance_fade_begin = 45.0
 			light.distance_fade_length = 10.0
 			light.transform = transforms[i] * Transform3D(Basis(), Vector3(0, height - 0.5, -arm_length))
 			add_child(light)
+
+
+## Пары фонарей для гирлянд: стоят по разные стороны одной улицы (кронштейны смотрят
+## навстречу друг другу) не дальше garland_max_span. У каждого фонаря — до двух гирлянд,
+## поэтому над улицей получается «зигзаг».
+func get_garland_pairs(transforms: Array[Transform3D]) -> Array[Vector2i]:
+	var pairs: Array[Vector2i] = []
+	for i in transforms.size():
+		var from := transforms[i].origin
+		var facing := _arm_direction(transforms[i])
+		var candidates: Array = []
+		for j in transforms.size():
+			if j == i:
+				continue
+			var to := transforms[j].origin - from
+			to.y = 0.0
+			var span := to.length()
+			if span < 6.0 or span > garland_max_span:
+				continue
+			var other := _arm_direction(transforms[j])
+			if facing.dot(other) > -0.7 or facing.dot(to) < 0.3 * span or other.dot(-to) < 0.3 * span:
+				continue
+			candidates.append([span, j])
+		candidates.sort()
+		for k in mini(2, candidates.size()):
+			var j: int = candidates[k][1]
+			var pair := Vector2i(mini(i, j), maxi(i, j))
+			if not pairs.has(pair):
+				pairs.append(pair)
+	return pairs
+
+
+func _arm_direction(t: Transform3D) -> Vector3:
+	var direction := -t.basis.z
+	direction.y = 0.0
+	return direction.normalized()
+
+
+## Гирлянды: провод провисает дугой, на нём лампочки (тёплые и каждая пятая — красная)
+## с мягким ореолом. Всё — три MultiMesh на весь город.
+func _add_garlands(transforms: Array[Transform3D]) -> void:
+	var bulbs: Array[Transform3D] = []
+	var colors: Array[Color] = []
+	var wires: Array[Transform3D] = []
+	var attach := Vector3(0, height + 0.1, -arm_length)
+	for pair in get_garland_pairs(transforms):
+		var a := transforms[pair.x] * attach
+		var b := transforms[pair.y] * attach
+		var span := a.distance_to(b)
+		var steps := maxi(int(span / BULB_STEP), 2)
+		var sag := span * 0.06
+		var previous := a
+		for k in range(1, steps + 1):
+			var t := float(k) / steps
+			var point := a.lerp(b, t) + Vector3.DOWN * sag * 4.0 * t * (1.0 - t)
+			var segment := point - previous
+			if segment.length() > 0.01:
+				var basis := Basis.looking_at(segment.normalized(), Vector3.UP).scaled_local(Vector3(1, 1, segment.length()))
+				wires.append(Transform3D(basis, (point + previous) * 0.5))
+			if k < steps:
+				bulbs.append(Transform3D(Basis(), point + Vector3.DOWN * 0.07))
+				colors.append(BULB_RED if (k + pair.x) % 5 == 0 else BULB_WARM)
+			previous = point
+	if bulbs.is_empty():
+		return
+	var wire_mesh := BoxMesh.new()
+	wire_mesh.size = Vector3(0.025, 0.025, 1.0)
+	var wire_material := StandardMaterial3D.new()
+	wire_material.albedo_color = POST_COLOR
+	wire_mesh.material = wire_material
+	_add_multimesh("GarlandWires", wire_mesh, wires, Transform3D.IDENTITY, false)
+	var bulb_mesh := SphereMesh.new()
+	bulb_mesh.radius = 0.07
+	bulb_mesh.height = 0.14
+	bulb_mesh.radial_segments = 6
+	bulb_mesh.rings = 3
+	var bulb_material := StandardMaterial3D.new()
+	bulb_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	bulb_material.vertex_color_use_as_albedo = true
+	bulb_mesh.material = bulb_material
+	_add_multimesh("GarlandBulbs", bulb_mesh, bulbs, Transform3D.IDENTITY, false, colors)
+	# Ореол — полупрозрачный шар, ярче в середине (без billboard: он ломается в MultiMesh).
+	var halo := SphereMesh.new()
+	halo.radius = 0.24
+	halo.height = 0.48
+	halo.radial_segments = 8
+	halo.rings = 4
+	var halo_material := ShaderMaterial.new()
+	halo_material.shader = Shader.new()
+	halo_material.shader.code = HALO_SHADER
+	halo.material = halo_material
+	_add_multimesh("GarlandHalos", halo, bulbs, Transform3D.IDENTITY, false, colors)
 
 
 func get_lamp_count() -> int:
@@ -55,13 +167,17 @@ func get_lamp_count() -> int:
 	return count
 
 
-func _add_multimesh(node_name: String, mesh: Mesh, transforms: Array[Transform3D], offset: Transform3D, shadow: bool) -> void:
+func _add_multimesh(node_name: String, mesh: Mesh, transforms: Array[Transform3D], offset: Transform3D, shadow: bool,
+		colors: Array[Color] = []) -> void:
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.use_colors = not colors.is_empty()
 	multimesh.mesh = mesh
 	multimesh.instance_count = transforms.size()
 	for i in transforms.size():
 		multimesh.set_instance_transform(i, transforms[i] * offset)
+		if multimesh.use_colors:
+			multimesh.set_instance_color(i, colors[i])
 	var instance := MultiMeshInstance3D.new()
 	instance.name = node_name
 	instance.multimesh = multimesh
@@ -97,9 +213,9 @@ func _pool_mesh() -> Mesh:
 	var plane := PlaneMesh.new()
 	plane.size = Vector2.ONE * pool_radius * 2.0
 	var gradient := Gradient.new()
-	gradient.set_color(0, Color(light_color, 0.4))
+	gradient.set_color(0, Color(light_color, 0.5))
 	gradient.set_color(1, Color(light_color, 0.0))
-	gradient.add_point(0.45, Color(light_color, 0.16))
+	gradient.add_point(0.45, Color(light_color, 0.22))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill = GradientTexture2D.FILL_RADIAL

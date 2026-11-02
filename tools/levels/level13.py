@@ -318,14 +318,14 @@ env = [
     ("Environment", "Env_13", {
         "background_mode": "2", "sky": 'SubResource("Sky_13")',
         "ambient_light_source": "2", "ambient_light_color": "Color(0.4, 0.45, 0.56, 1)",
-        "ambient_light_energy": "0.62", "tonemap_mode": "2",
-        "fog_enabled": "true", "fog_light_color": "Color(0.2, 0.22, 0.27, 1)", "fog_density": "0.011",
+        "ambient_light_energy": "1.0", "tonemap_mode": "2",
+        "fog_enabled": "true", "fog_light_color": "Color(0.24, 0.26, 0.31, 1)", "fog_density": "0.011",
         "fog_sky_affect": "0.35",
     }),
 ]
 L.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("Env_13")')
 L.node("Moonlight", "DirectionalLight3D", ".", transform=xform((0, 40, 0), mul(rot_y(210), rot_x(math.radians(-36)))),
-       light_color="Color(0.65, 0.75, 1, 1)", light_energy="0.38", shadow_enabled="true",
+       light_color="Color(0.65, 0.75, 1, 1)", light_energy="0.6", shadow_enabled="true",
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(-43.5, 0, -30), (-28.5, 0, -42.5), (43, 0, -43.5), (6.5, 0, -6.5), (-6.5, 0, 6.5), (42.5, 0, 6.5),
               (-43, 0, 40.5), (30, 0, 42.5), (-30, 0, -6.5)], pattern="TBT")

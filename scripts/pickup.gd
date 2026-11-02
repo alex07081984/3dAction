@@ -5,6 +5,9 @@ extends Area3D
 
 enum Kind { HEALTH, AMMO, WEAPON, GRENADE }
 
+## Ближе этого (от камеры) подпись оружия не показывается.
+const PICKUP_LABEL_HIDE_DISTANCE := 6.5
+
 @export var kind := Kind.HEALTH
 @export var heal_amount := 35
 @export var weapon: WeaponData  ## Только для Kind.WEAPON.
@@ -98,8 +101,11 @@ func _build_visual() -> Node3D:
 				label.font_size = 48
 				label.outline_size = 10
 				label.pixel_size = 0.006
-				label.position = Vector3(0, 0.6, 0)
-				label.no_depth_test = true
+				label.position = Vector3(0, 0.75, 0)
+				# Подпись видна издалека, а вблизи прячется и не налезает на героя
+				# (камера в паре метров за спиной). Герой и стены её загораживают.
+				label.visibility_range_begin = PICKUP_LABEL_HIDE_DISTANCE
+				label.visibility_range_begin_margin = 0.5
 				root.add_child(label)
 	# Светящийся круг под предметом, чтобы его было видно в темноте.
 	var glow := MeshInstance3D.new()

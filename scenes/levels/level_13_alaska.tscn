@@ -114,10 +114,10 @@ background_mode = 2
 sky = SubResource("Sky_13")
 ambient_light_source = 2
 ambient_light_color = Color(0.4, 0.45, 0.56, 1)
-ambient_light_energy = 0.62
+ambient_light_energy = 1.0
 tonemap_mode = 2
 fog_enabled = true
-fog_light_color = Color(0.2, 0.22, 0.27, 1)
+fog_light_color = Color(0.24, 0.26, 0.31, 1)
 fog_density = 0.011
 fog_sky_affect = 0.35
 
@@ -3371,7 +3371,7 @@ environment = SubResource("Env_13")
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866, 0.2939, -0.4045, 0, 0.809, 0.5878, 0.5, 0.509, -0.7006, 0, 40, 0)
 light_color = Color(0.65, 0.75, 1, 1)
-light_energy = 0.38
+light_energy = 0.6
 shadow_enabled = true
 directional_shadow_max_distance = 50.0
 directional_shadow_mode = 1

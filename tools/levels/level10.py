@@ -331,15 +331,15 @@ env = [
     ("Environment", "Env_10", {
         "background_mode": "2", "sky": 'SubResource("Sky_10")',
         "ambient_light_source": "2", "ambient_light_color": "Color(0.32, 0.36, 0.48, 1)",
-        "ambient_light_energy": "0.6", "tonemap_mode": "2",
-        "fog_enabled": "true", "fog_light_color": "Color(0.11, 0.12, 0.16, 1)", "fog_density": "0.013",
+        "ambient_light_energy": "1.05", "tonemap_mode": "2",
+        "fog_enabled": "true", "fog_light_color": "Color(0.16, 0.17, 0.22, 1)", "fog_density": "0.013",
         "fog_sky_affect": "0.35",
     }),
 ]
 L.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("Env_10")')
 L.node("Moonlight", "DirectionalLight3D", ".",
        transform=xform((0, 40, 0), mul(rot_y(MOON_YAW), rot_x(math.radians(MOON_PITCH)))),
-       light_color="Color(0.6, 0.7, 1, 1)", light_energy="0.32", shadow_enabled="true",
+       light_color="Color(0.6, 0.7, 1, 1)", light_energy="0.55", shadow_enabled="true",
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 L.explosives([(-43.5, 0, -30), (-28.5, 0, -43), (-45, 0, 43), (-28, 0, 43.5), (6.5, 0, -6.5), (-6.5, 0, 6.5),
               (14, HILL, -97.5), (-14, HILL, -110.5), (42.5, 0, 6.5)], pattern="BBC")

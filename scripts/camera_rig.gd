@@ -104,6 +104,14 @@ func set_pitch(value: float) -> void:
 	_arm.rotation.x = clampf(value, deg_to_rad(min_pitch_deg), deg_to_rad(max_pitch_deg))
 
 
+## Во что упирается камера: мир (слой 1) плюс, например, стенки кабины вертолёта (слой 6).
+func set_obstacle_mask(mask: int, margin := 0.01) -> void:
+	_shoulder.collision_mask = mask
+	_arm.collision_mask = mask
+	_shoulder.margin = margin
+	_arm.margin = margin
+
+
 func get_yaw_basis() -> Basis:
 	return Basis(Vector3.UP, rotation.y)
 

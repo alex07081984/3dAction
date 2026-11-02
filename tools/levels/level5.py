@@ -524,8 +524,8 @@ env = [
     ("Environment", "Env_5", {
         "background_mode": "2", "sky": 'SubResource("Sky_5")',
         "ambient_light_source": "2", "ambient_light_color": "Color(0.3, 0.36, 0.52, 1)",
-        "ambient_light_energy": "0.6", "tonemap_mode": "2",
-        "fog_enabled": "true", "fog_light_color": "Color(0.05, 0.06, 0.1, 1)", "fog_density": "0.011",
+        "ambient_light_energy": "1.05", "tonemap_mode": "2",
+        "fog_enabled": "true", "fog_light_color": "Color(0.12, 0.13, 0.18, 1)", "fog_density": "0.011",
         "fog_sky_affect": "0.25",
     }),
 ]
@@ -538,7 +538,7 @@ def mul(a, b):
 L.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("Env_5")')
 L.node("Moonlight", "DirectionalLight3D", ".",
        transform=xform((0, 40, 0), mul(rot_y(MOON_YAW), rot_x(math.radians(MOON_PITCH)))),
-       light_color="Color(0.6, 0.7, 1, 1)", light_energy="0.32", shadow_enabled="true",
+       light_color="Color(0.6, 0.7, 1, 1)", light_energy="0.55", shadow_enabled="true",
        directional_shadow_max_distance="50.0", directional_shadow_mode="1")
 # Взрывоопасные бочки и баллоны (места подобраны у стен рядом с постами врагов).
 L.explosives([(4.99, -0.02, 27.57), (-5.03, -0.02, -11.94), (17.06, -0.02, -7.06), (-17.06, -0.02, 7.06), (47.06, -0.02, 2.06), (40.42, -0.02, -27.17), (-15.06, -0.02, -33.94), (20, -0.02, 38), (-20.94, 0, -52.94), (22.94, 0, -12.94), (50.16, 0, -21.84), (-14.77, 0, 21.85)])

@@ -187,6 +187,14 @@ func _test_combat() -> void:
 	shotgun_pickup.global_position = player.global_position
 	await _frames(10)
 	_check(player.current_weapon.id == "shotgun", "подобранный дробовик сразу в руках")
+	var far_pickup := Pickup.new()
+	far_pickup.kind = Pickup.Kind.WEAPON
+	far_pickup.weapon = load("res://weapons/rifle.tres")
+	add_child(far_pickup)
+	var weapon_label := far_pickup.find_children("*", "Label3D", true, false)[0] as Label3D
+	_check(weapon_label.visibility_range_begin >= 5.0 and not weapon_label.no_depth_test,
+			"подпись оружия прячется вблизи и не рисуется поверх героя")
+	far_pickup.queue_free()
 	_check(hud.get_node("%SwitchButton").text == "Дробь", "кнопка смены оружия показывает дробовик")
 	player.switch_weapon()
 	await _frames(2)
@@ -482,8 +490,12 @@ func _test_noir_and_night() -> void:
 	_check(lamps != null and lamps.get_lamp_count() >= 30, "ночью на улицах горят фонари (%d)" % (lamps.get_lamp_count() if lamps else 0))
 	var lights := lamps.find_children("*", "OmniLight3D", false, false).size() if lamps else 0
 	_check(lights >= 10, "часть фонарей светит по-настоящему (%d источников)" % lights)
+	_check(lamps != null and lights >= lamps.get_lamp_count(), "на высокой графике светит каждый фонарь")
+	var bulbs := lamps.get_node_or_null("GarlandBulbs") as MultiMeshInstance3D if lamps else null
+	_check(bulbs != null and bulbs.multimesh.instance_count > 200,
+			"над улицами гирлянды (%d лампочек)" % (bulbs.multimesh.instance_count if bulbs else 0))
 	var moon := level.get_node_or_null("Moonlight") as DirectionalLight3D
-	_check(moon != null and moon.light_energy < 0.5, "вместо солнца — луна")
+	_check(moon != null and moon.light_energy < 0.8, "вместо солнца — луна")
 	var facade := load("res://materials/facade_white.tres") as ShaderMaterial
 	_check(facade != null and facade.get_shader_parameter("lit_texture") != null, "в домах светятся окна")
 	var noir := level.hud.get_node("%NoirFilter") as CanvasItem
@@ -939,6 +951,16 @@ func _test_helicopter() -> void:
 	await _frames(3)
 	var relative := wrapf(player.camera_rig.get_yaw() - (heli.rotation.y - PI / 2.0), -PI, PI)
 	_check(absf(relative) <= deg_to_rad(level.door_limit_deg) + 0.05, "из двери нельзя развернуться назад в кабину")
+	# Камера упирается в стенки кабины изнутри: стенка за спиной и крыша не закрывают обзор.
+	var outside := []
+	for view in [[0.0, -0.3], [0.0, 0.0], [0.0, -1.1], [1.4, -0.2], [-1.4, -0.2], [0.0, 0.6]]:
+		player.camera_rig.set_yaw(heli.rotation.y - PI / 2.0 + float(view[0]))
+		player.camera_rig.set_pitch(float(view[1]))
+		await _frames(4)
+		var local := heli.to_local(player.camera_rig.camera.global_position)
+		if local.x < -1.05 or local.y > 2.6 or absf(local.z - 0.2) > 2.0:
+			outside.append("%s → %s" % [view, local])
+	_check(outside.is_empty(), "камера в вертолёте остаётся внутри кабины %s" % [outside])
 
 	# Пирс: вертолёт зависает, пока не зачищено место с волнами.
 	level.jump_to_waypoint(4)
