@@ -122,7 +122,8 @@ func _add_garlands(transforms: Array[Transform3D]) -> void:
 			var point := a.lerp(b, t) + Vector3.DOWN * sag * 4.0 * t * (1.0 - t)
 			var segment := point - previous
 			if segment.length() > 0.01:
-				var basis := Basis.looking_at(segment.normalized(), Vector3.UP).scaled_local(Vector3(1, 1, segment.length()))
+				# Провод вытянут по оси Z на длину отрезка (scaled_local нет в Godot 4.4).
+				var basis := Basis.looking_at(segment.normalized(), Vector3.UP) * Basis.from_scale(Vector3(1, 1, segment.length()))
 				wires.append(Transform3D(basis, (point + previous) * 0.5))
 			if k < steps:
 				bulbs.append(Transform3D(Basis(), point + Vector3.DOWN * 0.07))
