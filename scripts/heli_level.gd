@@ -8,6 +8,8 @@ extends Level
 
 ## Слой 6: невидимые стенки кабины (Helicopter/CameraShell), в них упирается только камера.
 const CABIN_CAMERA_LAYER := 32
+## Сдвиг камеры вправо от героя у пулемёта, м (на ногах — 0.6, в машине — 0.9).
+const HELI_SHOULDER := 1.6
 
 @export var cruise_speed := 15.0
 @export var door_limit_deg := 85.0  ## Насколько можно отвернуться от двери.
@@ -33,7 +35,8 @@ func _ready() -> void:
 	_yaw = _heli.rotation.y
 	_boss = get_node_or_null("AttackHelicopter") as AttackHelicopter
 	# Камера держится внутри кабины: за спиной героя стенка, сверху крыша.
-	player.mount_to($Helicopter/Seat, 2.0)
+	# Сдвинута вправо, чтобы герой стоял у левого края и не закрывал цели.
+	player.mount_to($Helicopter/Seat, 2.0, 1.3, -0.3, HELI_SHOULDER)
 	player.camera_rig.set_obstacle_mask(1 | CABIN_CAMERA_LAYER, 0.15)
 	player.camera_rig.set_yaw(_door_yaw())
 	hud.set_mounted(true)

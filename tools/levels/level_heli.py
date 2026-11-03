@@ -135,6 +135,7 @@ START = (0, 38.6, 60)
 heli = L.node("Helicopter", "Node3D", ".", transform=xform(START))
 L.combiner("Helicopter/Body", False)
 B = "Helicopter/Body"
+# Хвостовая балка — на уровне крыши: из двери её не видно, камера справа от героя её не задевает.
 for name, center, size, mat in (
         ("Floor", (0, -0.07, 0.15), (2.4, 0.15, 3.6), "concrete_dark"),
         ("Roof", (0, 2.75, 0.15), (2.4, 0.15, 3.8), "black_metal"),
@@ -143,9 +144,9 @@ for name, center, size, mat in (
         ("PillarFront", (1.15, 1.35, -1.55), (0.12, 2.8, 0.12), "black_metal"),
         ("Cockpit", (0, 0.95, -2.3), (2.2, 1.7, 1.4), "dark_glass"),
         ("Nose", (0, 0.4, -3.15), (1.6, 0.8, 0.4), "white_paint"),
-        ("Boom", (0, 1.3, 5.0), (0.5, 0.6, 6.0), "black_metal"),
-        ("BoomStripe", (0, 1.0, 5.0), (0.52, 0.12, 6.0), "plaster_blue"),
-        ("Fin", (0, 2.0, 7.8), (0.12, 1.5, 1.0), "plaster_blue"),
+        ("Boom", (0, 2.65, 5.0), (0.5, 0.4, 6.0), "black_metal"),
+        ("BoomStripe", (0, 2.5, 5.0), (0.52, 0.08, 6.0), "plaster_blue"),
+        ("Fin", (0, 3.3, 7.8), (0.12, 1.3, 1.0), "plaster_blue"),
         ("SkidL", (-1.0, -0.6, 0.2), (0.12, 0.12, 4.0), "black_metal"),
         ("SkidR", (1.0, -0.6, 0.2), (0.12, 0.12, 4.0), "black_metal"),
         ("StrutL", (-1.0, -0.3, 0.2), (0.1, 0.6, 0.1), "black_metal"),

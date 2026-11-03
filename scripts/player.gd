@@ -188,7 +188,8 @@ func _move(delta: float, haste: float) -> void:
 
 
 ## Пристегнуть героя к точке (дверь вертолёта) или отстегнуть (null).
-func mount_to(node: Node3D, distance := 2.5, height := 1.3, pitch := -0.3) -> void:
+## shoulder — насколько камера сдвинута вправо от героя (больше — герой левее на экране).
+func mount_to(node: Node3D, distance := 2.5, height := 1.3, pitch := -0.3, shoulder := 0.9) -> void:
 	mount = node
 	if node == null:
 		camera_rig.distance = 3.0
@@ -200,7 +201,7 @@ func mount_to(node: Node3D, distance := 2.5, height := 1.3, pitch := -0.3) -> vo
 	velocity = Vector3.ZERO
 	# Камера ближе к плечу и чуть выше: за спиной — кабина вертолёта.
 	camera_rig.distance = distance
-	camera_rig.shoulder_offset = 0.9
+	camera_rig.shoulder_offset = shoulder
 	camera_rig.height = height
 	camera_rig.follow_speed = 90.0
 	camera_rig.set_pitch(pitch)
