@@ -72,7 +72,7 @@ func _ready() -> void:
 	_route = (ROUTES.get(key, ROUTES["1-2"]) as Array).duplicate()
 	if Game.travel_from > Game.travel_to:
 		_route.reverse()
-	title = "%s: %s → %s" % [title_prefix, Game.city_name(Game.travel_from), Game.city_name(Game.travel_to)]
+	title = "%s: %s → %s" % [tr(title_prefix), Game.city_name(Game.travel_from), Game.city_name(Game.travel_to)]
 	super._ready()
 	var world := get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if world:
@@ -157,7 +157,7 @@ func _set_biome(index: int) -> void:
 	_dust.color = Color(0.95, 0.97, 1.0, 0.8) if data.get("snow", false) else Color(0.75, 0.68, 0.55, 0.35)
 	_dust.emitting = data.get("snow", false) or _biome == "desert"
 	if index > 0:
-		hud.show_message(BIOME_NAMES.get(_biome, _biome), "До цели: %s" % Game.city_name(Game.travel_to))
+		hud.show_message(BIOME_NAMES.get(_biome, _biome), tr("До цели: %s") % Game.city_name(Game.travel_to))
 
 
 func _spawn_row(z: float) -> void:
@@ -424,7 +424,7 @@ func complete() -> void:
 	var reward := Game.finish_travel(stars)
 	Audio.stop_music()
 	Audio.play("level_complete")
-	hud.show_level_complete("Приехали: %s!" % Game.city_name(Game.travel_to), time, kills, headshots, reward, false,
+	hud.show_level_complete(tr("Приехали: %s!") % Game.city_name(Game.travel_to), time, kills, headshots, reward, false,
 			"Дальше")
 	hud.show_stars(stars, accuracy(), max_combo)
 

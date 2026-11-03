@@ -80,6 +80,7 @@ func _ready() -> void:
 	set_town_available(false)
 	Game.economy_changed.connect(_update_money)
 	Game.settings_changed.connect(_apply_noir)
+	Game.settings_changed.connect(_refresh_texts)
 	_apply_noir()
 	_update_money()
 	_money_popup.modulate.a = 0.0
@@ -125,8 +126,8 @@ func _process(delta: float) -> void:
 		var zone := _player.interactable
 		var show_action := is_instance_valid(zone) and _player.is_alive()
 		if show_action:
-			_interact_prompt.text = zone.get_prompt()
-			_interact_button.text = zone.get_button_text()
+			_interact_prompt.text = tr(zone.get_prompt())
+			_interact_button.text = tr(zone.get_button_text())
 		_interact_prompt.visible = show_action
 		_interact_button.visible = show_action and zone.active
 	# При низком здоровье края экрана пульсируют красным.
@@ -181,14 +182,22 @@ func set_health(current: int, maximum: int) -> void:
 		_damage_flash.color.a = 0.0
 
 
+## Сменили язык: подписи, собранные кодом (оружие, гранаты), пишем заново.
+func _refresh_texts() -> void:
+	if is_instance_valid(_player) and _player.current_weapon:
+		_weapon_label.text = tr(_player.current_weapon.display_name)
+		_switch_button.text = tr(_player.current_weapon.short_name)
+		_on_grenades_changed(_player.grenades)
+
+
 func set_objective(text: String) -> void:
-	_objective_label.text = text
+	_objective_label.text = tr(text)
 
 
 ## Полоса здоровья босса: имя, фаза и доля здоровья в текущей фазе.
 func update_boss(boss_name: String, fraction: float, phase: int, phases: int, status := "") -> void:
 	%BossBar.visible = true
-	%BossName.text = "%s · фаза %d из %d%s" % [boss_name, phase, phases, ("  (%s)" % status) if status != "" else ""]
+	%BossName.text = tr("%s · фаза %d из %d") % [tr(boss_name), phase, phases] + (("  (%s)" % tr(status)) if status != "" else "")
 	%BossHealth.value = fraction * 100.0
 
 
@@ -197,7 +206,7 @@ func hide_boss() -> void:
 
 
 func set_kills(count: int) -> void:
-	_kills_label.text = "Убито: %d" % count
+	_kills_label.text = tr("Убито: %d") % count
 
 
 func set_kills_visible(value: bool) -> void:
@@ -231,14 +240,13 @@ func show_money_popup(amount: int) -> void:
 
 func show_entrance(level_index: int) -> void:
 	_entrance_level = level_index
-	var title: String = Game.LEVELS[level_index].title
-	%EntranceTitle.text = title
+	%EntranceTitle.text = Game.level_title(level_index)
 	var tier := Game.tier_of(level_index)
-	var text := "Сложность: %d из %d\nНаграда за прохождение: $%d\nДеньги за убийства: ×%.1f" % [
+	var text := tr("Сложность: %d из %d\nНаграда за прохождение: $%d\nДеньги за убийства: ×%.1f") % [
 			tier + 1, Game.MAX_TIER + 1, Game.level_reward(level_index), Game.reward_multiplier(tier)]
 	var record: Variant = Game.records.get(level_index)
 	if record is Dictionary:
-		text += "\nРекорд: %s" % Game.format_time(record.time)
+		text += "\n" + tr("Рекорд: %s") % Game.format_time(record.time)
 	%EntranceInfo.text = text
 	_open_panel(_entrance_panel)
 
@@ -246,10 +254,10 @@ func show_entrance(level_index: int) -> void:
 ## Дорога в другой город: выбор — поезд или машина.
 func show_travel(episode: int) -> void:
 	_travel_episode = episode
-	%TravelTitle.text = "Дорога: %s" % Game.city_name(episode)
-	var plane := " Самолётом этот маршрут уже открыт — аэропорт." if Game.has_traveled(Game.latest_episode(), episode) else ""
-	%TravelInfo.text = "Поезд — пробиться через вагоны к паровозу, на крышах опасны тоннели.\n" + \
-			"Машина — рулите и отстреливайтесь от погони: мотоциклы, машины банды и вертолёт." + plane
+	%TravelTitle.text = tr("Дорога: %s") % Game.city_name(episode)
+	var plane := (" " + tr("Самолётом этот маршрут уже открыт — аэропорт.")) if Game.has_traveled(Game.latest_episode(), episode) else ""
+	%TravelInfo.text = tr("Поезд — пробиться через вагоны к паровозу, на крышах опасны тоннели.") + "\n" + \
+			tr("Машина — рулите и отстреливайтесь от погони: мотоциклы, машины банды и вертолёт.") + plane
 	_open_panel(%TravelPanel)
 
 
@@ -268,19 +276,19 @@ func show_property(property_id: String) -> void:
 func _refresh_property() -> void:
 	var item := Game.property(_property_id)
 	var owned := Game.owns_property(_property_id)
-	%PropertyTitle.text = item.title
+	%PropertyTitle.text = tr(item.title)
 	var buy := %PropertyBuyButton as Button
 	buy.visible = not owned
 	if owned:
-		%PropertyInfo.text = "Это ваше жильё. Улучшения видны внутри и работают на всех заданиях.\nДеньги: $%d" % Game.money
+		%PropertyInfo.text = tr("Это ваше жильё. Улучшения видны внутри и работают на всех заданиях.\nДеньги: $%d") % Game.money
 	elif not Game.is_property_available(_property_id):
-		%PropertyInfo.text = "Сначала купите жильё попроще."
+		%PropertyInfo.text = tr("Сначала купите жильё попроще.")
 		buy.disabled = true
-		buy.text = "Недоступно"
+		buy.text = tr("Недоступно")
 	else:
-		%PropertyInfo.text = "Цена: $%d\nУ вас: $%d" % [int(item.price), Game.money]
+		%PropertyInfo.text = tr("Цена: $%d\nУ вас: $%d") % [int(item.price), Game.money]
 		buy.disabled = Game.money < int(item.price)
-		buy.text = "Купить за $%d" % int(item.price)
+		buy.text = tr("Купить за $%d") % int(item.price)
 	for child in _upgrade_list.get_children():
 		child.queue_free()
 	if not owned:
@@ -289,14 +297,14 @@ func _refresh_property() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 16)
 		var label := Label.new()
-		label.text = "%s\n%s" % [upgrade.title, upgrade.text]
+		label.text = "%s\n%s" % [tr(upgrade.title), tr(upgrade.text)]
 		label.custom_minimum_size = Vector2(380, 0)
 		label.add_theme_font_size_override("font_size", 22)
 		row.add_child(label)
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(220, 70)
 		if Game.has_upgrade(_property_id, upgrade.id):
-			button.text = "Куплено"
+			button.text = tr("Куплено")
 			button.disabled = true
 		else:
 			button.text = "$%d" % int(upgrade.price)
@@ -309,7 +317,7 @@ func _refresh_property() -> void:
 func _buy_property() -> void:
 	if Game.buy_property(_property_id):
 		Audio.play("weapon_pickup")
-		show_toast("Куплено: %s!" % Game.property(_property_id).title)
+		show_toast(tr("Куплено: %s!") % tr(Game.property(_property_id).title))
 	_refresh_property()
 
 
@@ -344,9 +352,11 @@ func _update_money() -> void:
 	_money_label.text = "$ %d" % Game.money
 
 
+## Заголовок и подзаголовок посреди экрана. Строки переводятся здесь (tr), поэтому
+## постоянный текст можно передавать как есть; шаблоны с %s переводят до подстановки.
 func show_message(title: String, subtitle := "") -> void:
-	_message.text = title
-	_subtitle.text = subtitle
+	_message.text = tr(title)
+	_subtitle.text = tr(subtitle) if subtitle != "" else ""
 	if subtitle != "" and _objective_label.text == "":
 		set_objective(subtitle)
 	if _message_tween:
@@ -361,7 +371,7 @@ func show_message(title: String, subtitle := "") -> void:
 
 
 func show_toast(text: String) -> void:
-	_toast.text = text
+	_toast.text = tr(text)
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast.modulate.a = 1.0
@@ -379,23 +389,23 @@ func show_game_over() -> void:
 func show_level_complete(heading: String, time: float, kills: int, headshots: int, reward: int, record: bool,
 		next_text: String) -> void:
 	_hide_gameplay()
-	%CompleteTitle.text = heading
-	_complete_stats.text = "Время: %s\nУбито: %d · хедшоты: %d\nНаграда: $%d (всего $%d)" % [
+	%CompleteTitle.text = tr(heading)
+	_complete_stats.text = tr("Время: %s\nУбито: %d · хедшоты: %d\nНаграда: $%d (всего $%d)") % [
 			Game.format_time(time), kills, headshots, reward, Game.money]
 	_record_label.visible = record
 	_next_button.visible = next_text != ""
-	_next_button.text = next_text
+	_next_button.text = tr(next_text)
 	_complete.show()
 	get_tree().paused = true
 
 
 func _on_grenades_changed(count: int) -> void:
-	%GrenadeButton.text = "Гран %d" % count
+	%GrenadeButton.text = tr("Гран %d") % count
 
 
 func _on_weapon_changed(weapon: WeaponData) -> void:
-	_weapon_label.text = weapon.display_name
-	_switch_button.text = weapon.short_name
+	_weapon_label.text = tr(weapon.display_name)
+	_switch_button.text = tr(weapon.short_name)
 	_reload_bar.hide()
 	# Кнопка оптики видна только у снайперской винтовки.
 	%ScopeButton.visible = weapon.scope_fov > 0.0
@@ -434,17 +444,17 @@ func _on_rage_changed(value: float, active: bool) -> void:
 func update_combo(count: int, multiplier: int) -> void:
 	var label := %ComboLabel as Label
 	if multiplier < 2:
-		label.text = ("Серия: %d" % count) if count >= 2 else ""
+		label.text = (tr("Серия: %d") % count) if count >= 2 else ""
 		label.modulate = Color(1, 1, 1, 0.75)
 		return
-	label.text = "КОМБО ×%d · %d" % [multiplier, count]
+	label.text = tr("КОМБО ×%d · %d") % [multiplier, count]
 	label.modulate = Color.WHITE
 
 
 ## Крупная надпись посреди экрана: «ХЕДШОТ!», «ДВОЙНОЕ!»…
 func show_banner(text: String, color := Color(1, 0.85, 0.3)) -> void:
 	var banner := %Banner as Label
-	banner.text = text
+	banner.text = tr(text)
 	banner.add_theme_color_override("font_color", color)
 	if _banner_tween:
 		_banner_tween.kill()
@@ -468,12 +478,12 @@ func blood_splash(strength := 1.0) -> void:
 ## Звёзды и подробности на экране победы.
 func show_stars(stars: int, accuracy: float, best_combo: int) -> void:
 	%StarRating.stars = stars
-	_complete_stats.text += "\nМеткость: %d%% · лучшая серия: %d" % [roundi(accuracy * 100.0), best_combo]
+	_complete_stats.text += "\n" + tr("Меткость: %d%% · лучшая серия: %d") % [roundi(accuracy * 100.0), best_combo]
 
 
 func _on_scope_changed(on: bool) -> void:
 	_crosshair.scoped = on
-	%ScopeButton.text = "Без\nоптики" if on else "Прицел"
+	%ScopeButton.text = tr("Без\nоптики") if on else tr("Прицел")
 
 
 func _on_ammo_changed(_weapon: WeaponData, magazine: int, reserve: int) -> void:

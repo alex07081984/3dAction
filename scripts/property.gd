@@ -28,7 +28,7 @@ func refresh() -> void:
 		var label := _sign as Label3D
 		if label:
 			var item := Game.property(property_id)
-			label.text = "ПРОДАЁТСЯ\n%s — $%d" % [item.get("title", ""), int(item.get("price", 0))]
+			label.text = tr("ПРОДАЁТСЯ") + "\n" + "%s — $%d" % [tr(String(item.get("title", ""))), int(item.get("price", 0))]
 	if _furniture:
 		for group in _furniture.get_children():
 			if group.name == "Base":

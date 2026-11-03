@@ -100,7 +100,7 @@ func take_hit(damage: float, point: Vector3, direction: Vector3) -> void:
 	Fx.blood(point, direction, 20)
 	Audio.play_at("death", point)
 	Game.add_money(-mini(PENALTY, Game.money))
-	get_tree().call_group("hud", "show_toast", "Мирный житель! −$%d" % PENALTY)
+	get_tree().call_group("hud", "show_toast", tr("Мирный житель! −$%d") % PENALTY)
 	queue_free()
 
 

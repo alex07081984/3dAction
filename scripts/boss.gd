@@ -117,12 +117,12 @@ func _wake(alert_neighbors := true) -> void:
 		return
 	if hidden:
 		hidden = false
-		_hud("show_message", "Попался!", "%s найден" % boss_name)
-		_hud("set_objective", "Убейте: %s" % boss_name)
+		_hud("show_message", "Попался!", tr("%s найден") % tr(boss_name))
+		_hud("set_objective", tr("Убейте: %s") % tr(boss_name))
 		Audio.play_at("laugh", _head(), 4.0)
 	if not _announced:
 		_announced = true
-		_hud("show_message", boss_name, "Босс! Фаза 1 из %d" % phases)
+		_hud("show_message", boss_name, tr("Босс! Фаза 1 из %d") % phases)
 		Audio.play_at("laugh" if hides else "roar", _head(), 4.0)
 		get_tree().call_group("level", "on_boss_fight", self)
 	super._wake(alert_neighbors)
@@ -160,7 +160,7 @@ func _next_phase() -> void:
 		_relocate(true)
 	else:
 		Audio.play_at("roar", _head(), 6.0)
-		_hud("show_message", "%s в ярости!" % boss_name, "Фаза %d из %d · подмога!" % [phase, phases])
+		_hud("show_message", tr("%s в ярости!") % tr(boss_name), tr("Фаза %d из %d · подмога!") % [phase, phases])
 	_update_bar()
 
 
@@ -211,7 +211,7 @@ func _die(mode: BlockyCharacter.Death, direction: Vector3, force: float) -> void
 	super._die(mode, direction, force)
 	Game.add_money(bonus)
 	_hud("hide_boss")
-	_hud("show_message", "%s повержен!" % boss_name, "Премия: $%d" % bonus)
+	_hud("show_message", tr("%s повержен!") % tr(boss_name), tr("Премия: $%d") % bonus)
 	cleared.emit(self)
 	get_tree().call_group("level", "on_boss_defeated", self)
 
@@ -251,7 +251,7 @@ func _relocate(new_phase: bool) -> void:
 	var point := _pick_nest()
 	if point == null:
 		if new_phase:
-			_hud("show_message", "%s в ярости!" % boss_name, "Фаза %d из %d" % [phase, phases])
+			_hud("show_message", tr("%s в ярости!") % tr(boss_name), tr("Фаза %d из %d") % [phase, phases])
 		return
 	Fx.smoke_cloud(global_position + Vector3.UP)
 	Audio.play_at("smoke", global_position + Vector3.UP)
@@ -263,12 +263,12 @@ func _relocate(new_phase: bool) -> void:
 	_phase = Phase.PAUSE
 	_timer = 1.2
 	_show_laser(false)
-	var where := String(point.name)
+	var where := tr(String(point.name))
 	if new_phase:
-		_hud("show_message", "%s сменил позицию!" % boss_name, "Фаза %d из %d · он теперь: %s" % [phase, phases, where])
+		_hud("show_message", tr("%s сменил позицию!") % tr(boss_name), tr("Фаза %d из %d · он теперь: %s") % [phase, phases, where])
 	else:
-		_hud("show_message", "%s перебежал" % boss_name, "Ищите блик прицела: %s" % where)
-	_hud("set_objective", "Убейте: %s (%s)" % [boss_name, where])
+		_hud("show_message", tr("%s перебежал") % tr(boss_name), tr("Ищите блик прицела: %s") % where)
+	_hud("set_objective", tr("Убейте: %s (%s)") % [tr(boss_name), where])
 
 
 ## Другая позиция, подальше от игрока (но не дальше, чем он видит).
@@ -297,10 +297,10 @@ func _vanish() -> void:
 	Audio.play_at("smoke", global_position + Vector3.UP)
 	Audio.play_at("laugh", _head(), 6.0)
 	if point == null:
-		_hud("show_message", "%s звереет!" % boss_name, "Фаза %d из %d" % [phase, phases])
+		_hud("show_message", tr("%s звереет!") % tr(boss_name), tr("Фаза %d из %d") % [phase, phases])
 		return
-	_hud("show_message", "%s сбежал!" % boss_name, "Ищите его по смеху — фаза %d из %d" % [phase, phases])
-	_hud("set_objective", "Найдите: %s" % boss_name)
+	_hud("show_message", tr("%s сбежал!") % tr(boss_name), tr("Ищите его по смеху — фаза %d из %d") % [phase, phases])
+	_hud("set_objective", tr("Найдите: %s") % tr(boss_name))
 	global_position = point.global_position
 	rotation.y = point.global_rotation.y
 	velocity = Vector3.ZERO
@@ -323,7 +323,7 @@ func _hide_logic(delta: float) -> void:
 		_laugh_timer = randf_range(6.0, 8.0)
 		Audio.play_at("laugh", _head(), 8.0)
 		if _hint_timer <= 0.0:
-			_hud("set_objective", "Смех доносится: %s" % _hide_name)
+			_hud("set_objective", tr("Смех доносится: %s") % tr(_hide_name))
 	if _sees_player and _distance_to_player() < 16.0:
 		_wake()
 	elif _hidden_time > 50.0:

@@ -8,10 +8,10 @@ extends Interactable
 func get_prompt() -> String:
 	var item := Game.property(property_id)
 	if Game.owns_property(property_id):
-		return "%s — ваше жильё" % item.title
+		return tr("%s — ваше жильё") % tr(item.title)
 	if not Game.is_property_available(property_id):
-		return "%s — сначала купите жильё попроще" % item.title
-	return "%s — продаётся за $%d" % [item.title, int(item.price)]
+		return tr("%s — сначала купите жильё попроще") % tr(item.title)
+	return tr("%s — продаётся за $%d") % [tr(item.title), int(item.price)]
 
 
 func get_button_text() -> String:

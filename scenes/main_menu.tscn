@@ -87,7 +87,7 @@ offset_top = 150.0
 offset_right = 900.0
 offset_bottom = 190.0
 theme_override_font_sizes/font_size = 26
-text = "Эпизод 1: Подземка · Метро · Небоскрёб · Особняк · Город"
+text = "Эпизоды 1–3: Нью-Йорк · Сан-Франциско · Аляска"
 
 [node name="MoneyLabel" type="Label" parent="UI"]
 unique_name_in_owner = true

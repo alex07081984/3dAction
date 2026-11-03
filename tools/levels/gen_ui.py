@@ -157,6 +157,12 @@ def settings_panel():
            theme_override_constants__separation=10)
     done_parent = v
     v = f"{v}/Scroll/Items"
+    # Язык — первым пунктом: подпись «Language» видна на любом языке, кнопка листает языки по кругу.
+    s.node("LanguageRow", "HBoxContainer", v, layout="container", theme_override_constants__separation=16)
+    s.node("Label", "Label", f"{v}/LanguageRow", layout="container", custom_minimum_size="Vector2(260, 0)",
+           text="Язык")
+    s.node("LanguageButton", "Button", f"{v}/LanguageRow", layout="container", unique=True,
+           custom_minimum_size="Vector2(400, 56)", text="English")
     s.node("GraphicsRow", "HBoxContainer", v, layout="container", theme_override_constants__separation=16)
     s.node("Label", "Label", f"{v}/GraphicsRow", layout="container", custom_minimum_size="Vector2(260, 0)",
            text="Графика")
@@ -412,7 +418,7 @@ def main_menu():
            theme_override_constants__outline_size=14, theme_override_font_sizes__font_size=84,
            theme_override_colors__font_color="Color(1, 0.86, 0.35, 1)", text="3D ACTION")
     s.node("Subtitle", "Label", "UI", layout="top_left", offsets=(64, 150, 900, 190),
-           theme_override_font_sizes__font_size=26, text="Эпизод 1: Подземка · Метро · Небоскрёб · Особняк · Город")
+           theme_override_font_sizes__font_size=26, text="Эпизоды 1–3: Нью-Йорк · Сан-Франциско · Аляска")
     s.node("MoneyLabel", "Label", "UI", layout="top_right", offsets=(-420, 40, -60, 84), unique=True,
            theme_override_font_sizes__font_size=34, theme_override_colors__font_color="Color(1, 0.85, 0.3, 1)",
            text="$ 0", horizontal_alignment=2)

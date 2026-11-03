@@ -7,10 +7,10 @@ extends Interactable
 
 
 func get_prompt() -> String:
-	var title: String = Game.LEVELS[level_index].title
+	var title := Game.level_title(level_index)
 	if not active:
-		return "%s — закрыто" % title
-	return "%s · сложность %d · награда $%d" % [title, Game.tier_of(level_index) + 1, Game.level_reward(level_index)]
+		return tr("%s — закрыто") % title
+	return tr("%s · сложность %d · награда $%d") % [title, Game.tier_of(level_index) + 1, Game.level_reward(level_index)]
 
 
 func get_button_text() -> String:

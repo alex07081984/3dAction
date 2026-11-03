@@ -49,6 +49,8 @@ func _notification(what: int) -> void:
 			or what == NOTIFICATION_EXIT_TREE:
 		if _finger != -1:
 			_release()
+	elif what == NOTIFICATION_TRANSLATION_CHANGED:
+		queue_redraw()
 
 
 func _draw() -> void:
@@ -57,13 +59,19 @@ func _draw() -> void:
 	draw_circle(center, radius, pressed_color if _finger != -1 else color)
 	draw_arc(center, radius, 0.0, TAU, 48, ring_color, 3.0, true)
 	var font := get_theme_default_font()
-	var lines := text.split("\n")
-	var line_height := font.get_height(font_size)
-	var top := center.y - line_height * lines.size() * 0.5 + font.get_ascent(font_size)
+	# Подпись на текущем языке; длинное слово (Recharger, Ausweichen) уменьшаем, чтобы влезло в круг.
+	var lines := tr(text).split("\n")
+	var fitted := font_size
+	for line in lines:
+		var full := font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		if full > radius * 1.7:
+			fitted = mini(fitted, maxi(int(font_size * radius * 1.7 / full), 10))
+	var line_height := font.get_height(fitted)
+	var top := center.y - line_height * lines.size() * 0.5 + font.get_ascent(fitted)
 	for i in lines.size():
-		var width := font.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		var width := font.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fitted).x
 		draw_string(font, Vector2(center.x - width * 0.5, top + i * line_height), lines[i],
-				HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+				HORIZONTAL_ALIGNMENT_LEFT, -1, fitted)
 
 
 func _hit(screen_position: Vector2) -> bool:

@@ -27,6 +27,10 @@ func _run() -> void:
 	_game.settings.blood = true
 	_game.settings.show_fps = false
 	_game.set_graphics(2)
+	# Проверки сверяют подписи с русскими строками (это ключи перевода), поэтому язык — русский.
+	# Переводы на английский, немецкий и французский проверяет _test_localization().
+	_game.settings.language = "ru"
+	_game.apply_settings()
 	# Замедления времени мешают проверкам по кадрам — включаем их только в своей проверке.
 	_game.slowmo_enabled = false
 
@@ -62,6 +66,7 @@ func _run() -> void:
 	await _test_chase()
 	await _test_tank()
 	await _test_graphics_and_balance()
+	await _test_localization()
 
 	print("\n=== Пройдено: %d, провалено: %d ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -1460,6 +1465,93 @@ func _test_property_and_perks() -> void:
 
 
 # --- Помощники -------------------------------------------------------------------
+
+# --- Языки ---------------------------------------------------------------------------
+
+## Подписи, которые увидит игрок (надписи, кнопки, вывески), с русскими буквами после перевода.
+func _untranslated(root: Node) -> Array:
+	var cyrillic := RegEx.create_from_string("[А-Яа-яЁё]")
+	var bad := []
+	for node in root.find_children("*", "", true, false):
+		var text := ""
+		if node is Label or node is Button or node is Label3D or node is TouchActionButton:
+			text = String(node.get("text"))
+		else:
+			continue
+		var shown := tr(text)
+		if cyrillic.search(shown):
+			bad.append("%s «%s»" % [node.name, shown.replace("\n", " ")])
+	return bad
+
+
+func _test_localization() -> void:
+	var fresh: Node = (load("res://scripts/autoload/game.gd") as GDScript).new()
+	_check(fresh.settings.get("language") == "en", "основной язык игры — английский")
+	fresh.free()
+	var counts := {}
+	for lang in ["en", "de", "fr", "ru"]:
+		var translation := load("res://locale/%s.po" % lang) as Translation
+		counts[lang] = translation.get_message_count() if translation else 0
+	_check(counts.en > 400 and counts.de == counts.en and counts.fr == counts.en and counts.ru == counts.en,
+			"переведены все строки: %s" % [counts])
+
+	_game.reset_progress()
+	_game.set_setting("language", "en")
+	_check(TranslationServer.get_locale() == "en", "язык переключается (en)")
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	await _frames(6)
+	var menu := get_tree().current_scene
+	_check((menu.get_node("%PlayButton") as Button).text == "Play", "меню по-английски: «%s»" % (menu.get_node("%PlayButton") as Button).text)
+	var bad := _untranslated(menu)
+	_check(bad.is_empty(), "в меню нет непереведённых подписей %s" % [bad])
+	# Кнопка языка в настройках: English → Deutsch → Français → Русский → English.
+	var language_button := menu.get_node("%SettingsPanel").get_node("%LanguageButton") as Button
+	var seen := []
+	for i in 4:
+		language_button.pressed.emit()
+		await _frames(2)
+		seen.append(TranslationServer.get_locale())
+	_check(seen == ["de", "fr", "ru", "en"], "кнопка «Язык» листает языки %s" % [seen])
+	_game.set_setting("language", "de")
+	await _frames(2)
+	_check((menu.get_node("%PlayButton") as Button).text == "Spielen", "меню пересобирается на новом языке (de)")
+	_check(_untranslated(menu).is_empty(), "меню по-немецки без русских слов")
+	_game.set_setting("language", "fr")
+	await _frames(2)
+	_check(_untranslated(menu).is_empty(), "меню по-французски без русских слов")
+	_check(tr("%s подбит!") % tr("Танк") == "Char touché !", "сообщения с подстановкой переводятся (fr)")
+
+	# Все уровни, поездки и базы по-английски: надписи HUD, кнопки, вывески на уровнях.
+	_game.set_setting("language", "en")
+	_game.unlocked_levels = _game.LEVELS.size()
+	var problems := []
+	for index in _game.LEVELS.size():
+		var level := await _fresh_level(index, false)
+		for item in _untranslated(level):
+			problems.append("%s: %s" % [_game.LEVELS[index].scene.get_file(), item])
+	_game.town_liberated = true
+	_game.liberated_cities = [10, 14]
+	for index in [_game.TOWN_INDEX, 10, 14]:
+		var hub := await _fresh_level(index, false)
+		for item in _untranslated(hub):
+			problems.append("база %d: %s" % [index, item])
+	for mode in ["train", "chase"]:
+		_game.start_travel(2, mode)
+		await _frames(8)
+		for item in _untranslated(get_tree().current_scene):
+			problems.append("%s: %s" % [mode, item])
+	_check(problems.is_empty(), "на уровнях и базах всё переведено %s" % [problems.slice(0, 12)])
+	var hud := get_tree().get_first_node_in_group("hud")
+	hud.show_message("Засада!", "Продержитесь!")
+	_check(hud._message.text == "Ambush!" and hud._subtitle.text == "Hold out!", "HUD переводит сообщения сам")
+	for path in ["pistol", "shotgun", "deagle", "magnum", "rifle", "sniper", "rpg", "minigun", "heli_rockets"]:
+		var weapon := load("res://weapons/%s.tres" % path) as WeaponData
+		if weapon and RegEx.create_from_string("[А-Яа-яЁё]").search(tr(weapon.display_name) + tr(weapon.short_name)):
+			problems.append(path)
+	_check(problems.is_empty(), "названия оружия переведены")
+	_game.settings.language = "ru"
+	_game.apply_settings()
+
 
 func _fresh_level(index: int, clear_enemies := true) -> Level:
 	_game.start_level(index)

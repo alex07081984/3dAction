@@ -62,7 +62,7 @@ func _ready() -> void:
 
 	Audio.play_music("music_explore")
 	var tier: int = Game.current_tier
-	hud.show_message(title, objective if tier == 0 else "Сложность %d · награда ×%.1f" % [tier + 1, Game.reward_multiplier()])
+	hud.show_message(title, objective if tier == 0 else tr("Сложность %d · награда ×%.1f") % [tier + 1, Game.reward_multiplier()])
 	hud.set_objective(objective)
 
 
@@ -97,7 +97,7 @@ func register_kill(headshot: bool) -> void:
 	elif headshot:
 		hud.show_banner("ХЕДШОТ!", Color(1, 0.2, 0.15))
 	elif combo >= 5 and combo % 5 == 0:
-		hud.show_banner("СЕРИЯ ×%d!" % combo_multiplier(), Color(1, 0.85, 0.3))
+		hud.show_banner(tr("СЕРИЯ ×%d!") % combo_multiplier(), Color(1, 0.85, 0.3))
 
 
 ## Звёзды за уровень: одна за прохождение, ещё по одной за меткость (40%)
@@ -154,9 +154,9 @@ func complete() -> void:
 		next_text = "Следующий уровень"
 	elif Game.latest_city() >= 0:
 		next_text = "В город"
-	var heading := "%s пройден!" % title
+	var heading := tr("%s пройден!") % tr(title)
 	if Game.is_episode_finale(level_index):
-		heading = "Эпизод %d пройден!" % Game.episode_of(level_index)
+		heading = tr("Эпизод %d пройден!") % Game.episode_of(level_index)
 	hud.show_level_complete(heading, time, kills, headshots, result.reward, result.record, next_text)
 	hud.show_stars(stars, accuracy(), max_combo)
 
@@ -209,7 +209,7 @@ func _on_zone_started(zone: WaveZone) -> void:
 
 
 func _on_wave_started(_zone: WaveZone, wave: int, total: int) -> void:
-	hud.set_objective("Волна %d из %d" % [wave, total])
+	hud.set_objective(tr("Волна %d из %d") % [wave, total])
 
 
 func _on_zone_cleared(_zone: WaveZone) -> void:

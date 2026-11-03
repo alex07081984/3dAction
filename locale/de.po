@@ -1,0 +1,1263 @@
+# 3D Action — de. Файл собран tools/i18n/build_po.py из tools/i18n/strings.tsv, правьте таблицу.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: de\n"
+
+msgid "Боевой вертолёт"
+msgstr "Kampfhubschrauber"
+
+msgid "Босс! Сбивайте его ракеты очередью"
+msgstr "Boss! Schieß seine Raketen mit Feuerstößen ab"
+
+msgid "Ракеты! Сбейте их очередью"
+msgstr "Raketen! Schieß sie ab"
+
+msgid "%s подбит!"
+msgstr "%s getroffen!"
+
+msgid "Фаза %d из %d"
+msgstr "Phase %d von %d"
+
+msgid "%s сбит!"
+msgstr "%s abgeschossen!"
+
+msgid "Премия: $%d"
+msgstr "Prämie: $%d"
+
+msgid "Толстяк"
+msgstr "Der Dicke"
+
+msgid "Попался!"
+msgstr "Erwischt!"
+
+msgid "%s найден"
+msgstr "%s gefunden"
+
+msgid "Убейте: %s"
+msgstr "Töte: %s"
+
+msgid "Босс! Фаза 1 из %d"
+msgstr "Boss! Phase 1 von %d"
+
+msgid "%s в ярости!"
+msgstr "%s rastet aus!"
+
+msgid "Фаза %d из %d · подмога!"
+msgstr "Phase %d von %d · Verstärkung!"
+
+msgid "%s повержен!"
+msgstr "%s besiegt!"
+
+msgid "%s сменил позицию!"
+msgstr "%s hat die Stellung gewechselt!"
+
+msgid "Фаза %d из %d · он теперь: %s"
+msgstr "Phase %d von %d · jetzt: %s"
+
+msgid "%s перебежал"
+msgstr "%s hat sich verlegt"
+
+msgid "Ищите блик прицела: %s"
+msgstr "Achte auf das Blitzen des Zielfernrohrs: %s"
+
+msgid "Убейте: %s (%s)"
+msgstr "Töte: %s (%s)"
+
+msgid "%s звереет!"
+msgstr "%s dreht durch!"
+
+msgid "%s сбежал!"
+msgstr "%s ist abgehauen!"
+
+msgid "Ищите его по смеху — фаза %d из %d"
+msgstr "Folge seinem Lachen — Phase %d von %d"
+
+msgid "Найдите: %s"
+msgstr "Finde: %s"
+
+msgid "Смех доносится: %s"
+msgstr "Lachen hörbar: %s"
+
+msgid "прячется"
+msgstr "versteckt"
+
+msgid "ОГНЕОПАСНО"
+msgstr "ENTZÜNDLICH"
+
+msgid "ТОННЕЛЬ!"
+msgstr "TUNNEL!"
+
+msgid "Держитесь своей полосы"
+msgstr "Bleib auf deiner Spur"
+
+msgid "Шоссе"
+msgstr "Highway"
+
+msgid "Оторвитесь от погони банды"
+msgstr "Häng die Verfolger der Bande ab"
+
+msgid "Погоня! Волна %d из %d"
+msgstr "Verfolgung! Welle %d von %d"
+
+msgid "Мотоциклы и машины банды сзади"
+msgstr "Motorräder und Autos der Bande hinter dir"
+
+msgid "Погоня: волна %d из %d"
+msgstr "Verfolgung: Welle %d von %d"
+
+msgid "Оторвались!"
+msgstr "Abgehängt!"
+
+msgid "Но это ещё не всё…"
+msgstr "Aber das ist noch nicht alles…"
+
+msgid "Сверху вертолёт!"
+msgstr "Hubschrauber von oben!"
+
+msgid "Авария! Смотрите на дорогу"
+msgstr "Unfall! Achte auf die Straße"
+
+msgid "Город на горизонте!"
+msgstr "Stadt am Horizont!"
+
+msgid "%s · фаза %d из %d"
+msgstr "%s · Phase %d von %d"
+
+msgid "Убито: %d"
+msgstr "Kills: %d"
+
+msgid "Сложность: %d из %d\nНаграда за прохождение: $%d\nДеньги за убийства: ×%.1f"
+msgstr "Schwierigkeit: %d von %d\nBelohnung: $%d\nGeld pro Kill: ×%.1f"
+
+msgid "Рекорд: %s"
+msgstr "Rekord: %s"
+
+msgid "Дорога: %s"
+msgstr "Reise nach %s"
+
+msgid "Самолётом этот маршрут уже открыт — аэропорт."
+msgstr "Diese Strecke ist jetzt auch per Flugzeug offen — zum Flughafen."
+
+msgid "Поезд — пробиться через вагоны к паровозу, на крышах опасны тоннели."
+msgstr "Zug — kämpf dich durch die Waggons zur Lok; auf den Dächern sind Tunnel gefährlich."
+
+msgid "Машина — рулите и отстреливайтесь от погони: мотоциклы, машины банды и вертолёт."
+msgstr "Auto — fahr und schieß auf die Verfolger: Motorräder, Bandenautos und ein Hubschrauber."
+
+msgid "Это ваше жильё. Улучшения видны внутри и работают на всех заданиях.\nДеньги: $%d"
+msgstr "Das ist dein Zuhause. Upgrades siehst du drinnen, sie helfen bei jedem Auftrag.\nGeld: $%d"
+
+msgid "Сначала купите жильё попроще."
+msgstr "Kauf zuerst eine einfachere Bleibe."
+
+msgid "Недоступно"
+msgstr "Nicht verfügbar"
+
+msgid "Цена: $%d\nУ вас: $%d"
+msgstr "Preis: $%d\nDu hast: $%d"
+
+msgid "Купить за $%d"
+msgstr "Kaufen für $%d"
+
+msgid "Куплено"
+msgstr "Gekauft"
+
+msgid "Куплено: %s!"
+msgstr "Gekauft: %s!"
+
+msgid "Время: %s\nУбито: %d · хедшоты: %d\nНаграда: $%d (всего $%d)"
+msgstr "Zeit: %s\nKills: %d · Kopfschüsse: %d\nBelohnung: $%d (gesamt $%d)"
+
+msgid "Гран %d"
+msgstr "Gran %d"
+
+msgid "Серия: %d"
+msgstr "Serie: %d"
+
+msgid "КОМБО ×%d · %d"
+msgstr "KOMBO ×%d · %d"
+
+msgid "Меткость: %d%% · лучшая серия: %d"
+msgstr "Trefferquote: %d%% · beste Serie: %d"
+
+msgid "Без\nоптики"
+msgstr "Ohne\nVisier"
+
+msgid "Прицел"
+msgstr "Visier"
+
+msgid "Действие"
+msgstr "Aktion"
+
+msgid "Войти"
+msgstr "Betreten"
+
+msgid "Подземка"
+msgstr "Untergrund"
+
+msgid "Найдите выход"
+msgstr "Finde den Ausgang"
+
+msgid "Сложность %d · награда ×%.1f"
+msgstr "Schwierigkeit %d · Belohnung ×%.1f"
+
+msgid "ДВОЙНОЕ!"
+msgstr "DOPPELKILL!"
+
+msgid "ТРОЙНОЕ!"
+msgstr "DREIFACHKILL!"
+
+msgid "МЯСОРУБКА!"
+msgstr "GEMETZEL!"
+
+msgid "ХЕДШОТ!"
+msgstr "KOPFSCHUSS!"
+
+msgid "СЕРИЯ ×%d!"
+msgstr "SERIE ×%d!"
+
+msgid "Следующий уровень"
+msgstr "Nächstes Level"
+
+msgid "В город"
+msgstr "Zur Stadt"
+
+msgid "%s пройден!"
+msgstr "%s geschafft!"
+
+msgid "Эпизод %d пройден!"
+msgstr "Episode %d geschafft!"
+
+msgid "Продержитесь!"
+msgstr "Halte durch!"
+
+msgid "Волна %d из %d"
+msgstr "Welle %d von %d"
+
+msgid "Чисто!"
+msgstr "Sauber!"
+
+msgid "Проход открыт"
+msgstr "Der Weg ist frei"
+
+msgid "%s — закрыто"
+msgstr "%s — gesperrt"
+
+msgid "%s · сложность %d · награда $%d"
+msgstr "%s · Schwierigkeit %d · Belohnung $%d"
+
+msgid "Ярость готова!"
+msgstr "Wut bereit!"
+
+msgid "Гранаты: %d"
+msgstr "Granaten: %d"
+
+msgid "+%d здоровья"
+msgstr "+%d Gesundheit"
+
+msgid "Патроны: %s"
+msgstr "Munition: %s"
+
+msgid "Новое оружие: %s!"
+msgstr "Neue Waffe: %s!"
+
+msgid "Патроны"
+msgstr "Munition"
+
+msgid "ПРОДАЁТСЯ"
+msgstr "ZU VERKAUFEN"
+
+msgid "%s — ваше жильё"
+msgstr "%s — dein Zuhause"
+
+msgid "%s — сначала купите жильё попроще"
+msgstr "%s — kauf zuerst eine einfachere Bleibe"
+
+msgid "%s — продаётся за $%d"
+msgstr "%s — zu verkaufen für $%d"
+
+msgid "Улучшить"
+msgstr "Ausbauen"
+
+msgid "Купить"
+msgstr "Kaufen"
+
+msgid "Танк"
+msgstr "Panzer"
+
+msgid "Бейте в корму или из РПГ, от выстрела пушки — рывок"
+msgstr "Triff ihn am Heck oder mit dem RPG; weich Kanonenschüssen mit einer Rolle aus"
+
+msgid "Лоб танка пули не берут — заходите в корму или берите РПГ"
+msgstr "Kugeln prallen vorne ab — geh ans Heck oder nimm das RPG"
+
+msgid "Не стойте перед танком!"
+msgstr "Steh nicht vor dem Panzer!"
+
+msgid "%s уничтожен!"
+msgstr "%s zerstört!"
+
+msgid "БАНДА"
+msgstr "BANDE"
+
+msgid "Освободите город: осталось районов — %d"
+msgstr "Befreie die Stadt: Viertel übrig — %d"
+
+msgid "%s: поезд с вокзала"
+msgstr "%s: Zug vom Bahnhof"
+
+msgid "Ваша база: задания и недвижимость"
+msgstr "Deine Basis: Aufträge und Immobilien"
+
+msgid "Район освобождён!"
+msgstr "Viertel befreit!"
+
+msgid "Осталось районов: %d"
+msgstr "Viertel übrig: %d"
+
+msgid "Город свободен!"
+msgstr "Die Stadt ist frei!"
+
+msgid "База: задания и жильё"
+msgstr "Basis: Aufträge und Wohnungen"
+
+msgid "Пробейтесь через вагоны к паровозу"
+msgstr "Kämpf dich durch die Waggons zur Lok"
+
+msgid "Дорога: %s — пока закрыто"
+msgstr "Reise nach %s — noch gesperrt"
+
+msgid "Дорога: %s · поезд или машина"
+msgstr "Reise nach %s · Zug oder Auto"
+
+msgid "В путь"
+msgstr "Los geht's"
+
+msgid "Окраины"
+msgstr "Stadtrand"
+
+msgid "Прерии"
+msgstr "Prärie"
+
+msgid "Пустыня"
+msgstr "Wüste"
+
+msgid "Скалистые горы"
+msgstr "Rocky Mountains"
+
+msgid "Тихоокеанское побережье"
+msgstr "Pazifikküste"
+
+msgid "Тайга"
+msgstr "Taiga"
+
+msgid "Великие озёра"
+msgstr "Große Seen"
+
+msgid "Снега Аляски"
+msgstr "Schnee von Alaska"
+
+msgid "Спуститесь с крыши в вагон!"
+msgstr "Runter vom Dach in den Waggon!"
+
+msgid "Поезд"
+msgstr "Zug"
+
+msgid "До цели: %s"
+msgstr "Ziel: %s"
+
+msgid "Ударило тоннелем!"
+msgstr "Vom Tunnel erwischt!"
+
+msgid "В тоннелях держитесь внутри вагонов"
+msgstr "Bleib in Tunneln in den Waggons"
+
+msgid "Приехали: %s!"
+msgstr "Angekommen: %s!"
+
+msgid "Дальше"
+msgstr "Weiter"
+
+msgid "Перелёт: %s — сначала доберитесь поездом"
+msgstr "Flug: %s — erst über Land hinreisen"
+
+msgid "Перелёт: %s — пока закрыто"
+msgstr "Flug: %s — noch gesperrt"
+
+msgid "Перелёт: %s"
+msgstr "Flug: %s"
+
+msgid "Лететь"
+msgstr "Fliegen"
+
+msgid "Засада!"
+msgstr "Hinterhalt!"
+
+msgid "Пистолет"
+msgstr "Pistole"
+
+msgid "Пист"
+msgstr "Pistole"
+
+msgid "Метро"
+msgstr "U-Bahn"
+
+msgid "Небоскрёб"
+msgstr "Wolkenkratzer"
+
+msgid "Особняк"
+msgstr "Villa"
+
+msgid "Нью-Йорк"
+msgstr "New York"
+
+msgid "Порт"
+msgstr "Hafen"
+
+msgid "Казино"
+msgstr "Casino"
+
+msgid "Алькатрас"
+msgstr "Alcatraz"
+
+msgid "Мост Золотые Ворота"
+msgstr "Golden Gate Bridge"
+
+msgid "Вертолёт над заливом"
+msgstr "Hubschrauber über der Bucht"
+
+msgid "Сан-Франциско"
+msgstr "San Francisco"
+
+msgid "Золотой прииск"
+msgstr "Goldmine"
+
+msgid "Заброшенный городок"
+msgstr "Geisterstadt"
+
+msgid "Радарная станция"
+msgstr "Radarstation"
+
+msgid "Аляска"
+msgstr "Alaska"
+
+msgid "Эпизод 1 · Нью-Йорк"
+msgstr "Episode 1 · New York"
+
+msgid "Эпизод 2 · Сан-Франциско"
+msgstr "Episode 2 · San Francisco"
+
+msgid "Эпизод 3 · Аляска"
+msgstr "Episode 3 · Alaska"
+
+msgid "Хибара"
+msgstr "Bruchbude"
+
+msgid "Нормальная кровать"
+msgstr "Ein richtiges Bett"
+
+msgid "+10 к здоровью"
+msgstr "+10 Gesundheit"
+
+msgid "Тайник с патронами"
+msgstr "Munitionsversteck"
+
+msgid "+25% патронов в запасе"
+msgstr "+25% Reservemunition"
+
+msgid "Генератор и лампа"
+msgstr "Generator und Lampe"
+
+msgid "+5% денег за задания"
+msgstr "+5% Geld für Aufträge"
+
+msgid "Квартира"
+msgstr "Wohnung"
+
+msgid "Тренажёр"
+msgstr "Kraftstation"
+
+msgid "+15 к здоровью"
+msgstr "+15 Gesundheit"
+
+msgid "Оружейный шкаф"
+msgstr "Waffenschrank"
+
+msgid "+10% урона"
+msgstr "+10% Schaden"
+
+msgid "Телевизор и диван"
+msgstr "Fernseher und Sofa"
+
+msgid "+10% денег за задания"
+msgstr "+10% Geld für Aufträge"
+
+msgid "Тир в подвале"
+msgstr "Schießstand im Keller"
+
+msgid "Гардероб с бронежилетами"
+msgstr "Schrank mit Schutzwesten"
+
+msgid "−20% получаемого урона"
+msgstr "−20% erlittener Schaden"
+
+msgid "Бассейн"
+msgstr "Pool"
+
+msgid "+20 к здоровью"
+msgstr "+20 Gesundheit"
+
+msgid "Квартира в викторианском доме"
+msgstr "Wohnung im viktorianischen Haus"
+
+msgid "Кофемашина"
+msgstr "Espressomaschine"
+
+msgid "Сейф с патронами .44"
+msgstr "Tresor mit .44-Munition"
+
+msgid "Боксёрская груша"
+msgstr "Boxsack"
+
+msgid "Бревенчатый дом у озера"
+msgstr "Blockhütte am See"
+
+msgid "Печь и медвежья шкура"
+msgstr "Ofen und Bärenfell"
+
+msgid "Верстак оружейника"
+msgstr "Werkbank des Büchsenmachers"
+
+msgid "Лоток старателя"
+msgstr "Goldwaschpfanne"
+
+msgid "Мирный житель! −$%d"
+msgstr "Zivilist! −$%d"
+
+msgid "Играть"
+msgstr "Spielen"
+
+msgid "Продолжить: %s"
+msgstr "Weiter: %s"
+
+msgid "сложность %d"
+msgstr "Schwierigkeit %d"
+
+msgid "рекорд %s"
+msgstr "Rekord %s"
+
+msgid "звёзды %d/3"
+msgstr "Sterne %d/3"
+
+msgid "ваша база"
+msgstr "deine Basis"
+
+msgid "закрыт"
+msgstr "gesperrt"
+
+msgid "Низкая (быстрее)"
+msgstr "Niedrig (schneller)"
+
+msgid "Средняя"
+msgstr "Mittel"
+
+msgid "Высокая"
+msgstr "Hoch"
+
+msgid "Эпизоды 1–3: Нью-Йорк · Сан-Франциско · Аляска"
+msgstr "Episoden 1–3: New York · San Francisco · Alaska"
+
+msgid "Уровни"
+msgstr "Level"
+
+msgid "Настройки"
+msgstr "Einstellungen"
+
+msgid "Выход"
+msgstr "Beenden"
+
+msgid "Назад"
+msgstr "Zurück"
+
+msgid "Крупье"
+msgstr "Der Croupier"
+
+msgid "Маньяк"
+msgstr "Der Wahnsinnige"
+
+msgid "Снайпер"
+msgstr "Der Scharfschütze"
+
+msgid "Худой"
+msgstr "Der Dürre"
+
+msgid "Начальник тюрьмы"
+msgstr "Der Gefängnisdirektor"
+
+msgid "Освободите город: зачистите три района"
+msgstr "Befreie die Stadt: säubere drei Viertel"
+
+msgid "ЧАЙНАТАУН"
+msgstr "CHINATOWN"
+
+msgid "ПОЛИЦИЯ"
+msgstr "POLIZEI"
+
+msgid "ФОРТУНА"
+msgstr "FORTUNA"
+
+msgid "КАЗИНО"
+msgstr "CASINO"
+
+msgid "ЗАКУСОЧНАЯ"
+msgstr "IMBISS"
+
+msgid "ПОРТ"
+msgstr "HAFEN"
+
+msgid "КРАБЫ"
+msgstr "KRABBEN"
+
+msgid "ПИРС 39"
+msgstr "PIER 39"
+
+msgid "ПАРОМ НА АЛЬКАТРАС"
+msgstr "FÄHRE NACH ALCATRAZ"
+
+msgid "К МОСТУ ЗОЛОТЫЕ ВОРОТА"
+msgstr "ZUR GOLDEN GATE BRIDGE"
+
+msgid "АЭРОПОРТ"
+msgstr "FLUGHAFEN"
+
+msgid "АЭРОПОРТ → АЛЯСКА"
+msgstr "FLUGHAFEN → ALASKA"
+
+msgid "ТЕЛЕГРАФНЫЙ ХОЛМ"
+msgstr "TELEGRAPH HILL"
+
+msgid "Чайнатаун!"
+msgstr "Chinatown!"
+
+msgid "Набережная!"
+msgstr "Die Uferpromenade!"
+
+msgid "Холм!"
+msgstr "Der Hügel!"
+
+msgid "ВЕРТОЛЁТ ПОЛИЦИИ"
+msgstr "POLIZEIHUBSCHRAUBER"
+
+msgid "ДОРОГА → НЬЮ-ЙОРК"
+msgstr "STRASSE → NEW YORK"
+
+msgid "ДОРОГА → АЛЯСКА"
+msgstr "STRASSE → ALASKA"
+
+msgid "Пробейтесь через прииск к лифту наверх"
+msgstr "Kämpf dich durch die Mine zum Aufzug"
+
+msgid "ПРИИСК «ЗОЛОТАЯ ЖИЛА»"
+msgstr "GOLDFELD „GOLDADER“"
+
+msgid "Захватчики участков!"
+msgstr "Claim-Räuber!"
+
+msgid "ЛИФТ НАВЕРХ"
+msgstr "AUFZUG NACH OBEN"
+
+msgid "Обвал! Засада в пещере!"
+msgstr "Einsturz! Hinterhalt in der Höhle!"
+
+msgid "ЛИФТ"
+msgstr "AUFZUG"
+
+msgid "Возьмите винтовку охотника и зачистите городок"
+msgstr "Nimm das Jagdgewehr und säubere die Stadt"
+
+msgid "ВИНТОВКА ОХОТНИКА"
+msgstr "JAGDGEWEHR"
+
+msgid "САЛУН"
+msgstr "SALOON"
+
+msgid "ЛАВКА"
+msgstr "LADEN"
+
+msgid "БАНК"
+msgstr "BANK"
+
+msgid "ШЕРИФ"
+msgstr "SHERIFF"
+
+msgid "КОНЮШНЯ"
+msgstr "STALL"
+
+msgid "ОТЕЛЬ «АВРОРА»"
+msgstr "HOTEL AURORA"
+
+msgid "ЦИРЮЛЬНЯ"
+msgstr "BARBIER"
+
+msgid "ПРОБИРНАЯ КОНТОРА"
+msgstr "PRÜFAMT"
+
+msgid "СКЛАД"
+msgstr "LAGER"
+
+msgid "К ШАХТЕ →"
+msgstr "ZUR MINE →"
+
+msgid "Банда спускается с хребта!"
+msgstr "Die Bande kommt den Grat herunter!"
+
+msgid "Засада у конюшни!"
+msgstr "Hinterhalt am Stall!"
+
+msgid "ЦЕРКОВЬ СВ. НИКОЛАЯ"
+msgstr "ST.-NIKOLAUS-KIRCHE"
+
+msgid "ШАХТА «ЗОЛОТАЯ ЖИЛА»"
+msgstr "MINE „GOLDADER“"
+
+msgid "КОНТОРА ПРИИСКА"
+msgstr "MINENBÜRO"
+
+msgid "Колокольня"
+msgstr "Glockenturm"
+
+msgid "Водонапорная башня"
+msgstr "Wasserturm"
+
+msgid "Копёр шахты"
+msgstr "Förderturm"
+
+msgid "Крыша конторы"
+msgstr "Bürodach"
+
+msgid "ЦЕРКОВЬ ВОЗНЕСЕНИЯ"
+msgstr "HIMMELFAHRTSKIRCHE"
+
+msgid "ФАКТОРИЯ · МЕХА И ЗОЛОТО"
+msgstr "HANDELSPOSTEN · PELZE & GOLD"
+
+msgid "САЛУН «ПОЛЯРНЫЙ МЕДВЕДЬ»"
+msgstr "SALOON „EISBÄR“"
+
+msgid "РАДИО «КЛОНДАЙК»"
+msgstr "RADIO KLONDIKE"
+
+msgid "ЛЕСОПИЛКА"
+msgstr "SÄGEWERK"
+
+msgid "ОТЕЛЬ «СЕВЕРНОЕ СИЯНИЕ»"
+msgstr "HOTEL NORDLICHT"
+
+msgid "АЭРОДРОМ"
+msgstr "FLUGPLATZ"
+
+msgid "ШКОЛА"
+msgstr "SCHULE"
+
+msgid "ВСЁ ДЛЯ СТАРАТЕЛЯ"
+msgstr "GOLDGRÄBERBEDARF"
+
+msgid "ЗАКУСОЧНАЯ «ЛОСЬ»"
+msgstr "IMBISS „ELCH“"
+
+msgid "ТОПЛИВО"
+msgstr "TREIBSTOFF"
+
+msgid "РЫБНЫЙ РЫНОК"
+msgstr "FISCHMARKT"
+
+msgid "КОНСЕРВНЫЙ ЗАВОД"
+msgstr "KONSERVENFABRIK"
+
+msgid "ПРИЧАЛ"
+msgstr "ANLEGESTELLE"
+
+msgid "ДОМ У ОЗЕРА"
+msgstr "HAUS AM SEE"
+
+msgid "Лесопилка!"
+msgstr "Das Sägewerk!"
+
+msgid "Площадь с ёлкой!"
+msgstr "Der Platz mit dem Tannenbaum!"
+
+msgid "Консервный завод!"
+msgstr "Die Konservenfabrik!"
+
+msgid "ДОРОГА НА ПРИИСК"
+msgstr "WEG ZUR MINE"
+
+msgid "ДОРОГА НА РАДАРНУЮ СТАНЦИЮ"
+msgstr "WEG ZUR RADARSTATION"
+
+msgid "ТРОПА В ЗАБРОШЕННЫЙ ГОРОДОК"
+msgstr "PFAD ZUR GEISTERSTADT"
+
+msgid "САМОЛЁТ → ГОРОД"
+msgstr "FLUGZEUG → STADT"
+
+msgid "САМОЛЁТ → САН-ФРАНЦИСКО"
+msgstr "FLUGZEUG → SAN FRANCISCO"
+
+msgid "ДОРОГА → САН-ФРАНЦИСКО"
+msgstr "STRASSE → SAN FRANCISCO"
+
+msgid "Выберитесь из коллектора"
+msgstr "Raus aus der Kanalisation"
+
+msgid "КОЛЛЕКТОР 7"
+msgstr "KANAL 7"
+
+msgid "НАСОСНАЯ"
+msgstr "PUMPENRAUM"
+
+msgid "СЕКТОР Б"
+msgstr "SEKTOR B"
+
+msgid "Засада в отстойнике!"
+msgstr "Hinterhalt im Klärbecken!"
+
+msgid "Шлюз заблокирован!"
+msgstr "Die Schleuse ist blockiert!"
+
+msgid "ГЛАВНЫЙ КОЛЛЕКТОР"
+msgstr "HAUPTKANAL"
+
+msgid "БОМБОУБЕЖИЩЕ"
+msgstr "LUFTSCHUTZBUNKER"
+
+msgid "Бомбоубежище!"
+msgstr "Der Bunker!"
+
+msgid "КОТЕЛЬНАЯ"
+msgstr "HEIZRAUM"
+
+msgid "ВЫХОД"
+msgstr "AUSGANG"
+
+msgid "Пройдите по тоннелю к станции «Конечная»"
+msgstr "Folge dem Tunnel zur Station „Endstation“"
+
+msgid "М"
+msgstr "U"
+
+msgid "ВХОД В МЕТРО"
+msgstr "U-BAHN-EINGANG"
+
+msgid "ПОДЗЕМНАЯ"
+msgstr "UNTERGRUND"
+
+msgid "Засада на платформе!"
+msgstr "Hinterhalt am Bahnsteig!"
+
+msgid "КОНЕЧНАЯ"
+msgstr "ENDSTATION"
+
+msgid "В ДЕПО"
+msgstr "ZUM DEPOT"
+
+msgid "Они перекрыли станцию!"
+msgstr "Sie haben die Station abgeriegelt!"
+
+msgid "ЭЛЕКТРОДЕПО"
+msgstr "BETRIEBSHOF"
+
+msgid "Засада в депо!"
+msgstr "Hinterhalt im Depot!"
+
+msgid "ВЫХОД В ГОРОД"
+msgstr "AUSGANG ZUR STADT"
+
+msgid "Поднимитесь на крышу к вертолёту"
+msgstr "Rauf aufs Dach zum Hubschrauber"
+
+msgid "ПАРКИНГ  -1"
+msgstr "PARKDECK  -1"
+
+msgid "ЛОББИ"
+msgstr "LOBBY"
+
+msgid "ВЕРТИКАЛЬ ПЛАЗА"
+msgstr "VERTICAL PLAZA"
+
+msgid "ЭТАЖ 51"
+msgstr "ETAGE 51"
+
+msgid "Охрана подняла тревогу!"
+msgstr "Die Wachen schlagen Alarm!"
+
+msgid "ЭТАЖ 52"
+msgstr "ETAGE 52"
+
+msgid "ЭТАЖ 53"
+msgstr "ETAGE 53"
+
+msgid "РЕСТОРАН «ОБЛАКА»"
+msgstr "RESTAURANT „WOLKEN“"
+
+msgid "ПЕНТХАУС"
+msgstr "PENTHOUSE"
+
+msgid "Охрана босса!"
+msgstr "Die Leibwache des Bosses!"
+
+msgid "КРЫША"
+msgstr "DACH"
+
+msgid "ЭВАКУАЦИЯ"
+msgstr "EVAKUIERUNG"
+
+msgid "Найдите хозяина особняка — Худого"
+msgstr "Finde den Herrn der Villa — den Dürren"
+
+msgid "ПОМЕСТЬЕ «ЗОЛОТОЙ КЛЮЧ»"
+msgstr "ANWESEN „GOLDENER SCHLÜSSEL“"
+
+msgid "Охрана особняка!"
+msgstr "Die Wachen der Villa!"
+
+msgid "СТОЛОВАЯ"
+msgstr "SPEISESAAL"
+
+msgid "БИБЛИОТЕКА"
+msgstr "BIBLIOTHEK"
+
+msgid "Засада в библиотеке!"
+msgstr "Hinterhalt in der Bibliothek!"
+
+msgid "КАБИНЕТ"
+msgstr "ARBEITSZIMMER"
+
+msgid "холл, под галереей"
+msgstr "in der Halle, unter der Galerie"
+
+msgid "галерея холла"
+msgstr "auf der Galerie der Halle"
+
+msgid "столовая"
+msgstr "im Speisesaal"
+
+msgid "кухня"
+msgstr "in der Küche"
+
+msgid "спальня (восток)"
+msgstr "im Schlafzimmer (Ost)"
+
+msgid "спальня (запад)"
+msgstr "im Schlafzimmer (West)"
+
+msgid "библиотека (запад)"
+msgstr "in der Bibliothek (West)"
+
+msgid "библиотека (восток)"
+msgstr "in der Bibliothek (Ost)"
+
+msgid "кабинет"
+msgstr "im Arbeitszimmer"
+
+msgid "Город"
+msgstr "Stadt"
+
+msgid "МЭРИЯ"
+msgstr "RATHAUS"
+
+msgid "ПРОДУКТЫ"
+msgstr "LEBENSMITTEL"
+
+msgid "БАР «ГИЛЬЗА»"
+msgstr "BAR „PATRONENHÜLSE“"
+
+msgid "ОСТАНОВКА"
+msgstr "HALTESTELLE"
+
+msgid "АЭРОПОРТ → САН-ФРАНЦИСКО"
+msgstr "FLUGHAFEN → SAN FRANCISCO"
+
+msgid "Центральная площадь!"
+msgstr "Zentraler Platz!"
+
+msgid "Восточный перекрёсток!"
+msgstr "Östliche Kreuzung!"
+
+msgid "Площадь у мэрии!"
+msgstr "Rathausplatz!"
+
+msgid "Прорвитесь на сухогруз"
+msgstr "Kämpf dich zum Frachter durch"
+
+msgid "СКЛАД 7"
+msgstr "LAGER 7"
+
+msgid "Засада в доках!"
+msgstr "Hinterhalt in den Docks!"
+
+msgid "Засада на складе!"
+msgstr "Hinterhalt im Lager!"
+
+msgid "Абордаж!"
+msgstr "Entern!"
+
+msgid "ШЛЮПКА"
+msgstr "BEIBOOT"
+
+msgid "Доберитесь до Крупье в VIP-зале"
+msgstr "Erreiche den Croupier im VIP-Saal"
+
+msgid "Перестрелка в зале!"
+msgstr "Schießerei im Saal!"
+
+msgid "Хранилище!"
+msgstr "Der Tresorraum!"
+
+msgid "Найдите начальника тюрьмы"
+msgstr "Finde den Gefängnisdirektor"
+
+msgid "АЛЬКАТРАС"
+msgstr "ALCATRAZ"
+
+msgid "БЛОК А"
+msgstr "ZELLENBLOCK A"
+
+msgid "Бунт во дворе!"
+msgstr "Aufstand im Hof!"
+
+msgid "Камеры открыты!"
+msgstr "Die Zellen sind offen!"
+
+msgid "НАЧАЛЬНИК"
+msgstr "DIREKTOR"
+
+msgid "Поднимитесь на опору моста к Маньяку"
+msgstr "Klettere den Brückenpfeiler hoch zum Wahnsinnigen"
+
+msgid "МОСТ ЗОЛОТЫЕ ВОРОТА"
+msgstr "GOLDEN GATE BRIDGE"
+
+msgid "Пробка на мосту!"
+msgstr "Stau auf der Brücke!"
+
+msgid "Засада на опоре!"
+msgstr "Hinterhalt am Pfeiler!"
+
+msgid "Вертолёт банды"
+msgstr "Bandenhubschrauber"
+
+msgid "Прикройте полицию с воздуха и собейте боевой вертолёт банды"
+msgstr "Gib der Polizei Deckung aus der Luft und hol den Kampfhubschrauber der Bande runter"
+
+msgid "Банда на пирсе!"
+msgstr "Die Bande ist am Pier!"
+
+msgid "Бунт на Алькатрасе!"
+msgstr "Aufstand auf Alcatraz!"
+
+msgid "Засада на мосту!"
+msgstr "Hinterhalt auf der Brücke!"
+
+msgid "Прорвитесь на базу и уничтожьте танк банды"
+msgstr "Dring in die Basis ein und zerstöre den Panzer der Bande"
+
+msgid "РАДАРНАЯ СТАНЦИЯ «СЕВЕРНЫЙ ЩИТ»"
+msgstr "RADARSTATION „NORDSCHILD“"
+
+msgid "ПОСТОРОННИМ ВХОД ЗАПРЕЩЁН"
+msgstr "ZUTRITT FÜR UNBEFUGTE VERBOTEN"
+
+msgid "КАЗАРМА"
+msgstr "KASERNE"
+
+msgid "Тревога в казармах!"
+msgstr "Alarm in der Kaserne!"
+
+msgid "ОБЪЕКТ «ЩИТ-1»"
+msgstr "OBJEKT „SCHILD-1“"
+
+msgid "ПУЛЬТ УПРАВЛЕНИЯ"
+msgstr "LEITSTAND"
+
+msgid "Засада у радаров!"
+msgstr "Hinterhalt an den Radaren!"
+
+msgid "АНГАР №3"
+msgstr "HANGAR 3"
+
+msgid "ПОЧТА США"
+msgstr "U.S. MAIL"
+
+msgid "Банда в вагоне!"
+msgstr "Bande im Waggon!"
+
+msgid "Налёт на почтовый вагон!"
+msgstr "Überfall auf den Postwagen!"
+
+msgid "ПАРОВОЗ"
+msgstr "LOKOMOTIVE"
+
+msgid "ДИНАМИТ"
+msgstr "DYNAMIT"
+
+msgid "Огонь"
+msgstr "Feuer"
+
+msgid "Прыжок"
+msgstr "Sprung"
+
+msgid "Рывок"
+msgstr "Rolle"
+
+msgid "Заряд"
+msgstr "Laden"
+
+msgid "Гран 2"
+msgstr "Gran 2"
+
+msgid "ЯРОСТЬ"
+msgstr "WUT"
+
+msgid "Убито: 0"
+msgstr "Kills: 0"
+
+msgid "Босс"
+msgstr "Boss"
+
+msgid "Пауза"
+msgstr "Pause"
+
+msgid "Продолжить"
+msgstr "Weiter"
+
+msgid "Начать уровень заново"
+msgstr "Level neu starten"
+
+msgid "Вернуться в город"
+msgstr "Zurück zur Stadt"
+
+msgid "В главное меню"
+msgstr "Hauptmenü"
+
+msgid "Вы погибли"
+msgstr "Du bist tot"
+
+msgid "Заново"
+msgstr "Nochmal"
+
+msgid "Задание"
+msgstr "Auftrag"
+
+msgid "Начать"
+msgstr "Starten"
+
+msgid "Отмена"
+msgstr "Abbrechen"
+
+msgid "Недвижимость"
+msgstr "Immobilie"
+
+msgid "Закрыть"
+msgstr "Schließen"
+
+msgid "Дорога"
+msgstr "Reise"
+
+msgid "Поезд: бой в вагонах"
+msgstr "Zug: Kampf in den Waggons"
+
+msgid "Машина: погоня по шоссе"
+msgstr "Auto: Verfolgungsjagd"
+
+msgid "Уровень пройден!"
+msgstr "Level geschafft!"
+
+msgid "Время: 0:00"
+msgstr "Zeit: 0:00"
+
+msgid "Новый рекорд!"
+msgstr "Neuer Rekord!"
+
+msgid "Язык"
+msgstr "Sprache"
+
+msgid "Графика"
+msgstr "Grafik"
+
+msgid "Чувствительность"
+msgstr "Empfindlichkeit"
+
+msgid "Громкость"
+msgstr "Lautstärke"
+
+msgid "Помощь в прицеливании"
+msgstr "Zielhilfe"
+
+msgid "Автоогонь (стреляет сам, когда прицел на враге)"
+msgstr "Autofeuer (schießt, wenn das Fadenkreuz auf einem Gegner ist)"
+
+msgid "Тени (выключите, если игра тормозит)"
+msgstr "Schatten (ausschalten, wenn das Spiel ruckelt)"
+
+msgid "Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)"
+msgstr "Noir-Filter: Schwarzweiß, rotes Blut (aus ist schneller)"
+
+msgid "Музыка"
+msgstr "Musik"
+
+msgid "Много крови: куски тел, оторванные руки, пятна"
+msgstr "Viel Blut: Körperteile, abgetrennte Gliedmaßen, Flecken"
+
+msgid "Показывать FPS (кадры в секунду)"
+msgstr "FPS anzeigen (Bilder pro Sekunde)"
+
+msgid "Готово"
+msgstr "Fertig"
+
+msgid "Дигл"
+msgstr "Deagle"
+
+msgid "Ракеты"
+msgstr "Raketen"
+
+msgid "Ракет"
+msgstr "Raketen"
+
+msgid "Магнум .44"
+msgstr "Magnum .44"
+
+msgid "Магн"
+msgstr "Magnum"
+
+msgid "Бортовой пулемёт"
+msgstr "Bord-MG"
+
+msgid "Пулем"
+msgstr "MG"
+
+msgid "Автомат"
+msgstr "Sturmgewehr"
+
+msgid "Авт"
+msgstr "Gewehr"
+
+msgid "Гранатомёт РПГ"
+msgstr "RPG-Werfer"
+
+msgid "РПГ"
+msgstr "RPG"
+
+msgid "Дробовик"
+msgstr "Schrotflinte"
+
+msgid "Дробь"
+msgstr "Schrot"
+
+msgid "Снайперская винтовка"
+msgstr "Scharfschützengewehr"
+
+msgid "Снайп"
+msgstr "Sniper"
+

@@ -21,16 +21,22 @@ func _ready() -> void:
 	%QuitButton.pressed.connect(get_tree().quit)
 	%BackButton.pressed.connect(_show_main)
 	_settings.closed.connect(_show_main)
+	# Сменили язык в настройках — подписи, собранные кодом, пересобираем.
+	Game.settings_changed.connect(_refresh_texts)
+	_refresh_texts()
+	_show_main()
+
+
+func _refresh_texts() -> void:
 	var next := mini(Game.unlocked_levels, Game.LEVELS.size()) - 1
 	if Game.latest_city() >= 0:
-		_play_button.text = "В город"
+		_play_button.text = tr("В город")
 	elif next == 0 and Game.records.is_empty():
-		_play_button.text = "Играть"
+		_play_button.text = tr("Играть")
 	else:
-		_play_button.text = "Продолжить: %s" % Game.LEVELS[next].title
+		_play_button.text = tr("Продолжить: %s") % Game.level_title(next)
 	%MoneyLabel.text = "$ %d" % Game.money
 	_build_level_list()
-	_show_main()
 
 
 func _process(delta: float) -> void:
@@ -55,27 +61,27 @@ func _build_level_list() -> void:
 		for episode in Game.EPISODES:
 			if int(episode.first) == index:
 				var header := Label.new()
-				header.text = episode.title
+				header.text = tr(episode.title)
 				header.add_theme_font_size_override("font_size", 26)
 				header.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
 				_level_list.add_child(header)
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(720, 56)
-		var title: String = Game.LEVELS[index].title
+		var title := Game.level_title(index)
 		if Game.is_level_unlocked(index):
 			var record: Variant = Game.records.get(index)
 			button.text = "%d. %s" % [index + 1, title]
 			if not Game.is_city(index) and Game.tier_of(index) > 0:
-				button.text += "   · сложность %d" % (Game.tier_of(index) + 1)
+				button.text += "   · " + tr("сложность %d") % (Game.tier_of(index) + 1)
 			if record is Dictionary:
-				button.text += "   · рекорд %s" % Game.format_time(record.time)
+				button.text += "   · " + tr("рекорд %s") % Game.format_time(record.time)
 			if Game.stars_of(index) > 0:
-				button.text += "   · звёзды %d/3" % Game.stars_of(index)
+				button.text += "   · " + tr("звёзды %d/3") % Game.stars_of(index)
 			if Game.is_city(index) and Game.is_liberated(index):
-				button.text = "%d. %s   · ваша база" % [index + 1, title]
+				button.text = "%d. %s   · %s" % [index + 1, title, tr("ваша база")]
 			button.pressed.connect(Game.start_level.bind(index))
 		else:
-			button.text = "%d. %s   (закрыт)" % [index + 1, title]
+			button.text = "%d. %s   (%s)" % [index + 1, title, tr("закрыт")]
 			button.disabled = true
 		_level_list.add_child(button)
 

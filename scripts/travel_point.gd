@@ -7,12 +7,12 @@ extends Interactable
 
 
 func get_prompt() -> String:
-	var title: String = Game.EPISODES[episode - 1].title if episode <= Game.EPISODES.size() else "?"
+	var title := Game.episode_title(episode)
 	if not active:
 		if Game.is_episode_open(episode):
-			return "Перелёт: %s — сначала доберитесь поездом" % title
-		return "Перелёт: %s — пока закрыто" % title
-	return "Перелёт: %s" % title
+			return tr("Перелёт: %s — сначала доберитесь поездом") % title
+		return tr("Перелёт: %s — пока закрыто") % title
+	return tr("Перелёт: %s") % title
 
 
 func get_button_text() -> String:

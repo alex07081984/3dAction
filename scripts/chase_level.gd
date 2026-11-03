@@ -77,8 +77,8 @@ func spawn_wave(index: int) -> void:
 			var lane := randf_range(-road_half + 2.0, road_half - 2.0)
 			car.position = Vector3(lane, 0, 70.0 + count * 12.0)
 			count += 1
-	hud.show_message("Погоня! Волна %d из %d" % [wave, WAVES.size()], "Мотоциклы и машины банды сзади")
-	hud.set_objective("Погоня: волна %d из %d" % [wave, WAVES.size()])
+	hud.show_message(tr("Погоня! Волна %d из %d") % [wave, WAVES.size()], "Мотоциклы и машины банды сзади")
+	hud.set_objective(tr("Погоня: волна %d из %d") % [wave, WAVES.size()])
 	Audio.play_music("music_combat")
 
 

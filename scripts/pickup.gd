@@ -96,7 +96,7 @@ func _build_visual() -> Node3D:
 				gun.scale = Vector3.ONE * 1.8
 				root.add_child(gun)
 				var label := Label3D.new()
-				label.text = weapon.display_name
+				label.text = tr(weapon.display_name)
 				label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 				label.font_size = 48
 				label.outline_size = 10

@@ -1,0 +1,420 @@
+ru	en	de	fr
+Боевой вертолёт	Gunship	Kampfhubschrauber	Hélicoptère de combat
+Босс! Сбивайте его ракеты очередью	Boss! Shoot down its rockets with bursts	Boss! Schieß seine Raketen mit Feuerstößen ab	Boss ! Abattez ses roquettes en rafales
+Ракеты! Сбейте их очередью	Rockets! Shoot them down	Raketen! Schieß sie ab	Roquettes ! Abattez-les
+%s подбит!	%s hit!	%s getroffen!	%s touché !
+Фаза %d из %d	Phase %d of %d	Phase %d von %d	Phase %d sur %d
+%s сбит!	%s shot down!	%s abgeschossen!	%s abattu !
+Премия: $%d	Bonus: $%d	Prämie: $%d	Prime : $%d
+Толстяк	The Fat Man	Der Dicke	Le Gros
+Попался!	Gotcha!	Erwischt!	Je te tiens !
+%s найден	%s found	%s gefunden	%s trouvé
+Убейте: %s	Kill: %s	Töte: %s	Éliminez : %s
+Босс! Фаза 1 из %d	Boss! Phase 1 of %d	Boss! Phase 1 von %d	Boss ! Phase 1 sur %d
+%s в ярости!	%s is enraged!	%s rastet aus!	%s est furieux !
+Фаза %d из %d · подмога!	Phase %d of %d · backup incoming!	Phase %d von %d · Verstärkung!	Phase %d sur %d · renforts !
+%s повержен!	%s defeated!	%s besiegt!	%s vaincu !
+%s сменил позицию!	%s changed position!	%s hat die Stellung gewechselt!	%s a changé de position !
+Фаза %d из %d · он теперь: %s	Phase %d of %d · now at: %s	Phase %d von %d · jetzt: %s	Phase %d sur %d · maintenant : %s
+%s перебежал	%s has moved	%s hat sich verlegt	%s s'est déplacé
+Ищите блик прицела: %s	Look for the scope glint: %s	Achte auf das Blitzen des Zielfernrohrs: %s	Cherchez le reflet de la lunette : %s
+Убейте: %s (%s)	Kill: %s (%s)	Töte: %s (%s)	Éliminez : %s (%s)
+%s звереет!	%s goes berserk!	%s dreht durch!	%s devient enragé !
+%s сбежал!	%s ran off!	%s ist abgehauen!	%s s'est enfui !
+Ищите его по смеху — фаза %d из %d	Follow his laughter — phase %d of %d	Folge seinem Lachen — Phase %d von %d	Suivez son rire — phase %d sur %d
+Найдите: %s	Find: %s	Finde: %s	Trouvez : %s
+Смех доносится: %s	Laughter from: %s	Lachen hörbar: %s	Un rire résonne : %s
+прячется	hiding	versteckt	caché
+ОГНЕОПАСНО	FLAMMABLE	ENTZÜNDLICH	INFLAMMABLE
+ТОННЕЛЬ!	TUNNEL!	TUNNEL!	TUNNEL !
+Держитесь своей полосы	Stay in your lane	Bleib auf deiner Spur	Restez sur votre voie
+Шоссе	Highway	Highway	Autoroute
+Оторвитесь от погони банды	Shake off the gang's pursuit	Häng die Verfolger der Bande ab	Semez les poursuivants du gang
+Погоня! Волна %d из %d	Chase! Wave %d of %d	Verfolgung! Welle %d von %d	Poursuite ! Vague %d sur %d
+Мотоциклы и машины банды сзади	Gang bikes and cars behind you	Motorräder und Autos der Bande hinter dir	Motos et voitures du gang derrière vous
+Погоня: волна %d из %d	Chase: wave %d of %d	Verfolgung: Welle %d von %d	Poursuite : vague %d sur %d
+Оторвались!	Lost them!	Abgehängt!	Semés !
+Но это ещё не всё…	But that's not all…	Aber das ist noch nicht alles…	Mais ce n'est pas fini…
+Сверху вертолёт!	Helicopter overhead!	Hubschrauber von oben!	Hélicoptère au-dessus !
+Авария! Смотрите на дорогу	Crash! Watch the road	Unfall! Achte auf die Straße	Accident ! Regardez la route
+Город на горизонте!	City on the horizon!	Stadt am Horizont!	La ville à l'horizon !
+%s · фаза %d из %d	%s · phase %d of %d	%s · Phase %d von %d	%s · phase %d sur %d
+Убито: %d	Kills: %d	Kills: %d	Tués : %d
+Сложность: %d из %d\nНаграда за прохождение: $%d\nДеньги за убийства: ×%.1f	Difficulty: %d of %d\nCompletion reward: $%d\nKill money: ×%.1f	Schwierigkeit: %d von %d\nBelohnung: $%d\nGeld pro Kill: ×%.1f	Difficulté : %d sur %d\nRécompense : $%d\nArgent par élimination : ×%.1f
+Рекорд: %s	Record: %s	Rekord: %s	Record : %s
+Дорога: %s	Road to %s	Reise nach %s	Route vers %s
+Самолётом этот маршрут уже открыт — аэропорт.	This route is now open by plane too — use the airport.	Diese Strecke ist jetzt auch per Flugzeug offen — zum Flughafen.	Cet itinéraire est aussi ouvert en avion — passez par l'aéroport.
+Поезд — пробиться через вагоны к паровозу, на крышах опасны тоннели.	Train — fight through the cars to the locomotive; on the roofs, watch out for tunnels.	Zug — kämpf dich durch die Waggons zur Lok; auf den Dächern sind Tunnel gefährlich.	Train — traversez les wagons jusqu'à la locomotive ; sur les toits, gare aux tunnels.
+Машина — рулите и отстреливайтесь от погони: мотоциклы, машины банды и вертолёт.	Car — drive and shoot back at the pursuers: bikes, gang cars and a helicopter.	Auto — fahr und schieß auf die Verfolger: Motorräder, Bandenautos und ein Hubschrauber.	Voiture — conduisez et ripostez : motos, voitures du gang et hélicoptère.
+Это ваше жильё. Улучшения видны внутри и работают на всех заданиях.\nДеньги: $%d	This is your home. Upgrades show up inside and help on every mission.\nMoney: $%d	Das ist dein Zuhause. Upgrades siehst du drinnen, sie helfen bei jedem Auftrag.\nGeld: $%d	C'est votre logement. Les améliorations sont visibles à l'intérieur et servent à chaque mission.\nArgent : $%d
+Сначала купите жильё попроще.	Buy a cheaper home first.	Kauf zuerst eine einfachere Bleibe.	Achetez d'abord un logement plus modeste.
+Недоступно	Unavailable	Nicht verfügbar	Indisponible
+Цена: $%d\nУ вас: $%d	Price: $%d\nYou have: $%d	Preis: $%d\nDu hast: $%d	Prix : $%d\nVous avez : $%d
+Купить за $%d	Buy for $%d	Kaufen für $%d	Acheter pour $%d
+Куплено	Owned	Gekauft	Acheté
+Куплено: %s!	Purchased: %s!	Gekauft: %s!	Acheté : %s !
+Время: %s\nУбито: %d · хедшоты: %d\nНаграда: $%d (всего $%d)	Time: %s\nKills: %d · headshots: %d\nReward: $%d (total $%d)	Zeit: %s\nKills: %d · Kopfschüsse: %d\nBelohnung: $%d (gesamt $%d)	Temps : %s\nTués : %d · tirs à la tête : %d\nRécompense : $%d (total $%d)
+Гран %d	Gren %d	Gran %d	Gren %d
+Серия: %d	Streak: %d	Serie: %d	Série : %d
+КОМБО ×%d · %d	COMBO ×%d · %d	KOMBO ×%d · %d	COMBO ×%d · %d
+Меткость: %d%% · лучшая серия: %d	Accuracy: %d%% · best streak: %d	Trefferquote: %d%% · beste Serie: %d	Précision : %d%% · meilleure série : %d
+Без\nоптики	No\nscope	Ohne\nVisier	Sans\nviseur
+Прицел	Scope	Visier	Viseur
+Действие	Action	Aktion	Action
+Войти	Enter	Betreten	Entrer
+Подземка	Underground	Untergrund	Souterrains
+Найдите выход	Find the exit	Finde den Ausgang	Trouvez la sortie
+Сложность %d · награда ×%.1f	Difficulty %d · reward ×%.1f	Schwierigkeit %d · Belohnung ×%.1f	Difficulté %d · récompense ×%.1f
+ДВОЙНОЕ!	DOUBLE KILL!	DOPPELKILL!	DOUBLÉ !
+ТРОЙНОЕ!	TRIPLE KILL!	DREIFACHKILL!	TRIPLÉ !
+МЯСОРУБКА!	MASSACRE!	GEMETZEL!	CARNAGE !
+ХЕДШОТ!	HEADSHOT!	KOPFSCHUSS!	HEADSHOT !
+СЕРИЯ ×%d!	STREAK ×%d!	SERIE ×%d!	SÉRIE ×%d !
+Следующий уровень	Next level	Nächstes Level	Niveau suivant
+В город	To the city	Zur Stadt	En ville
+%s пройден!	%s complete!	%s geschafft!	%s terminé !
+Эпизод %d пройден!	Episode %d complete!	Episode %d geschafft!	Épisode %d terminé !
+Продержитесь!	Hold out!	Halte durch!	Tenez bon !
+Волна %d из %d	Wave %d of %d	Welle %d von %d	Vague %d sur %d
+Чисто!	Clear!	Sauber!	Dégagé !
+Проход открыт	The way is open	Der Weg ist frei	Le passage est ouvert
+%s — закрыто	%s — locked	%s — gesperrt	%s — verrouillé
+%s · сложность %d · награда $%d	%s · difficulty %d · reward $%d	%s · Schwierigkeit %d · Belohnung $%d	%s · difficulté %d · récompense $%d
+Ярость готова!	Rage ready!	Wut bereit!	Rage prête !
+Гранаты: %d	Grenades: %d	Granaten: %d	Grenades : %d
++%d здоровья	+%d health	+%d Gesundheit	+%d santé
+Патроны: %s	Ammo: %s	Munition: %s	Munitions : %s
+Новое оружие: %s!	New weapon: %s!	Neue Waffe: %s!	Nouvelle arme : %s !
+Патроны	Ammo	Munition	Munitions
+ПРОДАЁТСЯ	FOR SALE	ZU VERKAUFEN	À VENDRE
+%s — ваше жильё	%s — your home	%s — dein Zuhause	%s — votre logement
+%s — сначала купите жильё попроще	%s — buy a cheaper home first	%s — kauf zuerst eine einfachere Bleibe	%s — achetez d'abord un logement plus modeste
+%s — продаётся за $%d	%s — for sale: $%d	%s — zu verkaufen für $%d	%s — à vendre : $%d
+Улучшить	Upgrade	Ausbauen	Améliorer
+Купить	Buy	Kaufen	Acheter
+Танк	Tank	Panzer	Char
+Бейте в корму или из РПГ, от выстрела пушки — рывок	Hit it from behind or with the RPG; dash away from cannon shots	Triff ihn am Heck oder mit dem RPG; weich Kanonenschüssen mit einer Rolle aus	Visez l'arrière ou utilisez le RPG ; esquivez les tirs du canon
+Лоб танка пули не берут — заходите в корму или берите РПГ	Bullets bounce off the front — flank to the rear or grab the RPG	Kugeln prallen vorne ab — geh ans Heck oder nimm das RPG	Les balles ricochent à l'avant — prenez-le à revers ou prenez le RPG
+Не стойте перед танком!	Don't stand in front of the tank!	Steh nicht vor dem Panzer!	Ne restez pas devant le char !
+%s уничтожен!	%s destroyed!	%s zerstört!	%s détruit !
+БАНДА	GANG	BANDE	GANG
+Освободите город: осталось районов — %d	Liberate the city: districts left — %d	Befreie die Stadt: Viertel übrig — %d	Libérez la ville : quartiers restants — %d
+%s: поезд с вокзала	%s: take the train from the station	%s: Zug vom Bahnhof	%s : train depuis la gare
+Ваша база: задания и недвижимость	Your base: missions and property	Deine Basis: Aufträge und Immobilien	Votre base : missions et immobilier
+Район освобождён!	District liberated!	Viertel befreit!	Quartier libéré !
+Осталось районов: %d	Districts left: %d	Viertel übrig: %d	Quartiers restants : %d
+Город свободен!	The city is free!	Die Stadt ist frei!	La ville est libre !
+База: задания и жильё	Base: missions and homes	Basis: Aufträge und Wohnungen	Base : missions et logements
+Пробейтесь через вагоны к паровозу	Fight through the cars to the locomotive	Kämpf dich durch die Waggons zur Lok	Traversez les wagons jusqu'à la locomotive
+Дорога: %s — пока закрыто	Road to %s — not open yet	Reise nach %s — noch gesperrt	Route vers %s — pas encore ouverte
+Дорога: %s · поезд или машина	Road to %s · train or car	Reise nach %s · Zug oder Auto	Route vers %s · train ou voiture
+В путь	Let's go	Los geht's	En route
+Окраины	Outskirts	Stadtrand	Banlieue
+Прерии	Prairies	Prärie	Prairies
+Пустыня	Desert	Wüste	Désert
+Скалистые горы	Rocky Mountains	Rocky Mountains	Montagnes Rocheuses
+Тихоокеанское побережье	Pacific Coast	Pazifikküste	Côte pacifique
+Тайга	Taiga	Taiga	Taïga
+Великие озёра	Great Lakes	Große Seen	Grands Lacs
+Снега Аляски	Alaskan snows	Schnee von Alaska	Neiges d'Alaska
+Спуститесь с крыши в вагон!	Get off the roof and into the car!	Runter vom Dach in den Waggon!	Descendez du toit dans le wagon !
+Поезд	Train	Zug	Train
+До цели: %s	Destination: %s	Ziel: %s	Destination : %s
+Ударило тоннелем!	Hit by the tunnel!	Vom Tunnel erwischt!	Percuté par le tunnel !
+В тоннелях держитесь внутри вагонов	Stay inside the cars in tunnels	Bleib in Tunneln in den Waggons	Dans les tunnels, restez dans les wagons
+Приехали: %s!	Arrived: %s!	Angekommen: %s!	Arrivée : %s !
+Дальше	Continue	Weiter	Continuer
+Перелёт: %s — сначала доберитесь поездом	Flight: %s — get there by land first	Flug: %s — erst über Land hinreisen	Vol : %s — allez-y d'abord par la route
+Перелёт: %s — пока закрыто	Flight: %s — not open yet	Flug: %s — noch gesperrt	Vol : %s — pas encore ouvert
+Перелёт: %s	Flight: %s	Flug: %s	Vol : %s
+Лететь	Fly	Fliegen	Décoller
+Засада!	Ambush!	Hinterhalt!	Embuscade !
+Пистолет	Pistol	Pistole	Pistolet
+Пист	Pistol	Pistole	Pistolet
+Метро	Subway	U-Bahn	Métro
+Небоскрёб	Skyscraper	Wolkenkratzer	Gratte-ciel
+Особняк	Mansion	Villa	Manoir
+Нью-Йорк	New York	New York	New York
+Порт	Port	Hafen	Port
+Казино	Casino	Casino	Casino
+Алькатрас	Alcatraz	Alcatraz	Alcatraz
+Мост Золотые Ворота	Golden Gate Bridge	Golden Gate Bridge	Pont du Golden Gate
+Вертолёт над заливом	Helicopter over the Bay	Hubschrauber über der Bucht	Hélicoptère sur la baie
+Сан-Франциско	San Francisco	San Francisco	San Francisco
+Золотой прииск	Gold Mine	Goldmine	Mine d'or
+Заброшенный городок	Ghost Town	Geisterstadt	Ville fantôme
+Радарная станция	Radar Station	Radarstation	Station radar
+Аляска	Alaska	Alaska	Alaska
+Эпизод 1 · Нью-Йорк	Episode 1 · New York	Episode 1 · New York	Épisode 1 · New York
+Эпизод 2 · Сан-Франциско	Episode 2 · San Francisco	Episode 2 · San Francisco	Épisode 2 · San Francisco
+Эпизод 3 · Аляска	Episode 3 · Alaska	Episode 3 · Alaska	Épisode 3 · Alaska
+Хибара	Shack	Bruchbude	Cabane
+Нормальная кровать	A proper bed	Ein richtiges Bett	Un vrai lit
++10 к здоровью	+10 health	+10 Gesundheit	+10 santé
+Тайник с патронами	Ammo stash	Munitionsversteck	Cache de munitions
++25% патронов в запасе	+25% reserve ammo	+25% Reservemunition	+25% de munitions en réserve
+Генератор и лампа	Generator and lamp	Generator und Lampe	Générateur et lampe
++5% денег за задания	+5% mission money	+5% Geld für Aufträge	+5% d'argent par mission
+Квартира	Apartment	Wohnung	Appartement
+Тренажёр	Home gym	Kraftstation	Appareil de musculation
++15 к здоровью	+15 health	+15 Gesundheit	+15 santé
+Оружейный шкаф	Gun cabinet	Waffenschrank	Armoire à armes
++10% урона	+10% damage	+10% Schaden	+10% de dégâts
+Телевизор и диван	TV and sofa	Fernseher und Sofa	Télé et canapé
++10% денег за задания	+10% mission money	+10% Geld für Aufträge	+10% d'argent par mission
+Тир в подвале	Basement shooting range	Schießstand im Keller	Stand de tir au sous-sol
+Гардероб с бронежилетами	Body armor closet	Schrank mit Schutzwesten	Placard à gilets pare-balles
+−20% получаемого урона	−20% damage taken	−20% erlittener Schaden	−20% de dégâts subis
+Бассейн	Swimming pool	Pool	Piscine
++20 к здоровью	+20 health	+20 Gesundheit	+20 santé
+Квартира в викторианском доме	Victorian apartment	Wohnung im viktorianischen Haus	Appartement victorien
+Кофемашина	Espresso machine	Espressomaschine	Machine à espresso
+Сейф с патронами .44	.44 ammo safe	Tresor mit .44-Munition	Coffre de munitions .44
+Боксёрская груша	Punching bag	Boxsack	Sac de frappe
+Бревенчатый дом у озера	Lakeside log cabin	Blockhütte am See	Chalet en rondins au bord du lac
+Печь и медвежья шкура	Stove and bearskin rug	Ofen und Bärenfell	Poêle et peau d'ours
+Верстак оружейника	Gunsmith's workbench	Werkbank des Büchsenmachers	Établi d'armurier
+Лоток старателя	Prospector's gold pan	Goldwaschpfanne	Batée de prospecteur
+Мирный житель! −$%d	Civilian! −$%d	Zivilist! −$%d	Civil ! −$%d
+Играть	Play	Spielen	Jouer
+Продолжить: %s	Continue: %s	Weiter: %s	Continuer : %s
+сложность %d	difficulty %d	Schwierigkeit %d	difficulté %d
+рекорд %s	record %s	Rekord %s	record %s
+звёзды %d/3	stars %d/3	Sterne %d/3	étoiles %d/3
+ваша база	your base	deine Basis	votre base
+закрыт	locked	gesperrt	verrouillé
+Низкая (быстрее)	Low (faster)	Niedrig (schneller)	Basse (plus rapide)
+Средняя	Medium	Mittel	Moyenne
+Высокая	High	Hoch	Haute
+Эпизоды 1–3: Нью-Йорк · Сан-Франциско · Аляска	Episodes 1–3: New York · San Francisco · Alaska	Episoden 1–3: New York · San Francisco · Alaska	Épisodes 1–3 : New York · San Francisco · Alaska
+Уровни	Levels	Level	Niveaux
+Настройки	Settings	Einstellungen	Paramètres
+Выход	Quit	Beenden	Quitter
+Назад	Back	Zurück	Retour
+Крупье	The Croupier	Der Croupier	Le Croupier
+Маньяк	The Maniac	Der Wahnsinnige	Le Maniaque
+Снайпер	The Sniper	Der Scharfschütze	Le Sniper
+Худой	The Thin Man	Der Dürre	Le Maigre
+Начальник тюрьмы	The Warden	Der Gefängnisdirektor	Le Directeur
+Освободите город: зачистите три района	Liberate the city: clear three districts	Befreie die Stadt: säubere drei Viertel	Libérez la ville : nettoyez trois quartiers
+ЧАЙНАТАУН	CHINATOWN	CHINATOWN	CHINATOWN
+ПОЛИЦИЯ	POLICE	POLIZEI	POLICE
+ФОРТУНА	FORTUNA	FORTUNA	FORTUNA
+КАЗИНО	CASINO	CASINO	CASINO
+ЗАКУСОЧНАЯ	DINER	IMBISS	SNACK
+ПОРТ	PORT	HAFEN	PORT
+КРАБЫ	CRABS	KRABBEN	CRABES
+ПИРС 39	PIER 39	PIER 39	PIER 39
+ПАРОМ НА АЛЬКАТРАС	FERRY TO ALCATRAZ	FÄHRE NACH ALCATRAZ	FERRY POUR ALCATRAZ
+К МОСТУ ЗОЛОТЫЕ ВОРОТА	TO THE GOLDEN GATE BRIDGE	ZUR GOLDEN GATE BRIDGE	VERS LE GOLDEN GATE
+АЭРОПОРТ	AIRPORT	FLUGHAFEN	AÉROPORT
+АЭРОПОРТ → АЛЯСКА	AIRPORT → ALASKA	FLUGHAFEN → ALASKA	AÉROPORT → ALASKA
+ТЕЛЕГРАФНЫЙ ХОЛМ	TELEGRAPH HILL	TELEGRAPH HILL	TELEGRAPH HILL
+Чайнатаун!	Chinatown!	Chinatown!	Chinatown !
+Набережная!	The waterfront!	Die Uferpromenade!	Le front de mer !
+Холм!	The hill!	Der Hügel!	La colline !
+ВЕРТОЛЁТ ПОЛИЦИИ	POLICE HELICOPTER	POLIZEIHUBSCHRAUBER	HÉLICO DE POLICE
+ДОРОГА → НЬЮ-ЙОРК	ROAD → NEW YORK	STRASSE → NEW YORK	ROUTE → NEW YORK
+ДОРОГА → АЛЯСКА	ROAD → ALASKA	STRASSE → ALASKA	ROUTE → ALASKA
+Пробейтесь через прииск к лифту наверх	Fight through the mine to the lift	Kämpf dich durch die Mine zum Aufzug	Traversez la mine jusqu'à l'ascenseur
+ПРИИСК «ЗОЛОТАЯ ЖИЛА»	MOTHER LODE DIGGINGS	GOLDFELD „GOLDADER“	PLACER « FILON D'OR »
+Захватчики участков!	Claim jumpers!	Claim-Räuber!	Voleurs de concessions !
+ЛИФТ НАВЕРХ	LIFT UP	AUFZUG NACH OBEN	ASCENSEUR
+Обвал! Засада в пещере!	Cave-in! Ambush in the cave!	Einsturz! Hinterhalt in der Höhle!	Éboulement ! Embuscade dans la grotte !
+ЛИФТ	LIFT	AUFZUG	ASCENSEUR
+Возьмите винтовку охотника и зачистите городок	Grab the hunter's rifle and clear the town	Nimm das Jagdgewehr und säubere die Stadt	Prenez le fusil du chasseur et nettoyez la ville
+ВИНТОВКА ОХОТНИКА	HUNTER'S RIFLE	JAGDGEWEHR	FUSIL DE CHASSE
+САЛУН	SALOON	SALOON	SALOON
+ЛАВКА	GENERAL STORE	LADEN	BAZAR
+БАНК	BANK	BANK	BANQUE
+ШЕРИФ	SHERIFF	SHERIFF	SHÉRIF
+КОНЮШНЯ	STABLES	STALL	ÉCURIE
+ОТЕЛЬ «АВРОРА»	AURORA HOTEL	HOTEL AURORA	HÔTEL AURORA
+ЦИРЮЛЬНЯ	BARBER	BARBIER	BARBIER
+ПРОБИРНАЯ КОНТОРА	ASSAY OFFICE	PRÜFAMT	BUREAU D'ESSAI
+СКЛАД	WAREHOUSE	LAGER	ENTREPÔT
+К ШАХТЕ →	TO THE MINE →	ZUR MINE →	VERS LA MINE →
+Банда спускается с хребта!	The gang is coming down the ridge!	Die Bande kommt den Grat herunter!	Le gang descend de la crête !
+Засада у конюшни!	Ambush at the stables!	Hinterhalt am Stall!	Embuscade à l'écurie !
+ЦЕРКОВЬ СВ. НИКОЛАЯ	ST. NICHOLAS CHURCH	ST.-NIKOLAUS-KIRCHE	ÉGLISE SAINT-NICOLAS
+ШАХТА «ЗОЛОТАЯ ЖИЛА»	MOTHER LODE MINE	MINE „GOLDADER“	MINE « FILON D'OR »
+КОНТОРА ПРИИСКА	MINE OFFICE	MINENBÜRO	BUREAU DE LA MINE
+Колокольня	Bell tower	Glockenturm	Clocher
+Водонапорная башня	Water tower	Wasserturm	Château d'eau
+Копёр шахты	Mine headframe	Förderturm	Chevalement
+Крыша конторы	Office roof	Bürodach	Toit du bureau
+ЦЕРКОВЬ ВОЗНЕСЕНИЯ	CHURCH OF THE ASCENSION	HIMMELFAHRTSKIRCHE	ÉGLISE DE L'ASCENSION
+ФАКТОРИЯ · МЕХА И ЗОЛОТО	TRADING POST · FURS & GOLD	HANDELSPOSTEN · PELZE & GOLD	COMPTOIR · FOURRURES ET OR
+САЛУН «ПОЛЯРНЫЙ МЕДВЕДЬ»	POLAR BEAR SALOON	SALOON „EISBÄR“	SALOON « OURS POLAIRE »
+РАДИО «КЛОНДАЙК»	RADIO KLONDIKE	RADIO KLONDIKE	RADIO KLONDIKE
+ЛЕСОПИЛКА	SAWMILL	SÄGEWERK	SCIERIE
+ОТЕЛЬ «СЕВЕРНОЕ СИЯНИЕ»	NORTHERN LIGHTS HOTEL	HOTEL NORDLICHT	HÔTEL AURORE BORÉALE
+АЭРОДРОМ	AIRFIELD	FLUGPLATZ	AÉRODROME
+ШКОЛА	SCHOOL	SCHULE	ÉCOLE
+ВСЁ ДЛЯ СТАРАТЕЛЯ	PROSPECTOR SUPPLIES	GOLDGRÄBERBEDARF	TOUT POUR LE PROSPECTEUR
+ЗАКУСОЧНАЯ «ЛОСЬ»	MOOSE DINER	IMBISS „ELCH“	SNACK « L'ÉLAN »
+ТОПЛИВО	FUEL	TREIBSTOFF	CARBURANT
+РЫБНЫЙ РЫНОК	FISH MARKET	FISCHMARKT	MARCHÉ AUX POISSONS
+КОНСЕРВНЫЙ ЗАВОД	CANNERY	KONSERVENFABRIK	CONSERVERIE
+ПРИЧАЛ	DOCK	ANLEGESTELLE	QUAI
+ДОМ У ОЗЕРА	LAKE HOUSE	HAUS AM SEE	MAISON DU LAC
+Лесопилка!	The sawmill!	Das Sägewerk!	La scierie !
+Площадь с ёлкой!	The square with the tree!	Der Platz mit dem Tannenbaum!	La place au sapin !
+Консервный завод!	The cannery!	Die Konservenfabrik!	La conserverie !
+ДОРОГА НА ПРИИСК	ROAD TO THE MINE	WEG ZUR MINE	ROUTE DE LA MINE
+ДОРОГА НА РАДАРНУЮ СТАНЦИЮ	ROAD TO THE RADAR STATION	WEG ZUR RADARSTATION	ROUTE DE LA STATION RADAR
+ТРОПА В ЗАБРОШЕННЫЙ ГОРОДОК	TRAIL TO THE GHOST TOWN	PFAD ZUR GEISTERSTADT	SENTIER VERS LA VILLE FANTÔME
+САМОЛЁТ → ГОРОД	PLANE → CITY	FLUGZEUG → STADT	AVION → VILLE
+САМОЛЁТ → САН-ФРАНЦИСКО	PLANE → SAN FRANCISCO	FLUGZEUG → SAN FRANCISCO	AVION → SAN FRANCISCO
+ДОРОГА → САН-ФРАНЦИСКО	ROAD → SAN FRANCISCO	STRASSE → SAN FRANCISCO	ROUTE → SAN FRANCISCO
+Выберитесь из коллектора	Get out of the sewer	Raus aus der Kanalisation	Sortez des égouts
+КОЛЛЕКТОР 7	SEWER 7	KANAL 7	ÉGOUT 7
+НАСОСНАЯ	PUMP ROOM	PUMPENRAUM	SALLE DES POMPES
+СЕКТОР Б	SECTOR B	SEKTOR B	SECTEUR B
+Засада в отстойнике!	Ambush in the settling tank!	Hinterhalt im Klärbecken!	Embuscade dans le bassin !
+Шлюз заблокирован!	The floodgate is blocked!	Die Schleuse ist blockiert!	L'écluse est bloquée !
+ГЛАВНЫЙ КОЛЛЕКТОР	MAIN SEWER	HAUPTKANAL	ÉGOUT PRINCIPAL
+БОМБОУБЕЖИЩЕ	FALLOUT SHELTER	LUFTSCHUTZBUNKER	ABRI ANTIATOMIQUE
+Бомбоубежище!	The fallout shelter!	Der Bunker!	L'abri antiatomique !
+КОТЕЛЬНАЯ	BOILER ROOM	HEIZRAUM	CHAUFFERIE
+ВЫХОД	EXIT	AUSGANG	SORTIE
+Пройдите по тоннелю к станции «Конечная»	Follow the tunnel to Terminal station	Folge dem Tunnel zur Station „Endstation“	Suivez le tunnel jusqu'à la station « Terminus »
+М	M	U	M
+ВХОД В МЕТРО	SUBWAY ENTRANCE	U-BAHN-EINGANG	ENTRÉE DU MÉTRO
+ПОДЗЕМНАЯ	UNDERGROUND	UNTERGRUND	SOUTERRAINE
+Засада на платформе!	Ambush on the platform!	Hinterhalt am Bahnsteig!	Embuscade sur le quai !
+КОНЕЧНАЯ	TERMINAL	ENDSTATION	TERMINUS
+В ДЕПО	TO THE DEPOT	ZUM DEPOT	VERS LE DÉPÔT
+Они перекрыли станцию!	They've sealed off the station!	Sie haben die Station abgeriegelt!	Ils ont bloqué la station !
+ЭЛЕКТРОДЕПО	TRAIN DEPOT	BETRIEBSHOF	DÉPÔT
+Засада в депо!	Ambush in the depot!	Hinterhalt im Depot!	Embuscade au dépôt !
+ВЫХОД В ГОРОД	EXIT TO THE CITY	AUSGANG ZUR STADT	SORTIE VERS LA VILLE
+Поднимитесь на крышу к вертолёту	Get up to the roof and the helicopter	Rauf aufs Dach zum Hubschrauber	Montez sur le toit jusqu'à l'hélicoptère
+ПАРКИНГ  -1	PARKING  -1	PARKDECK  -1	PARKING  -1
+ЛОББИ	LOBBY	LOBBY	HALL
+ВЕРТИКАЛЬ ПЛАЗА	VERTICAL PLAZA	VERTICAL PLAZA	VERTICAL PLAZA
+ЭТАЖ 51	FLOOR 51	ETAGE 51	ÉTAGE 51
+Охрана подняла тревогу!	Security raised the alarm!	Die Wachen schlagen Alarm!	La sécurité a donné l'alerte !
+ЭТАЖ 52	FLOOR 52	ETAGE 52	ÉTAGE 52
+ЭТАЖ 53	FLOOR 53	ETAGE 53	ÉTAGE 53
+РЕСТОРАН «ОБЛАКА»	THE CLOUDS RESTAURANT	RESTAURANT „WOLKEN“	RESTAURANT « LES NUAGES »
+ПЕНТХАУС	PENTHOUSE	PENTHOUSE	PENTHOUSE
+Охрана босса!	The boss's bodyguards!	Die Leibwache des Bosses!	La garde du boss !
+КРЫША	ROOF	DACH	TOIT
+ЭВАКУАЦИЯ	EVACUATION	EVAKUIERUNG	ÉVACUATION
+Найдите хозяина особняка — Худого	Find the mansion's owner — the Thin Man	Finde den Herrn der Villa — den Dürren	Trouvez le maître du manoir — le Maigre
+ПОМЕСТЬЕ «ЗОЛОТОЙ КЛЮЧ»	GOLDEN KEY ESTATE	ANWESEN „GOLDENER SCHLÜSSEL“	DOMAINE « LA CLÉ D'OR »
+Охрана особняка!	Mansion guards!	Die Wachen der Villa!	Les gardes du manoir !
+СТОЛОВАЯ	DINING ROOM	SPEISESAAL	SALLE À MANGER
+БИБЛИОТЕКА	LIBRARY	BIBLIOTHEK	BIBLIOTHÈQUE
+Засада в библиотеке!	Ambush in the library!	Hinterhalt in der Bibliothek!	Embuscade dans la bibliothèque !
+КАБИНЕТ	STUDY	ARBEITSZIMMER	BUREAU
+холл, под галереей	the hall, under the gallery	in der Halle, unter der Galerie	le hall, sous la galerie
+галерея холла	the hall gallery	auf der Galerie der Halle	la galerie du hall
+столовая	the dining room	im Speisesaal	la salle à manger
+кухня	the kitchen	in der Küche	la cuisine
+спальня (восток)	the bedroom (east)	im Schlafzimmer (Ost)	la chambre (est)
+спальня (запад)	the bedroom (west)	im Schlafzimmer (West)	la chambre (ouest)
+библиотека (запад)	the library (west)	in der Bibliothek (West)	la bibliothèque (ouest)
+библиотека (восток)	the library (east)	in der Bibliothek (Ost)	la bibliothèque (est)
+кабинет	the study	im Arbeitszimmer	le bureau
+Город	City	Stadt	Ville
+МЭРИЯ	CITY HALL	RATHAUS	MAIRIE
+ПРОДУКТЫ	GROCERIES	LEBENSMITTEL	ÉPICERIE
+БАР «ГИЛЬЗА»	THE SHELL CASING BAR	BAR „PATRONENHÜLSE“	BAR « LA DOUILLE »
+ОСТАНОВКА	BUS STOP	HALTESTELLE	ARRÊT DE BUS
+АЭРОПОРТ → САН-ФРАНЦИСКО	AIRPORT → SAN FRANCISCO	FLUGHAFEN → SAN FRANCISCO	AÉROPORT → SAN FRANCISCO
+Центральная площадь!	Central Square!	Zentraler Platz!	Place centrale !
+Восточный перекрёсток!	East Crossing!	Östliche Kreuzung!	Carrefour est !
+Площадь у мэрии!	City Hall Square!	Rathausplatz!	Place de la mairie !
+Прорвитесь на сухогруз	Break through to the freighter	Kämpf dich zum Frachter durch	Percez jusqu'au cargo
+СКЛАД 7	WAREHOUSE 7	LAGER 7	ENTREPÔT 7
+Засада в доках!	Ambush at the docks!	Hinterhalt in den Docks!	Embuscade sur les docks !
+Засада на складе!	Ambush in the warehouse!	Hinterhalt im Lager!	Embuscade dans l'entrepôt !
+Абордаж!	Boarding!	Entern!	À l'abordage !
+ШЛЮПКА	LIFEBOAT	BEIBOOT	CANOT
+Доберитесь до Крупье в VIP-зале	Reach the Croupier in the VIP room	Erreiche den Croupier im VIP-Saal	Rejoignez le Croupier dans le salon VIP
+Перестрелка в зале!	Shootout on the floor!	Schießerei im Saal!	Fusillade dans la salle !
+Хранилище!	The vault!	Der Tresorraum!	La salle des coffres !
+Найдите начальника тюрьмы	Find the prison warden	Finde den Gefängnisdirektor	Trouvez le directeur de la prison
+АЛЬКАТРАС	ALCATRAZ	ALCATRAZ	ALCATRAZ
+БЛОК А	CELLBLOCK A	ZELLENBLOCK A	BLOC A
+Бунт во дворе!	Riot in the yard!	Aufstand im Hof!	Émeute dans la cour !
+Камеры открыты!	The cells are open!	Die Zellen sind offen!	Les cellules sont ouvertes !
+НАЧАЛЬНИК	WARDEN	DIREKTOR	DIRECTEUR
+Поднимитесь на опору моста к Маньяку	Climb the bridge tower to the Maniac	Klettere den Brückenpfeiler hoch zum Wahnsinnigen	Grimpez sur le pylône jusqu'au Maniaque
+МОСТ ЗОЛОТЫЕ ВОРОТА	GOLDEN GATE BRIDGE	GOLDEN GATE BRIDGE	PONT DU GOLDEN GATE
+Пробка на мосту!	Traffic jam on the bridge!	Stau auf der Brücke!	Bouchon sur le pont !
+Засада на опоре!	Ambush on the tower!	Hinterhalt am Pfeiler!	Embuscade sur le pylône !
+Вертолёт банды	Gang helicopter	Bandenhubschrauber	Hélicoptère du gang
+Прикройте полицию с воздуха и собейте боевой вертолёт банды	Cover the police from the air and shoot down the gang's gunship	Gib der Polizei Deckung aus der Luft und hol den Kampfhubschrauber der Bande runter	Couvrez la police depuis les airs et abattez l'hélicoptère de combat du gang
+Банда на пирсе!	The gang is on the pier!	Die Bande ist am Pier!	Le gang est sur la jetée !
+Бунт на Алькатрасе!	Riot on Alcatraz!	Aufstand auf Alcatraz!	Émeute à Alcatraz !
+Засада на мосту!	Ambush on the bridge!	Hinterhalt auf der Brücke!	Embuscade sur le pont !
+Прорвитесь на базу и уничтожьте танк банды	Break into the base and destroy the gang's tank	Dring in die Basis ein und zerstöre den Panzer der Bande	Infiltrez la base et détruisez le char du gang
+РАДАРНАЯ СТАНЦИЯ «СЕВЕРНЫЙ ЩИТ»	NORTHERN SHIELD RADAR STATION	RADARSTATION „NORDSCHILD“	STATION RADAR « BOUCLIER DU NORD »
+ПОСТОРОННИМ ВХОД ЗАПРЕЩЁН	AUTHORIZED PERSONNEL ONLY	ZUTRITT FÜR UNBEFUGTE VERBOTEN	ACCÈS RÉSERVÉ AU PERSONNEL
+КАЗАРМА	BARRACKS	KASERNE	CASERNE
+Тревога в казармах!	Alarm in the barracks!	Alarm in der Kaserne!	Alerte à la caserne !
+ОБЪЕКТ «ЩИТ-1»	SITE SHIELD-1	OBJEKT „SCHILD-1“	SITE « BOUCLIER-1 »
+ПУЛЬТ УПРАВЛЕНИЯ	CONTROL ROOM	LEITSTAND	SALLE DE CONTRÔLE
+Засада у радаров!	Ambush at the radars!	Hinterhalt an den Radaren!	Embuscade près des radars !
+АНГАР №3	HANGAR 3	HANGAR 3	HANGAR 3
+ПОЧТА США	U.S. MAIL	U.S. MAIL	U.S. MAIL
+Банда в вагоне!	Gang in the car!	Bande im Waggon!	Le gang dans le wagon !
+Налёт на почтовый вагон!	Raid on the mail car!	Überfall auf den Postwagen!	Attaque du wagon postal !
+ПАРОВОЗ	LOCOMOTIVE	LOKOMOTIVE	LOCOMOTIVE
+ДИНАМИТ	DYNAMITE	DYNAMIT	DYNAMITE
+Огонь	Fire	Feuer	Tir
+Прыжок	Jump	Sprung	Saut
+Рывок	Dash	Rolle	Esquive
+Заряд	Reload	Laden	Recharger
+Гран 2	Gren 2	Gran 2	Gren 2
+ЯРОСТЬ	RAGE	WUT	RAGE
+Убито: 0	Kills: 0	Kills: 0	Tués : 0
+Босс	Boss	Boss	Boss
+Пауза	Paused	Pause	Pause
+Продолжить	Resume	Weiter	Reprendre
+Начать уровень заново	Restart level	Level neu starten	Recommencer le niveau
+Вернуться в город	Back to the city	Zurück zur Stadt	Retour en ville
+В главное меню	Main menu	Hauptmenü	Menu principal
+Вы погибли	You died	Du bist tot	Vous êtes mort
+Заново	Retry	Nochmal	Réessayer
+Задание	Mission	Auftrag	Mission
+Начать	Start	Starten	Commencer
+Отмена	Cancel	Abbrechen	Annuler
+Недвижимость	Property	Immobilie	Immobilier
+Закрыть	Close	Schließen	Fermer
+Дорога	Road	Reise	Route
+Поезд: бой в вагонах	Train: fight in the cars	Zug: Kampf in den Waggons	Train : combat dans les wagons
+Машина: погоня по шоссе	Car: highway chase	Auto: Verfolgungsjagd	Voiture : poursuite sur l'autoroute
+Уровень пройден!	Level complete!	Level geschafft!	Niveau terminé !
+Время: 0:00	Time: 0:00	Zeit: 0:00	Temps : 0:00
+Новый рекорд!	New record!	Neuer Rekord!	Nouveau record !
+Язык	Language	Sprache	Langue
+Графика	Graphics	Grafik	Graphismes
+Чувствительность	Sensitivity	Empfindlichkeit	Sensibilité
+Громкость	Volume	Lautstärke	Volume
+Помощь в прицеливании	Aim assist	Zielhilfe	Aide à la visée
+Автоогонь (стреляет сам, когда прицел на враге)	Auto-fire (shoots when the crosshair is on an enemy)	Autofeuer (schießt, wenn das Fadenkreuz auf einem Gegner ist)	Tir auto (tire quand le viseur est sur un ennemi)
+Тени (выключите, если игра тормозит)	Shadows (turn off if the game lags)	Schatten (ausschalten, wenn das Spiel ruckelt)	Ombres (désactivez-les si le jeu rame)
+Нуар-фильтр: ч/б кадр, красная кровь (выкл. — быстрее)	Noir filter: black & white, red blood (off is faster)	Noir-Filter: Schwarzweiß, rotes Blut (aus ist schneller)	Filtre noir : noir et blanc, sang rouge (désactivé = plus rapide)
+Музыка	Music	Musik	Musique
+Много крови: куски тел, оторванные руки, пятна	Lots of blood: gibs, severed limbs, stains	Viel Blut: Körperteile, abgetrennte Gliedmaßen, Flecken	Beaucoup de sang : morceaux, membres arrachés, taches
+Показывать FPS (кадры в секунду)	Show FPS (frames per second)	FPS anzeigen (Bilder pro Sekunde)	Afficher les FPS (images par seconde)
+Готово	Done	Fertig	Terminé
+Дигл	Deagle	Deagle	Deagle
+Ракеты	Rockets	Raketen	Roquettes
+Ракет	Rockets	Raketen	Roquettes
+Магнум .44	Magnum .44	Magnum .44	Magnum .44
+Магн	Magnum	Magnum	Magnum
+Бортовой пулемёт	Door gun	Bord-MG	Mitrailleuse de bord
+Пулем	MG	MG	Mitrail.
+Автомат	Assault rifle	Sturmgewehr	Fusil d'assaut
+Авт	Rifle	Gewehr	Fusil
+Гранатомёт РПГ	RPG launcher	RPG-Werfer	Lance-roquettes RPG
+РПГ	RPG	RPG	RPG
+Дробовик	Shotgun	Schrotflinte	Fusil à pompe
+Дробь	Shotgun	Schrot	Pompe
+Снайперская винтовка	Sniper rifle	Scharfschützengewehr	Fusil de sniper
+Снайп	Sniper	Sniper	Sniper

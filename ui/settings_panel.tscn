@@ -63,6 +63,21 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+[node name="LanguageRow" type="HBoxContainer" parent="Center/Panel/VBox/Scroll/Items"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="Center/Panel/VBox/Scroll/Items/LanguageRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+text = "Язык"
+
+[node name="LanguageButton" type="Button" parent="Center/Panel/VBox/Scroll/Items/LanguageRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+text = "English"
+
 [node name="GraphicsRow" type="HBoxContainer" parent="Center/Panel/VBox/Scroll/Items"]
 layout_mode = 2
 theme_override_constants/separation = 16

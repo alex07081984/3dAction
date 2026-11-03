@@ -240,7 +240,7 @@ func _next_phase() -> void:
 	_smoke.append(Fx.fire(self, spot, 1.2 if phase >= 3 else 0.7, phase >= 3))
 	Fx.explosion(global_transform * spot, 3.0)
 	Game.slow_motion(0.5, 0.3)
-	_hud("show_message", "%s подбит!" % boss_name, "Фаза %d из %d" % [phase, phases])
+	_hud("show_message", tr("%s подбит!") % tr(boss_name), tr("Фаза %d из %d") % [phase, phases])
 	_update_bar()
 
 
@@ -255,7 +255,7 @@ func _die() -> void:
 	Fx.explosion(global_position, 5.0)
 	Game.slow_motion(1.4, 0.2)
 	_hud("hide_boss")
-	_hud("show_message", "%s сбит!" % boss_name, "Премия: $%d" % bonus)
+	_hud("show_message", tr("%s сбит!") % tr(boss_name), tr("Премия: $%d") % bonus)
 	get_tree().call_group("level", "register_kill", false)
 
 

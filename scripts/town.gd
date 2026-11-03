@@ -30,7 +30,7 @@ func _ready() -> void:
 		hud.show_message(title, _hub_hint())
 		Audio.play_music("music_menu")
 	else:
-		hud.set_objective("Освободите город: осталось районов — %d" % _districts_left)
+		hud.set_objective(tr("Освободите город: осталось районов — %d") % _districts_left)
 
 
 ## Подсказка на базе: если открыт следующий эпизод, а его город ещё не освобождён — лететь туда.
@@ -38,7 +38,7 @@ func _hub_hint() -> String:
 	for i in Game.EPISODES.size():
 		var episode: Dictionary = Game.EPISODES[i]
 		if int(episode.city) != level_index and Game.is_episode_open(i + 1) and not Game.is_liberated(int(episode.city)):
-			return "%s: поезд с вокзала" % episode.title
+			return tr("%s: поезд с вокзала") % tr(episode.title)
 	return "Ваша база: задания и недвижимость"
 
 
@@ -47,8 +47,8 @@ func _on_zone_cleared(_zone: WaveZone) -> void:
 	Game.slow_motion(0.9, 0.25)
 	_districts_left -= 1
 	if _districts_left > 0:
-		hud.show_message("Район освобождён!", "Осталось районов: %d" % _districts_left)
-		hud.set_objective("Освободите город: осталось районов — %d" % _districts_left)
+		hud.show_message("Район освобождён!", tr("Осталось районов: %d") % _districts_left)
+		hud.set_objective(tr("Освободите город: осталось районов — %d") % _districts_left)
 	else:
 		hud.show_message("Город свободен!", "")
 		get_tree().create_timer(2.5, false).timeout.connect(complete)

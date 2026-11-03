@@ -9,8 +9,8 @@ extends Interactable
 func get_prompt() -> String:
 	var city := Game.city_name(episode)
 	if not active:
-		return "Дорога: %s — пока закрыто" % city
-	return "Дорога: %s · поезд или машина" % city
+		return tr("Дорога: %s — пока закрыто") % city
+	return tr("Дорога: %s · поезд или машина") % city
 
 
 func get_button_text() -> String:

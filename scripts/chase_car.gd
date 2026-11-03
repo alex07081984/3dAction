@@ -304,7 +304,7 @@ func _build_tanker() -> void:
 	_mesh(Vector3(2.4, 0.8, 0.8), Vector3(0, 0.4, -3.0), Color(0.05, 0.05, 0.05))
 	_mesh(Vector3(2.4, 0.8, 0.8), Vector3(0, 0.4, 2.8), Color(0.05, 0.05, 0.05))
 	var label := Label3D.new()
-	label.text = "ОГНЕОПАСНО"
+	label.text = tr("ОГНЕОПАСНО")
 	label.pixel_size = 0.008
 	label.font_size = 56
 	label.modulate = Color(0.85, 0.1, 0.05)

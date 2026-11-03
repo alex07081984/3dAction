@@ -97,7 +97,10 @@ var settings := {
 	"blood": true,
 	"graphics": 2,  ## 0 — низкая, 1 — средняя, 2 — высокая (на телефоне по умолчанию средняя).
 	"show_fps": false,
+	"language": "en",  ## Код языка из LANGUAGES. Основной — английский.
 }
+## Языки: код → название в меню (на самом языке). Переводы — locale/*.po, источник — tools/i18n/strings.tsv.
+const LANGUAGES := [["en", "English"], ["de", "Deutsch"], ["fr", "Français"], ["ru", "Русский"]]
 var unlocked_levels := 1
 ## Рекорды: индекс уровня -> {"time": секунды, "kills": убийства, "headshots": хедшоты}.
 var records := {}
@@ -259,7 +262,34 @@ func is_episode_open(episode: int) -> bool:
 func city_name(episode: int) -> String:
 	if episode < 1 or episode > EPISODES.size():
 		return "?"
-	return String(EPISODES[episode - 1].get("city_name", EPISODES[episode - 1].title))
+	return tr(String(EPISODES[episode - 1].get("city_name", EPISODES[episode - 1].title)))
+
+
+## Название уровня на текущем языке.
+func level_title(index: int) -> String:
+	return tr(String(LEVELS[index].title)) if index >= 0 and index < LEVELS.size() else "?"
+
+
+## Название эпизода на текущем языке.
+func episode_title(episode: int) -> String:
+	return tr(String(EPISODES[episode - 1].title)) if episode >= 1 and episode <= EPISODES.size() else "?"
+
+
+## Код текущего языка и переключение (подписи в меню и на уровнях переводятся сами).
+func language() -> String:
+	return String(settings.get("language", "en"))
+
+
+func language_name(code: String) -> String:
+	for item in LANGUAGES:
+		if item[0] == code:
+			return item[1]
+	return code
+
+
+func next_language() -> String:
+	var codes: Array = LANGUAGES.map(func(item: Array) -> String: return item[0])
+	return codes[(codes.find(language()) + 1) % codes.size()]
 
 
 func route_key(a: int, b: int) -> String:
@@ -481,6 +511,7 @@ func set_setting(key: String, value: Variant) -> void:
 
 
 func apply_settings() -> void:
+	TranslationServer.set_locale(language())
 	var bus := AudioServer.get_bus_index("Master")
 	var volume := float(settings.volume)
 	AudioServer.set_bus_mute(bus, volume <= 0.001)

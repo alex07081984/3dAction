@@ -310,7 +310,7 @@ func add_grenades(amount: int) -> bool:
 		return false
 	grenades = mini(grenades + amount, max_grenades)
 	grenades_changed.emit(grenades)
-	picked_up.emit("Гранаты: %d" % grenades)
+	picked_up.emit(tr("Гранаты: %d") % grenades)
 	return true
 
 
@@ -319,7 +319,7 @@ func heal(amount: int) -> bool:
 		return false
 	health = mini(health + amount, max_health)
 	health_changed.emit(health, max_health)
-	picked_up.emit("+%d здоровья" % amount)
+	picked_up.emit(tr("+%d здоровья") % amount)
 	return true
 
 
@@ -330,14 +330,14 @@ func give_weapon(weapon: WeaponData, announce := true) -> bool:
 	if _ammo.has(weapon.id):
 		var added := _add_reserve(weapon, weapon.ammo_per_pickup * 2)
 		if added and announce:
-			picked_up.emit("Патроны: %s" % weapon.display_name)
+			picked_up.emit(tr("Патроны: %s") % tr(weapon.display_name))
 		return added
 	weapons.append(weapon)
 	var reserve := roundi(weapon.start_reserve * (1.0 + Game.perk("ammo")))
 	_ammo[weapon.id] = {"mag": weapon.magazine, "reserve": mini(reserve, weapon.max_reserve)}
 	_select(weapon)
 	if announce:
-		picked_up.emit("Новое оружие: %s!" % weapon.display_name)
+		picked_up.emit(tr("Новое оружие: %s!") % tr(weapon.display_name))
 	return true
 
 

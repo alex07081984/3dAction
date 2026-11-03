@@ -74,7 +74,7 @@ func activate() -> void:
 		return
 	active = true
 	_player = get_tree().get_first_node_in_group("player") as Player
-	_hud("show_message", boss_name + "!", "Бейте в корму или из РПГ, от выстрела пушки — рывок")
+	_hud("show_message", tr(boss_name) + "!", "Бейте в корму или из РПГ, от выстрела пушки — рывок")
 	Audio.play_music("music_combat")
 	Audio.play_at("explosion", global_position, 0.0, 0.5)
 	if _sound:
@@ -304,7 +304,7 @@ func _next_phase() -> void:
 	_smoke.append(Fx.fire(self, spot, 1.0 if phase >= 3 else 0.6, phase >= 3))
 	Fx.explosion(global_transform * spot, 3.0)
 	Game.slow_motion(0.5, 0.3)
-	_hud("show_message", "%s подбит!" % boss_name, "Фаза %d из %d · подмога!" % [phase, phases])
+	_hud("show_message", tr("%s подбит!") % tr(boss_name), tr("Фаза %d из %d · подмога!") % [phase, phases])
 	_spawn_henchmen()
 	_update_bar()
 
@@ -337,7 +337,7 @@ func _die() -> void:
 	Game.add_money(bonus)
 	Game.slow_motion(1.4, 0.2)
 	_hud("hide_boss")
-	_hud("show_message", "%s уничтожен!" % boss_name, "Премия: $%d" % bonus)
+	_hud("show_message", tr("%s уничтожен!") % tr(boss_name), tr("Премия: $%d") % bonus)
 	get_tree().call_group("level", "register_kill", false)
 	Fx.explosion(global_position + Vector3.UP * 1.5, 8.0)
 	Audio.play_at("explosion", global_position, 10.0, 0.7)
@@ -421,7 +421,7 @@ func _build() -> void:
 	_add_mesh(_turret, Vector3(0.42, 0.42, 0.5), Vector3(0, 2.15, -4.6), dark)
 	_add_mesh(_turret, Vector3(0.12, 0.12, 1.0), Vector3(-0.6, 2.85, 0.2), dark)
 	var star := Label3D.new()
-	star.text = "БАНДА"
+	star.text = tr("БАНДА")
 	star.pixel_size = 0.008
 	star.font_size = 48
 	star.modulate = Color(0.75, 0.08, 0.05)
