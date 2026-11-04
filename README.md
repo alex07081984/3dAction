@@ -225,6 +225,8 @@ tools/                        — генераторы звуков и текс�
 tools/levels/                 — генераторы уровней и интерфейса (Python, для ПК)
 tools/i18n/                   — таблица переводов strings.tsv и сборка locale/*.po
 locale/                       — переводы: en (основной), de, fr, ru
+icon.svg, icons/              — иконка (силуэт в федоре на красной луне) и значки Android
+tools/gen_icon.py             — рисует иконку (SVG); tools/render_icon.gd — PNG для Android
 tools/perf_check.gd           — замер нагрузки по уровням
 ```
 

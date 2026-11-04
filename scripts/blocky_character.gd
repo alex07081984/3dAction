@@ -323,7 +323,10 @@ func break_apart(mode: Death, direction: Vector3, force: float) -> void:
 	_broken = true
 	# Дальше части тела летят отдельно: у каждой свой меш, скелет больше не нужен.
 	for part in _parts:
-		_detach_part(part)
+		# Оторванная раньше конечность улетела обломком, а обломки живут недолго
+		# (и старые удаляются по лимиту) — такой части уже нет.
+		if is_instance_valid(part):
+			_detach_part(part)
 	_skeleton.visible = false
 	_skeleton.queue_free()
 	direction.y = maxf(direction.y, 0.0)

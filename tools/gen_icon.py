@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+"""Иконка игры: тёмный фон, красная «кровавая луна», силуэт героя в федоре с сигаретой.
+
+  python3 tools/gen_icon.py   — пишет icon.svg (иконка проекта) и icons/*.svg
+  godot --headless --path . -s res://tools/render_icon.gd — растрирует их в icons/*.png
+                                                         (значки Android: обычный и адаптивный)
+"""
+import os
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+DEFS = """  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#262d3d"/>
+      <stop offset="1" stop-color="#0a0c11"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="0.4" cy="0.36" r="0.72">
+      <stop offset="0" stop-color="#ff4b3e"/>
+      <stop offset="1" stop-color="#9c0e12"/>
+    </radialGradient>
+  </defs>
+"""
+
+# Рисунок в квадрате 512×512: луна, силуэт (плащ, шея, голова, шляпа), лента шляпы,
+# белый уголок рубашки, сигарета с огоньком и дымок.
+ART = """  <circle cx="256" cy="228" r="166" fill="url(#moon)"/>
+  <g fill="#07080b">
+    <path d="M 58 512 C 66 424 138 384 206 372 L 256 424 L 306 372 C 374 384 446 424 454 512 Z"/>
+    <rect x="222" y="318" width="68" height="72" rx="14"/>
+    <ellipse cx="256" cy="284" rx="62" ry="74"/>
+    <path d="M 172 238 C 176 184 196 150 224 148 C 240 147 248 160 256 160 C 264 160 272 147 288 148 C 316 150 336 184 340 238 Z"/>
+    <ellipse cx="256" cy="240" rx="152" ry="26"/>
+  </g>
+  <path d="M 175 214 L 337 214 L 339 232 L 173 232 Z" fill="#c9141a"/>
+  <path d="M 234 386 L 256 426 L 278 386 L 268 381 L 256 402 L 244 381 Z" fill="#ece9e3"/>
+  <rect x="290" y="320" width="44" height="9" rx="3" fill="#f2efe8" transform="rotate(-10 290 324)"/>
+  <circle cx="335" cy="317" r="6" fill="#ff8a33"/>
+  <path d="M 338 304 C 354 288 332 274 346 256 C 358 240 342 226 354 208" stroke="#e4ded5"
+        stroke-width="6" fill="none" stroke-linecap="round" opacity="0.75"/>
+"""
+
+
+def svg(size, body):
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 512 512">\n%s%s</svg>\n'
+            % (size, size, DEFS, body))
+
+
+def write(path, text):
+    with open(os.path.join(ROOT, path), "w", encoding="utf-8", newline="\n") as out:
+        out.write(text)
+    print("wrote", path)
+
+
+# Иконка проекта (и обычный значок Android): скруглённый квадрат с рисунком.
+write("icon.svg", svg(512, '  <clipPath id="card"><rect width="512" height="512" rx="112"/></clipPath>\n'
+                       '  <g clip-path="url(#card)">\n  <rect width="512" height="512" fill="url(#bg)"/>\n'
+                       + ART + "  </g>\n"))
+# Адаптивный значок Android 8+: фон отдельно, рисунок — в безопасной зоне (центральные ~61%).
+write("icons/icon_background.svg", svg(432, '  <rect width="512" height="512" fill="url(#bg)"/>\n'))
+write("icons/icon_foreground.svg",
+      svg(432, '  <g transform="translate(256 256) scale(0.62) translate(-256 -256)">\n' + ART + "  </g>\n"))

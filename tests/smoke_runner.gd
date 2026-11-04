@@ -40,6 +40,7 @@ func _run() -> void:
 	await _test_combat()
 	await _test_models()
 	await _test_dismemberment()
+	await _test_death_after_lost_limb()
 	await _test_explosives()
 	await _test_enemies_fight_back()
 	await _test_touch()
@@ -336,6 +337,27 @@ func _test_models() -> void:
 			"человечек рисуется одним мешем на скелете (+ оружие)")
 	fat.queue_free()
 	thin.queue_free()
+
+
+## Враг без ноги прожил дольше, чем живёт обломок ноги (обломок удалён), и погиб:
+## тело всё равно разваливается (раньше разбор падал на удалённой части).
+func _test_death_after_lost_limb() -> void:
+	var level := await _fresh_level(0)
+	var model := BlockyCharacter.new()
+	level.add_child(model)
+	model.global_position = level.player.global_position + Vector3(0, 0, -6)
+	await _frames(3)
+	var hip := model.find_child("HipL", true, false) as Node3D
+	_check(model.sever_limb("leg_l", Vector3.FORWARD, 4.0), "нога оторвана")
+	await _frames(2)
+	# Обломок ноги исчез (как по лимиту обломков): удаляем его в конце кадра, как это делает игра.
+	var debris := hip.get_parent() if hip.get_parent() is RigidBody3D else hip
+	debris.queue_free()
+	await _frames(2)
+	_check(not is_instance_valid(hip) and is_instance_valid(model), "обломок ноги удалён")
+	model.break_apart(BlockyCharacter.Death.GIB, Vector3.FORWARD, 5.0)
+	_check(model._broken and not model._skeleton.visible, "тело без удалённой ноги разваливается без ошибки")
+	model.queue_free()
 
 
 func _test_dismemberment() -> void:
